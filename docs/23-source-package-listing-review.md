@@ -141,3 +141,58 @@ When archive access is available:
 10. Complete territorial rights review and then approve a specific import run for publication.
 
 **Decision:** retain WEBP and KJV as the selected initial editions, but keep both in an unacquired/unpublished state until the binary archive and legal validation gates are complete.
+
+
+## 23.10 Official archive directory metadata
+
+The official [eBible.org Scripture file directory](https://ebible.org/scriptures/dir.php) was queried on 18 November 2026. It publishes the following file sizes and last-modified timestamps:
+
+| Archive | Listed size (bytes) | Listed last modified |
+|---|---:|---|
+| engwebp_usfm.zip | 2,908,410 | 2026-11-17 01:18:23 |
+| eng-kjv_usfm.zip | 2,771,068 | 2026-11-15 09:36:58 |
+| engwebp_usfx.zip | 3,316,038 | 2026-11-17 01:18:25 |
+| eng-kjv_usfx.zip | 2,825,185 | 2026-11-15 09:37:00 |
+
+These are source-directory metadata values, not local measurements. The directory does not expose a SHA-256 checksum in the retrieved listing. The time-zone convention for the displayed timestamps is not explicitly stated in the listing; preserve the values as printed rather than converting them to UTC.
+
+This closes the **source directory metadata** portion of the acquisition checklist. It does not close the archive-download, ZIP integrity, checksum, member inventory or parser gates.
+
+## 23.11 Independent derived-corpus cross-check
+
+The public [BibleNLP/eBible repository](https://github.com/BibleNLP/ebible) was inspected at main commit `2bde52b4c2cfd7056cf4ed07c48969647df79744` (14 November 2026). It describes itself as a curated corpus derived from eBible.org translation packages. Its README states that the source USFM ZIP is obtained from eBible.org and extracted to a verse-per-line corpus.
+
+The README also explicitly states that the extracted files contain **only verse text**: introductory paragraphs, comments, footnotes and other material are removed. Blank lines represent missing source verses; a verse range is kept on its first line and subsequent lines receive the literal `<range>` token. It retains separate per-translation copyright/permission HTML in its metadata/licenses directory.
+
+### Relevant derived files
+
+| Derived file | Size in repository (bytes) | Git blob ID |
+|---|---:|---|
+| `corpus/eng-engwebp.txt` | 4,024,726 | `6651f1414751516e5239e0d0bf38d52355bef9dd` |
+| `corpus/eng-eng-kjv.txt` | 4,896,341 | `d343cefadbf07934940d69850c9198c1ca701ce2` |
+| `corpus/eng-eng-kjv2006.txt` | 4,162,183 | `b5fe850467c22a7a971580c36bf05cd529de6f9e` |
+
+The Git blob IDs are repository object identifiers, not SHA-256 hashes of the original eBible ZIP archives.
+
+### Metadata cross-check
+
+The repository's `metadata/translations.csv` snapshot labels both selected eBible projects downloadable and redistributable/public domain. Its records identify project IDs `engWEB2015peb` for WEBP and `engKJV1769eb` for KJV. The KJV row describes the 1769 text with Apocrypha/Deuterocanon and lists 14 additional-corpus books. These are records from the BibleNLP repository's metadata snapshot, not a replacement for the current eBible rights pages.
+
+Its `metadata/verse_counts.tsv` derived-extract statistics report:
+
+| Derived file | Total verse-address rows | Books | OT rows | NT rows | Deuterocanon rows |
+|---|---:|---:|---:|---:|---:|
+| `eng-engwebp.txt` | 31,090 | 66 | 23,142 | 7,948 | 0 |
+| `eng-eng-kjv.txt` | 36,694 | 81 | 23,142 | 7,955 | 5,597 |
+| `eng-eng-kjv2006.txt` | 31,097 | 66 | 23,142 | 7,955 | 0 |
+
+The same repository's `translations.csv` has different source-level chapter/verse declarations (WEBP 23,145 OT and 7,958 NT; KJV 23,145 OT, 7,957 NT and 5,720 Deuterocanon verses). This discrepancy is a reason to treat the derived metadata as an independent warning/cross-check, not as the authoritative versification or exact current archive inventory. The extraction is from an earlier source snapshot and transforms verse structures into aligned text lines.
+
+### How this evidence will be used
+
+- Use the files and metadata to identify likely edge cases and to cross-check source verse text/count reports after acquiring the official archives.
+- Do not import these derived text files as the platform's canonical Bible corpus. They discard non-verse structure and may encode verse ranges, missing positions and verse references differently from the raw USFM.
+- Do not use the BibleNLP repository's overall GitHub `NOASSERTION` licence as a blanket licence for all translation files. The repository says the original source licence applies to each translation and stores per-file notices. Re-check eBible.org's current rights page for publication decisions.
+- The separate `eng-kjv2006` entry is a protocanon-only KJV variant with Strong's numbers added. It is not silently substituted for the selected `eng-kjv` source package.
+
+**Evidence boundary:** this is an independently maintained derivative dataset and metadata review. It does not supply the current official USFM ZIP bytes or prove that the present eBible archive matches the derivative corpus snapshot.
