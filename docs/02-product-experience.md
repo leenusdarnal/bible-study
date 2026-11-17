@@ -22,8 +22,9 @@ A combined, customisable dashboard. Users should be able to rearrange, hide and 
 
 Potential sections:
 - Continue reading.
+- Reading progress overview and resume tracker.
 - Daily Scripture.
-- Reading plan progress.
+- Reading plan progress (separate from chapter completion).
 - Continue a course or study.
 - Recently viewed passages.
 - Recommended studies.
@@ -46,7 +47,7 @@ Scripture with contextual tools such as notes, highlights, explanations and cros
 ### Parallel comparison reader
 Side-by-side translations with synchronised passage navigation. Show only translations the platform is legally permitted to display.
 
-Reader layout preference should persist for signed-in users and be locally remembered for guests where practical.
+Reader layout preference should persist for signed-in users and be locally remembered for guests where practical. The reader may offer an explicit “Mark chapter as read” action. Merely opening, scrolling or spending time on a chapter must not automatically mark it complete.
 
 ## 2.4 Study experience
 
@@ -88,9 +89,11 @@ For registered users:
 - Notes attached to stable Scripture identifiers.
 - Highlights.
 - Bookmarks.
-- Reading progress.
+- Reading progress through independent chapter trackers.
 - Saved studies and preferences.
 - Personal learning goals and history.
+
+Reading progress is separate from reading plans and works with a printed Bible or another application. See [Reading Progress Tracker Specification](22-reading-progress-tracker-spec.md).
 
 Personal data must remain separate from public knowledge records. Translation switching must not detach notes from their underlying passage.
 
@@ -108,7 +111,7 @@ A progressive curriculum:
 9. Advanced research.
 10. Independent study.
 
-Support learning paths, reading plans, quizzes and progress tracking.
+Support learning paths, reading plans, quizzes and progress tracking. Plan completion and chapter reading completion are separate records.
 
 ## 2.9 Appearance and accessibility
 
@@ -124,3 +127,5 @@ Offline priorities:
 - Reading plans and selected study content where licensing allows.
 
 Use a PWA/service-worker approach and IndexedDB. Queue local changes and synchronise on reconnection and app opening; do not rely exclusively on browser Background Sync support. Define conflict handling for simultaneous edits. Research and AI features may require internet.
+
+Guest trackers persist locally in IndexedDB. Cloud sync and guest-to-account migration follow the ownership, export and conflict requirements in [Reading Progress Tracker Specification](22-reading-progress-tracker-spec.md).
