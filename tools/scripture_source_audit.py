@@ -17,6 +17,7 @@ import re
 import stat
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 from collections import Counter, defaultdict
@@ -165,15 +166,27 @@ def inspect_archive_bytes(
         raise AuditError("Downloaded file is not a valid ZIP archive.") from exc
 
     with zip_file:
-        bad_member = zip_file.testzip()
-        if bad_member:
-            raise AuditError(f"ZIP CRC validation failed for member {bad_member!r}")
-
         infos = zip_file.infolist()
         if len(infos) > MAX_MEMBERS:
             raise AuditError(f"ZIP contains more than {MAX_MEMBERS} members.")
 
         member_names: set[str] = set()
+        total_uncompressed = 0
+        for info in infos:
+            _validate_member_path(info)
+            if info.is_dir():
+                continue
+            if info.filename in member_names:
+                raise AuditError(f"Duplicate ZIP member name: {info.filename!r}")
+            member_names.add(info.filename)
+            total_uncompressed += info.file_size
+            if total_uncompressed > MAX_TOTAL_UNCOMPRESSED_BYTES:
+                raise AuditError("ZIP total uncompressed size exceeds the safety limit.")
+
+        bad_member = zip_file.testzip()
+        if bad_member:
+            raise AuditError(f"ZIP CRC validation failed for member {bad_member!r}")
+        member_names.clear()
         total_uncompressed = 0
         inventory: list[dict[str, Any]] = []
         marker_counts: Counter[str] = Counter()
@@ -315,7 +328,7 @@ def download_archive(source_id: str, cache_dir: Path) -> tuple[bytes, str, dict[
             if status != 200:
                 raise AuditError(f"Unexpected HTTP status {status} for {source['url']}")
             final_url = response.geturl()
-            if urllib.request.urlparse(final_url).hostname not in {"ebible.org", "www.ebible.org"}:
+            if urllib.parse.urlparse(final_url).hostname not in {"ebible.org", "www.ebible.org"}:
                 raise AuditError(f"Download redirected to an unexpected host: {final_url}")
             headers = {key.lower(): value for key, value in response.headers.items()}
             content_type = headers.get("content-type", "")
