@@ -72,9 +72,11 @@ Use Wrangler's documented D1 migration workflow and keep migration files in the 
 
 ## 13.5 Reading progress migration 0003
 
-Migration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject new progress outside a selected-book scope. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
+Migration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject progress outside selected-book scope, re-check edits to historic out-of-scope progress, require at least one selected book before activating selected scope, and prevent removing or moving the final selected book. Selected scope is created transactionally by inserting a tracker as all-books, adding selected-book rows, then switching its scope before commit. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
 
-Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
+Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
+
+Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite only; repeat the migration and behavioural checks against Wrangler's D1 local/preview database before production.
 
 ## 13.6 Acceptance criteria
 
