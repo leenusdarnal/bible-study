@@ -67,11 +67,15 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Scripture source selection](docs/14-scripture-source-selection.md) | Selected WEBP and KJV editions, rights and source formats |
 | [Dual-text import pipeline](docs/15-dual-bible-text-import-pipeline.md) | Archive, USFM parsing, staging, versification, validation and publication |
 | [Blue Letter Bible product reference](docs/16-product-reference-blue-letter-bible.md) | Product benchmark, feature lessons, original platform requirements and copyright boundaries |
+| [STEP Bible product reference](docs/17-product-reference-step-bible.md) | Original-language, interlinear, morphology and guided study benchmark |
+| [Bible Hub product reference](docs/18-product-reference-bible-hub.md) | Passage navigation, parallel reading and reference-resource benchmark |
+| [YouVersion product reference](docs/19-product-reference-youversion.md) | Reading engagement, personal library, offline and developer platform benchmark |
+| [Competitive benchmark and product blueprint](docs/20-competitive-benchmark-and-product-blueprint.md) | Consolidated comparison, information architecture, release priorities and integration recommendations |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
 
-**Discovery:** 14 rounds completed.  
+**Discovery:** 14 rounds completed; product benchmark research expanded across four reference platforms.  
 **Current stage:** database design, source validation and import planning.  
 **Application implementation:** not started in this repository.
 
