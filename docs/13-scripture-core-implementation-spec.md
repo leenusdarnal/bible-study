@@ -9,7 +9,8 @@
 
 - `sql/0001_scripture_core.sql` — core Scripture and translation tables.
 - `sql/0002_seed_protestant_66.sql` — 66-book identity and order seed only.
-- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.\n- `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
+- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
+- `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
 
 These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records.
 
