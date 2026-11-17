@@ -142,8 +142,8 @@ Authentication-provider tables are owned by the selected auth library after a co
 | reading_plan_day_passages | id PK, reading_plan_day_id FK, passage_reference_id FK, display_order |
 | user_reading_plans | id PK, user_id FK, reading_plan_id FK, started_at, completed_at, status |
 | reading_trackers | id PK, user_id FK, name, description, canon_id FK, versification_scheme_id FK, scope_mode, colour_token, created_at, updated_at, archived_at |
-| reading_tracker_books | id PK, tracker_id FK, work_id FK, display_order; UNIQUE(tracker_id, work_id) |
-| reading_tracker_chapter_progress | id PK, tracker_id FK, chapter_id FK, progress_state, started_at, completed_at, updated_at; UNIQUE(tracker_id, chapter_id) |
+| reading_tracker_books | id PK, tracker_id FK, canon_id FK, work_id FK, display_order; UNIQUE(tracker_id, work_id) |
+| reading_tracker_chapter_progress | id PK, tracker_id FK, canon_id FK, versification_scheme_id FK, work_id FK, chapter_id FK, progress_state, started_at, completed_at, updated_at; UNIQUE(tracker_id, chapter_id) |
 
 **Reading progress integrity rules:**
 - Cloud trackers belong to a verified account. Guest trackers live in IndexedDB; installation IDs do not authenticate users.
@@ -155,7 +155,7 @@ Authentication-provider tables are owned by the selected auth library after a co
 - Reading plans and chapter completion are separate.
 - Guest-to-account migration is explicit and idempotent. Multi-device sync needs mutation IDs, tombstones and conflict rules.
 
-The legacy user_reading_progress proposal is superseded by these tracker tables. Do not create both models for the same chapter-completion purpose. If plan-step completion is needed, add a separately named table.
+The legacy user_reading_progress proposal is superseded by these tracker tables. Draft DDL and selected-scope triggers are in [0003_reading_progress.sql](sql/0003_reading_progress.sql). Do not create both models for the same chapter-completion purpose. If plan-step completion is needed, add a separately named table.
 
 Every private library operation must enforce user ownership on the server. Notes, bookmarks and highlights reference stable passage identities, not copied translation text. Offline sync should be a later migration with explicit conflict rules.
 
