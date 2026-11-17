@@ -97,5 +97,13 @@ BEGIN
   SELECT RAISE(ABORT, 'selected_books scope requires at least one selected book');
 END;
 
+
+CREATE TRIGGER trg_tracker_books_selected_mode_update
+BEFORE UPDATE OF tracker_id, canon_id, work_id ON reading_tracker_books
+WHEN (SELECT scope_mode FROM reading_trackers WHERE id = NEW.tracker_id) <> 'selected_books'
+BEGIN
+  SELECT RAISE(ABORT, 'book selections require selected_books scope');
+END;
+
 -- Create a selected-books tracker and its first selected book in one transaction.
 -- Excluded historical progress is retained but excluded from current calculations.
