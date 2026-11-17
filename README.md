@@ -63,6 +63,7 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Detailed database schema](docs/11-database-schema.md) | Proposed D1 tables, keys, constraints, indexes and migration slices |
 | [Entity relationship diagrams](docs/12-entity-relationship-diagrams.md) | Domain ERDs and cross-domain integrity rules |
 | [Scripture core implementation specification](docs/13-scripture-core-implementation-spec.md) | Draft SQLite DDL, 66-book seed and validation plan |
+| [Scripture source selection](docs/14-scripture-source-selection.md) | Public-domain text candidates, formats, licensing and versification review |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
