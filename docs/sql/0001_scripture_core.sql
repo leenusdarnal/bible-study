@@ -75,6 +75,7 @@ CREATE TABLE scripture_units (
     CHECK (unit_kind IN ('verse', 'heading', 'superscription', 'other')),
   FOREIGN KEY (chapter_id, scheme_id, work_id)
     REFERENCES scheme_chapters(id, scheme_id, work_id) ON DELETE RESTRICT,
+  UNIQUE (id, scheme_id),
   UNIQUE (id, scheme_id, work_id),
   UNIQUE (scheme_id, work_id, chapter_id, unit_order),
   UNIQUE (scheme_id, work_id, chapter_id, unit_label)
@@ -83,7 +84,9 @@ CREATE TABLE scripture_units (
 CREATE TABLE scripture_unit_mappings (
   id TEXT PRIMARY KEY NOT NULL,
   from_unit_id TEXT NOT NULL,
+  from_scheme_id TEXT NOT NULL,
   to_unit_id TEXT NOT NULL,
+  to_scheme_id TEXT NOT NULL,
   mapping_type TEXT NOT NULL
     CHECK (mapping_type IN ('equivalent', 'split', 'combined', 'partial', 'approximate')),
   source_id TEXT,
@@ -93,9 +96,10 @@ CREATE TABLE scripture_unit_mappings (
   review_status TEXT NOT NULL DEFAULT 'pending'
     CHECK (review_status IN ('pending', 'approved', 'rejected')),
   created_at INTEGER NOT NULL,
-  FOREIGN KEY (from_unit_id) REFERENCES scripture_units(id) ON DELETE RESTRICT,
-  FOREIGN KEY (to_unit_id) REFERENCES scripture_units(id) ON DELETE RESTRICT,
-  CHECK (from_unit_id <> to_unit_id)
+  FOREIGN KEY (from_unit_id, from_scheme_id) REFERENCES scripture_units(id, scheme_id) ON DELETE RESTRICT,
+  FOREIGN KEY (to_unit_id, to_scheme_id) REFERENCES scripture_units(id, scheme_id) ON DELETE RESTRICT,
+  CHECK (from_unit_id <> to_unit_id),
+  CHECK (from_scheme_id <> to_scheme_id)
 );
 
 CREATE TABLE translation_editions (
@@ -176,10 +180,10 @@ CREATE INDEX idx_scripture_units_reference
   ON scripture_units(scheme_id, work_id, chapter_id, unit_order);
 
 CREATE INDEX idx_scripture_unit_mappings_from
-  ON scripture_unit_mappings(from_unit_id);
+  ON scripture_unit_mappings(from_unit_id, from_scheme_id);
 
 CREATE INDEX idx_scripture_unit_mappings_to
-  ON scripture_unit_mappings(to_unit_id);
+  ON scripture_unit_mappings(to_unit_id, to_scheme_id);
 
 CREATE INDEX idx_translation_texts_edition
   ON translation_texts(edition_id, scripture_unit_id);
