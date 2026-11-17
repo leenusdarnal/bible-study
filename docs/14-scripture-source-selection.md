@@ -1,93 +1,94 @@
 # 14. Scripture Source and Initial Text Selection
 
-- **Status:** Research completed; initial text choice requires project-owner approval.
+- **Status:** Both initial English editions selected; acquisition and validation pending.
 - **Date reviewed:** 2026-11-17
-- **Purpose:** Select a legally reusable first Bible text and identify reliable machine-readable import sources.
+- **Purpose:** Record the selected text editions, source evidence, rights gates and machine-readable source formats.
 
-## 14.1 Recommendation
+## 14.1 Selected initial corpus
 
-Use the **World English Bible Update, 66-book edition (WEBP)** as the first complete English text corpus, subject to preserving the exact source text and recording its edition/version metadata.
+The project owner selected **both WEBP and KJV** as the initial English text corpus.
 
-Reasons:
-- eBible.org identifies this edition as the 66-book protocanon-only version.
-- The source states that the World English Bible is dedicated to the public domain and permits copying, publishing, redistribution and use.
-- A downloadable USFM package is available, which is suitable for a structured import pipeline.
-- The 66-book subset avoids having to discard deuterocanonical books from the first import.
-- The edition's stated 2020 stable text edition provides an identifiable edition label.
+1. **World English Bible Update (WEBP)** — eBible.org's 66-book protocanon edition.
+2. **King James Version (KJV)** — eBible.org's 1769 standardised text edition, whose supplied package includes Apocrypha/Deuterocanon.
 
-The project must preserve the source wording exactly if it continues to call the text the World English Bible. If text is edited, normalised or otherwise changed, preserve the original and label the transformed derivative accurately rather than presenting it as the unchanged WEB text.
+The two editions will be imported as separate translation editions using a common USFM parser. Their original archives, source metadata, rights notices, checksums, parser versions and versification profiles must remain distinct.
 
-**Source pages**
-- [WEBP edition details and downloads](https://ebible.org/find/details.php?id=engwebp)
-- [WEBP public-domain notice](https://ebible.org/engwebp/copyright.htm)
-- [WEBP 66-book text](https://ebible.org/engwebp/)
+The first public release remains scoped to the Protestant 66-book canon. KJV source files outside those 66 books must be inventoried and retained in source/staging records; they must not be silently discarded or included in the first public reader.
 
-## 14.2 Candidate comparison
+## 14.2 Candidate comparison and source evidence
 
-| Candidate | Source evidence | Format / coverage | Assessment |
+| Candidate | Source evidence | Format / coverage | Decision |
 |---|---|---|---|
-| World English Bible Update (WEBP) | eBible.org states public domain | USFM and USFX; 66-book protocanon edition | **Recommended first import** |
-| King James Version (KJV) | eBible.org identifies its 1769 standardised text as public domain outside the UK | USFM and USFX; supplied edition includes Apocrypha/Deuterocanon | Good later option; filter to 66 books for Protestant canon and review territorial restrictions |
-| NIV | Rights holder permission process | Licensed text | Do not import full text until written permission covers the intended uses |
-| NKJV | Rights holder permission process | Licensed text | Do not import full text until written permission covers the intended uses |
+| World English Bible Update (WEBP) | eBible.org states public domain and permits copying, redistribution and use; changed text must not be called the unchanged World English Bible | USFM and USFX; 66-book protocanon edition | **Selected** |
+| King James Version (KJV) | eBible.org identifies the 1769 standardised text as public domain outside the UK and notes a UK Crown patent printing/import issue | USFM and USFX; supplied edition includes Apocrypha/Deuterocanon | **Selected, subject to territorial rights review** |
+| NIV | Rights holder permission process | Licensed text | Do not import full text until written permission covers intended uses |
+| NKJV | Rights holder permission process | Licensed text | Do not import full text until written permission covers intended uses |
 
-The KJV source page notes UK printing/import restrictions associated with the Crown patent, while describing the work as public domain outside the UK. Because the platform may be accessible internationally, review territorial implications before globally distributing a KJV corpus. This document is not a legal opinion.
+**WEBP sources**
+- [Edition details and downloads](https://ebible.org/find/details.php?id=engwebp)
+- [Public-domain notice](https://ebible.org/engwebp/copyright.htm)
+- [USFM archive](https://ebible.org/Scriptures/engwebp_usfm.zip)
+- [USFX archive](https://ebible.org/Scriptures/engwebp_usfx.zip)
+
+**KJV sources**
+- [Edition details and downloads](https://ebible.org/find/details.php?id=eng-kjv)
+- [Copyright notice](https://ebible.org/eng-kjv/copyright.htm)
+- [USFM archive](https://ebible.org/Scriptures/eng-kjv_usfm.zip)
+- [USFX archive](https://ebible.org/Scriptures/eng-kjv_usfx.zip)
+
+The KJV source notice states that the text is public domain outside the UK, while noting letters-patent restrictions on printing the translation in the UK or importing printed copies into the UK. Because the platform may be globally accessible, obtain jurisdiction-specific legal review before unrestricted KJV distribution. This document is not a legal opinion.
 
 NIV permissions: https://www.biblica.com/permissions/  
 NKJV permissions: https://www.harpercollinschristian.com/sales-and-rights/permissions/
 
-## 14.3 Import source and format
+## 14.3 Acquisition status
 
-Preferred source for WEBP:
-- Edition: World English Bible Update, 66-book protocanon.
-- Source identifier: engwebp / WEBP.
-- Machine-readable format: USFM package.
-- Alternative source format: USFX.
-- Source version label: 2020 stable text edition, as stated on the source details page.
-- Retrieval date and exact archive checksum must be recorded at the time of import.
-- Preserve the original archive in R2; parse into staging before publishing any text rows.
+The source detail and rights pages and their USFM/USFX download links have been reviewed. The actual ZIP archives have **not yet been downloaded, checksummed or parsed**. No archive file inventory, checksum, byte size, book count or import validation result is claimed.
 
-The import must retain:
-- Original book identifiers and chapter/verse markers.
-- Paragraph and poetry markers where the source encodes them.
-- Footnotes and cross-reference markers as structured metadata when feasible.
-- Source archive checksum, file names, edition, retrieval date and source URL.
-- Parser version and transformation log.
+Before ingestion, record:
+- exact source page and direct download URL;
+- retrieval timestamp and response metadata;
+- archive filename, byte size and SHA-256;
+- source edition and rights-notice snapshot;
+- complete archive member inventory;
+- parser version and import-run identifier.
 
-Do not treat the source archive's USFM markers as proof that its versification matches every other translation. Compare actual unit divisions and create explicit mappings where needed.
+Preserve each original archive immutably in R2. Do not replace an archive when the source changes; acquire a new version and record a new checksum.
 
-## 14.4 Versification strategy
+## 14.4 Common import format
 
-Do not hard-code the initial scheme solely because the first translation is WEBP.
+Use USFM as the common interchange format. The official USFM 3.0 documentation describes book identification, chapters and verses, alternate numbering, headings, paragraphs, poetry, footnotes, cross-references, character styles and word-level attributes.
 
-Recommended procedure:
-1. Import the WEBP USFM archive into a staging parser.
-2. Extract book/chapter/verse labels and count units without publishing text.
-3. Compare the extracted divisions with a documented standard English versification reference.
-4. Inspect known difficult cases and chapter/verse differences.
-5. Review STEPBible's versification datasets as a candidate crosswalk resource.
-6. Select and document the canonical reference scheme only after the comparison.
-7. Store the translation edition's actual source scheme and map it to the canonical scheme where differences exist.
+USFM references:
+- [USFM documentation](https://ubsicap.github.io/usfm/)
+- [Chapters and verses](https://ubsicap.github.io/usfm/chapters_verses/index.html)
+- [Footnotes](https://ubsicap.github.io/usfm/notes_basic/fnotes.html)
+- [Cross-references](https://ubsicap.github.io/usfm/notes_basic/xrefs.html)
 
-STEPBible Data:
-- Repository: https://github.com/STEPBible/STEPBible-Data
-- The repository currently describes its data licence as CC BY 4.0 and requests attribution to STEP Bible.
-- Its Versification materials describe differences between Hebrew, Greek, Latin and English numbering traditions.
-- Use as a candidate reference dataset, not as an unquestioned authority. Record attribution, dataset version, changes and any underlying source/licence conditions.
+Use a marker-aware parser. Preserve semantic markup and unknown markers for review; do not flatten all content into plain verse strings. Capture alternate numbering markers such as `\ca` and `\va` separately from primary chapter/verse labels.
 
-## 14.5 Source governance
+## 14.5 Versification strategy
 
-Before import approval:
-- Verify the edition and public-domain/licence notice at the source.
-- Record the exact source page, download URL, retrieval date and checksum.
-- Preserve an immutable copy of the original archive in R2.
-- Confirm that all included files belong to the declared edition and licence.
-- Keep the raw import, parsed staging data and published records separately identifiable.
-- Run validation for missing/duplicate books, chapters and units.
-- Do not modify the source text silently.
-- Record every normalisation or transformation in an import log.
-- Keep translation licensing independent from the licence of metadata or cross-reference datasets.
+Do not assume the two editions use identical verse boundaries. Import each into its own source-specific versification profile first. Compare book/chapter coverage, verse labels, subverses, alternate numbering and known edge cases before selecting a canonical reference profile.
 
-## 14.6 Decision required
+STEPBible Data is a candidate crosswalk source:
+- [STEPBible Data repository](https://github.com/STEPBible/STEPBible-Data)
+- [Versification directory](https://github.com/STEPBible/STEPBible-Data/tree/master/Versification)
+- [TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/blob/master/Versification/TVTMS%20-%20Translators%20Versification%20Traditions%20with%20Methodology%20for%20Standardisation%20for%20Eng%2BHeb%2BLat%2BGrk%2BOthers%20-%20STEPBible.org%20CC%20BY.txt)
 
-The recommended initial corpus is WEBP, with KJV considered as a subsequent addition after territorial and edition checks. Confirm whether WEBP is acceptable as the first complete public-domain text. If KJV is preferred as the first reader translation, conduct a separate 66-book extraction and jurisdiction review before committing to that source.
+The TVTMS file describes KJV, Hebrew, Latin and Greek traditions and explains that alignments may require split, merged, moved, absent and subverse mappings. It identifies its data as CC BY 4.0, requests attribution to Tyndale House and STEPBible.org, and asks users not to repost copies of the dataset elsewhere so that the source remains the single up-to-date version. Record its version, attribution, source link and any transformations. Use it as a reviewed candidate, not as unquestioned authority.
+
+## 14.6 Source governance
+
+- Preserve original archives, checksums and rights snapshots.
+- Keep raw archives, parsed staging records and published text separately identifiable.
+- Validate book, chapter and verse inventories against source declarations.
+- Preserve headings, poetry, footnotes, cross-references and other semantic markup.
+- Do not silently modify source wording.
+- Record every transformation and parser version.
+- Keep translation rights independent from the licence of versification or other metadata datasets.
+- Publish only after structural validation, editorial review and rights approval for intended territories.
+
+## 14.7 Next implementation document
+
+See [15. Dual Bible Text Import and Validation Pipeline](15-dual-bible-text-import-pipeline.md) for archive acquisition, USFM parser design, staging states, canon handling, versification comparison, validation gates and publication acceptance criteria.
