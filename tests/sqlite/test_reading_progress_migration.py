@@ -36,19 +36,6 @@ class ReadingProgressMigrationTests(unittest.TestCase):
             ("scheme-test-b", "test-b", "Test scheme B", "Second test-only scheme", "1", "Unit tests", "verified", NOW, NOW),
         )
 
-        self.db.executemany(
-            """INSERT INTO scheme_chapters
-               (id, scheme_id, work_id, chapter_label, chapter_order)
-               VALUES (?, ?, ?, ?, ?)""",
-            [
-                ("gen-1-a", "scheme-test-a", "work-gen", "1", 1),
-                ("gen-2-a", "scheme-test-a", "work-gen", "2", 2),
-                ("exo-1-a", "scheme-test-a", "work-exo", "1", 1),
-                ("tob-1-a", "scheme-test-a", "work-tobit", "1", 1),
-                ("gen-1-b", "scheme-test-b", "work-gen", "1", 1),
-            ],
-        )
-
         # A work in a second test canon proves that a tracker cannot point outside
         # its selected canon, even if that work has a valid chapter in the same scheme.
         self.db.execute(
@@ -68,6 +55,19 @@ class ReadingProgressMigrationTests(unittest.TestCase):
                (id, canon_id, work_id, position, display_name, is_included)
                VALUES (?, ?, ?, ?, ?, ?)""",
             ("canonbook-test-tobit", "canon-test-other", "work-tobit", 1, "Tobit", 1),
+        )
+
+        self.db.executemany(
+            """INSERT INTO scheme_chapters
+               (id, scheme_id, work_id, chapter_label, chapter_order)
+               VALUES (?, ?, ?, ?, ?)""",
+            [
+                ("gen-1-a", "scheme-test-a", "work-gen", "1", 1),
+                ("gen-2-a", "scheme-test-a", "work-gen", "2", 2),
+                ("exo-1-a", "scheme-test-a", "work-exo", "1", 1),
+                ("tob-1-a", "scheme-test-a", "work-tobit", "1", 1),
+                ("gen-1-b", "scheme-test-b", "work-gen", "1", 1),
+            ],
         )
 
         self.db.executescript((SQL_DIR / "0003_reading_progress.sql").read_text(encoding="utf-8"))
