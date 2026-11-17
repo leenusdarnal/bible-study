@@ -14,7 +14,7 @@ Target translations: NIV, KJV and NKJV.
 
 - NIV: obtain and document appropriate permission from the rights holder before redistribution.
 - NKJV: obtain and document appropriate permission from the rights holder before redistribution.
-- KJV: verify the exact edition and jurisdiction. Public-domain status varies by jurisdiction and edition; UK Crown copyright considerations may apply.
+- KJV: verify the exact 1769-standardised source edition and jurisdiction. eBible.org describes the text as public domain outside the UK and notes a UK letters-patent restriction concerning printing and import of printed copies. That notice does not, by itself, resolve all digital app distribution questions. Obtain jurisdiction-specific legal review before UK distribution.
 - Start with text whose specific licence permits the intended use.
 - Keep translation edition, rights holder, licence, permission evidence, territory and permitted display/caching uses in the translation registry.
 
