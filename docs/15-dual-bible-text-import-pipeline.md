@@ -378,23 +378,23 @@ Publication must be an explicit reviewed promotion of one complete run. Retain t
 
 The first dual-edition import is accepted only when all boxes below are supported by recorded evidence:
 
-- [ ] WEBP and KJV archives downloaded from their declared source URLs.
-- [ ] Archive SHA-256, byte size, response metadata and immutable R2 keys recorded.
-- [ ] ZIP integrity and safe-extraction checks pass.
-- [ ] Every archive member is inventoried and every Scripture file's in-file book code is verified.
-- [ ] WEBP's declared 66-book scope is confirmed from the actual archive.
-- [ ] All KJV source books, including Apocrypha/Deuterocanon material, are inventoried; only the approved release canon is published.
-- [ ] Parser passes synthetic fixtures and real-file samples from both editions.
+- [x] WEBP and KJV archives downloaded from their declared source URLs by GitHub Actions.
+- [x] Archive SHA-256, actual byte sizes, response metadata and source directory comparison recorded. Immutable R2 keys remain pending because R2 has not been configured.
+- [x] ZIP integrity, CRC and safe-member checks pass; the scanner reads members in memory rather than extracting them to disk.
+- [x] Every archive member is inventoried and every Scripture file's in-file book code is verified.
+- [x] WEBP's 66-book scope is confirmed from the actual archive: all 66 core IDs are present.
+- [x] All KJV source book IDs, including 14 Apocrypha/Deuterocanon IDs, are inventoried. The first-release 66-book filter is specified but not yet implemented in a production import.
+- [x] Structural scanner passes synthetic fixtures and scans all real USFM members; full semantic-parser tests remain pending.
 - [ ] Unknown markers and all structural warnings are resolved or explicitly approved.
 - [ ] The source structure is preserved without flattening away USFM semantics.
-- [ ] Independent WEBP and KJV versification profiles are generated.
-- [ ] STEPBible TVTMS candidate mappings are pinned, attributed and reviewed.
-- [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented.
-- [ ] The schema can represent structured content and non-one-to-one mappings.
+- [ ] Independent WEBP and KJV source versification profiles are complete and approved; primary address comparison is preliminary only.
+- [ ] STEPBible TVTMS revision is pinned, attributed and applied only after editorial review.
+- [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented in reviewed mapping groups.
+- [ ] The production schema can preserve structured USFM content as well as non-one-to-one mappings.
 - [ ] Rights review is recorded for intended publication territories.
-- [ ] All blocking validation findings are cleared.
-- [ ] A reviewer approves the exact source checksums and import run.
-- [ ] Publication and rollback are tested.
+- [ ] All blocking validation findings are cleared, including the Romans address divergence.
+- [ ] A reviewer approves the exact source checksums and complete semantic import run.
+- [ ] D1 publication and rollback are tested.
 
 **Current status (18 Nov 2026):** both official binary archives have been downloaded, SHA-256 checksummed and CRC-validated by the source-audit workflow. All 66 core book IDs are present; WEBP contains 68 USFM members and KJV 81, including KJV Apocrypha/Deuterocanon. The source-level chapter and verse address comparison reveals a Romans placement/numbering difference, recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). Full semantic USFM parsing, source-text round-trip validation, detached-signature verification, mapping approval, rights review and D1 publication remain open.
 
