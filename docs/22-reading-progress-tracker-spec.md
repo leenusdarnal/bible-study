@@ -44,7 +44,7 @@
 
 Each tracker has a name, optional description, canon, versification scheme, scope mode (all books or selected books), optional accessible colour token, timestamps and optional archive timestamp. Selected-book scope must contain at least one book, and every selected book must belong to the chosen canon. The SQL migration requires selected scope to be activated within a transaction: insert the tracker initially as all-books, add at least one selected-book row, then change the scope to selected-books before committing. This also makes scope changes auditable and prevents an empty selected scope from being committed.
 
-Changing canon or scope after progress exists requires a preview of which chapters remain in scope. Do not silently delete excluded progress.
+Changing canon or scope after progress exists requires a preview of which chapters remain in scope. Do not silently delete excluded progress. To change from all-books to selected-books, the service adds one or more selected-book rows and activates selected scope in one transaction. The SQL migration prevents committing a selected scope with no books and prevents removing or moving its final selected book. When replacing the last book, add the replacement first or switch to all-books within the same transaction.
 
 ## 22.5 Chapter states and interactions
 
@@ -79,12 +79,12 @@ Use stable Scripture chapter identities, not translation-specific verse IDs or p
 id PK; user_id FK for cloud records; name; description; canon_id FK; versification_scheme_id FK; scope_mode; colour_token; created_at; updated_at; archived_at.
 
 ### reading_tracker_books
-id PK; tracker_id FK; work_id FK; display_order; UNIQUE(tracker_id, work_id). Used for selected-book scope.
+id PK; tracker_id FK; canon_id FK; work_id FK; display_order; UNIQUE(tracker_id, work_id). Used for selected-book scope. The selection list may be retained while all-books scope is active; it affects statistics only when selected-books scope is active.
 
 ### reading_tracker_chapter_progress
-id PK; tracker_id FK; chapter_id FK to scheme_chapters; progress_state (in_progress or read); started_at; completed_at; updated_at; UNIQUE(tracker_id, chapter_id).
+id PK; tracker_id FK; canon_id FK; versification_scheme_id FK; work_id FK; chapter_id FK to scheme_chapters; progress_state (in_progress or read); started_at; completed_at; updated_at; UNIQUE(tracker_id, chapter_id).
 
-No row means unread. A read state requires completed_at; other states must not have a completion timestamp. Composite foreign keys bind the tracker to its canon and scheme and bind each chapter row to its scheme, work and canon. Triggers reject progress outside the active selected-book scope, re-check edits to historical out-of-scope rows, and prevent removing or moving the last selected book. The service must still validate ownership and the current scope.
+No row means unread. A read state requires completed_at; other states must not have a completion timestamp. Composite foreign keys bind the tracker to its canon and scheme and bind each chapter row to its scheme, work and canon. Triggers reject progress outside the active selected-book scope, re-check edits to historical out-of-scope rows, require selected scope to be activated only after adding a selection, and prevent removing or moving the last selected book. The service must still validate ownership and the current scope.
 
 An optional event/history table and achievements tables are deferred. Do not build them into the first migration without a demonstrated need.
 
