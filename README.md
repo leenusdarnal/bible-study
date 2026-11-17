@@ -19,6 +19,7 @@ The platform is designed for beginners, regular Bible readers, teachers, pastors
 The first public release is intended to provide a complete basic platform:
 
 - A complete Protestant 66-book Scripture framework.
+- Two initial English text editions: WEBP and KJV, subject to the documented rights and import-validation gates.
 - Legally distributable Bible text, with additional translations added after permissions are secured.
 - Bible reading, search and study material.
 - Biblical people, places and events.
@@ -63,13 +64,14 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Detailed database schema](docs/11-database-schema.md) | Proposed D1 tables, keys, constraints, indexes and migration slices |
 | [Entity relationship diagrams](docs/12-entity-relationship-diagrams.md) | Domain ERDs and cross-domain integrity rules |
 | [Scripture core implementation specification](docs/13-scripture-core-implementation-spec.md) | Draft SQLite DDL, 66-book seed and validation plan |
-| [Scripture source selection](docs/14-scripture-source-selection.md) | Public-domain text candidates, formats, licensing and versification review |
+| [Scripture source selection](docs/14-scripture-source-selection.md) | Selected WEBP and KJV editions, rights and source formats |
+| [Dual-text import pipeline](docs/15-dual-bible-text-import-pipeline.md) | Archive, USFM parsing, staging, versification, validation and publication |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
 
 **Discovery:** 14 rounds completed.  
-**Current stage:** database design and implementation planning.  
+**Current stage:** database design, source validation and import planning.  
 **Application implementation:** not started in this repository.
 
 Requirements in these documents represent agreed project direction unless explicitly marked as a recommendation, assumption, open question or item requiring verification. Technical limits, licensing terms and third-party integrations must be rechecked before implementation.
