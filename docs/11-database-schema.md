@@ -2,7 +2,7 @@
 
 - **Status:** Proposed physical design; pending migration and D1 runtime validation.
 - **Target:** Cloudflare D1 (SQLite) + Drizzle ORM.
-- **Related:** [Data model](04-data-model.md), [Architecture](03-technical-architecture.md), [ADR-005](../decisions/ADR-005-database-schema.md).
+- **Related:** [Data model](04-data-model.md), [Architecture](03-technical-architecture.md), [ADR-005](../decisions/ADR-005-database-schema.md), [Reading Progress specification](22-reading-progress-tracker-spec.md).
 
 This is a design specification, not an executed migration. Implement in slices and validate against the actual D1 runtime before production use.
 
@@ -141,9 +141,23 @@ Authentication-provider tables are owned by the selected auth library after a co
 | reading_plan_days | id PK, reading_plan_id FK, day_number, title, display_order |
 | reading_plan_day_passages | id PK, reading_plan_day_id FK, passage_reference_id FK, display_order |
 | user_reading_plans | id PK, user_id FK, reading_plan_id FK, started_at, completed_at, status |
-| user_reading_progress | id PK, user_id FK, passage_reference_id FK, progress_state, last_read_at, completed_at |
+| reading_trackers | id PK, user_id FK, name, description, canon_id FK, versification_scheme_id FK, scope_mode, colour_token, created_at, updated_at, archived_at |
+| reading_tracker_books | id PK, tracker_id FK, work_id FK, display_order; UNIQUE(tracker_id, work_id) |
+| reading_tracker_chapter_progress | id PK, tracker_id FK, chapter_id FK, progress_state, started_at, completed_at, updated_at; UNIQUE(tracker_id, chapter_id) |
 
-Every private library operation must enforce user ownership on the server. Notes, bookmarks and highlights reference stable passage identities, not copied translation text. Offline sync should be a later migration with client mutation IDs, tombstones and explicit conflict rules, after supported offline operations are defined.
+**Reading progress integrity rules:**
+- Cloud trackers belong to a verified account. Guest trackers live in IndexedDB; installation IDs do not authenticate users.
+- Every tracker declares canon, scheme and scope mode (all_books or selected_books).
+- Selected-book rows must reference works in the tracker's canon; selected scope cannot be empty.
+- Chapter progress references stable scheme_chapters IDs. Services validate scheme, canon and scope membership.
+- No progress row means unread. Stored states are in_progress or read. A read state requires completed_at.
+- Overall percentages and book states are derived, not stored counters.
+- Reading plans and chapter completion are separate.
+- Guest-to-account migration is explicit and idempotent. Multi-device sync needs mutation IDs, tombstones and conflict rules.
+
+The legacy user_reading_progress proposal is superseded by these tracker tables. Do not create both models for the same chapter-completion purpose. If plan-step completion is needed, add a separately named table.
+
+Every private library operation must enforce user ownership on the server. Notes, bookmarks and highlights reference stable passage identities, not copied translation text. Offline sync should be a later migration with explicit conflict rules.
 
 ## 11.8 Dataset import and search
 
@@ -173,18 +187,18 @@ Plan indexes for:
 - citations by source_id/source_version_id;
 - content by editorial status/publication date and revisions by content/revision number;
 - user-owned records by user_id and relevant updated/last-read timestamps;
+- reading_tracker_chapter_progress unique (tracker_id, chapter_id);
+- reading_tracker_books unique (tracker_id, work_id);
 - staged records by import_run_id/validation_status.
 
-Additional domain rules enforced in services and integration tests:
-- Passage endpoints belong to the declared scheme and ranges are ordered.
-- Translation text units belong to the edition's declared scheme.
-- Relationship entity types conform to relationship type rules.
-- Evidence has a valid target and role.
-- Published claims/content have reviewed citations and permissions.
-- A manually verified entity is not overwritten by an import without reviewed reconciliation.
+Service and integration rules:
+- Validate passage endpoints, translation units, relationship types and evidence targets.
 - Users cannot access another user's private records.
-- Entity merges preserve aliases, external IDs, relationships and citations and can be reversed.
-- Retired records remain resolvable for citations and annotations.
+- Tracker chapter rows must belong to the tracker's scheme, canon and selected scope.
+- A selected-book tracker must have at least one selected book.
+- Percentages are derived; never trust client-submitted counters.
+- Published claims/content require reviewed citations and permissions.
+- Preserve source and editorial history.
 
 ## 11.10 Incremental migration plan
 
@@ -194,11 +208,9 @@ Additional domain rules enforced in services and integration tests:
 
 **Slice C — Evidence and editorial:** sources, versions, licences, citations, claims/evidence, contributions, reviews, audit, chronology/geography and textual criticism as required.
 
-**Slice D — Personal library:** auth integration, profiles, roles, preferences, notes, bookmarks, highlights, reading plans and progress.
+**Slice D — Personal library:** auth integration, profiles, roles, preferences, notes, bookmarks, highlights, reading plans, reading trackers and chapter progress.
 
 **Slice E — Import/search scale:** datasets, versions, runs, staging, merge history, search projection and later offline sync.
-
-The first implementation proof must cover Scripture import, reference lookup, translation switching, passage ranges, cross-reference display and stable note/highlight attachment before broad ingestion.
 
 ## 11.11 Open implementation gates
 
@@ -207,6 +219,4 @@ The first implementation proof must cover Scripture import, reference lookup, tr
 3. Prove the selected authentication library with SvelteKit + Workers + D1 + Drizzle.
 4. Test migrations, constraints and foreign-key behaviour in D1.
 5. Validate non-one-to-one verse mappings with real source data.
-6. Define first-release offline actions and conflict resolution.
-
-These gates do not block logical design, but must be resolved before production migrations.
+6. Define offline actions, guest migration and sync conflict resolution.
