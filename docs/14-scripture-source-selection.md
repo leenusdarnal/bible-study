@@ -1,6 +1,6 @@
 # 14. Scripture Source and Initial Text Selection
 
-- **Status:** Both initial English editions selected; acquisition and validation pending.
+- **Status:** Both initial English editions selected; official USFM archives downloaded and structurally audited; semantic parsing, import and territorial rights review remain pending.
 - **Date reviewed:** 2026-11-18
 - **Purpose:** Record the selected text editions, source evidence, rights gates and machine-readable source formats.
 
@@ -43,7 +43,7 @@ NKJV permissions: https://www.harpercollinschristian.com/sales-and-rights/permis
 
 ## 14.3 Acquisition status
 
-The source detail and rights pages and their USFM/USFX download links have been reviewed. The actual ZIP archives have **not yet been downloaded, checksummed or parsed**. The official file directory now provides listed sizes and last-modified timestamps, but these are not locally verified measurements. No archive checksum, ZIP member inventory, archive-derived book count or import validation result is claimed.
+The source detail and rights pages, archive directory and direct USFM/USFX URLs have been reviewed. Both official USFM ZIP archives were downloaded by the GitHub-hosted source-audit workflow, SHA-256 checksummed, passed ZIP CRC tests and had every member inventoried. The 66 Protestant book IDs were found in both. Full archive results and the Romans address differences are recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). The source text has not been imported into D1, and the structural scanner is not the final semantic USFM parser.
 
 Before ingestion, record:
 - exact source page and direct download URL;
@@ -116,7 +116,7 @@ The current eBible.org HTML reading indexes were inspected in addition to the ed
 - The WEBP rights page calls the text public domain, identifies “World English Bible” as a trademark and asks that modified text not be represented under that unchanged name.
 - The KJV rights notice describes the 1769-standardised text as public domain outside the UK and notes a letters-patent issue for printing in the UK or importing printed copies into the UK. This wording does not settle every legal question for a globally accessible digital application; obtain jurisdiction-specific advice before UK availability.
 
-**Evidence boundary:** this is an online-directory and rights-page review, not inspection of the binary USFM archives. The archive acquisition, checksum, ZIP member inventory, in-file \\id and \\usfm markers, chapter/verse counts and parsing remain pending. See [23. Source Package Listing Review](23-source-package-listing-review.md).
+**Evidence boundary:** the binary packages have now been acquired and structurally audited. Full semantic USFM parsing, source-text round-trip tests, cryptographic signature verification and D1 import remain pending. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the audit hashes and results.
 
 
 ## 14.10 Official archive file-directory metadata
