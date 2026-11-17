@@ -1,10 +1,10 @@
-\\id GEN
-\\ide UTF-8
-\\h Genesis
-\\toc1 Genesis
-\\mt1 Genesis
-\\c 1
-\\s1 A synthetic section heading
-\\p
-\\v 1 This invented sentence tests the first verse.
-\\v 2 This invented sentence tests a second verse on a separate source line.
+\id GEN
+\ide UTF-8
+\h Genesis
+\toc1 Genesis
+\mt1 Genesis
+\c 1
+\s1 A synthetic section heading
+\p
+\v 1 This invented sentence tests the first verse.
+\v 2 This invented sentence tests a second verse on a separate source line.
