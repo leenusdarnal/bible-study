@@ -42,7 +42,7 @@
 
 ## 22.4 Tracker configuration
 
-Each tracker has a name, optional description, canon, versification scheme, scope mode (all books or selected books), optional accessible colour token, timestamps and optional archive timestamp. Selected-book scope must contain at least one book, and every selected book must belong to the chosen canon.
+Each tracker has a name, optional description, canon, versification scheme, scope mode (all books or selected books), optional accessible colour token, timestamps and optional archive timestamp. Selected-book scope must contain at least one book, and every selected book must belong to the chosen canon. The SQL migration requires selected scope to be activated within a transaction: insert the tracker initially as all-books, add at least one selected-book row, then change the scope to selected-books before committing. This also makes scope changes auditable and prevents an empty selected scope from being committed.
 
 Changing canon or scope after progress exists requires a preview of which chapters remain in scope. Do not silently delete excluded progress.
 
@@ -84,7 +84,7 @@ id PK; tracker_id FK; work_id FK; display_order; UNIQUE(tracker_id, work_id). Us
 ### reading_tracker_chapter_progress
 id PK; tracker_id FK; chapter_id FK to scheme_chapters; progress_state (in_progress or read); started_at; completed_at; updated_at; UNIQUE(tracker_id, chapter_id).
 
-No row means unread. A read state requires completed_at; other states must not have a completion timestamp. Services validate that the chapter belongs to the tracker's scheme, canon and selected scope.
+No row means unread. A read state requires completed_at; other states must not have a completion timestamp. Composite foreign keys bind the tracker to its canon and scheme and bind each chapter row to its scheme, work and canon. Triggers reject progress outside the active selected-book scope, re-check edits to historical out-of-scope rows, and prevent removing or moving the last selected book. The service must still validate ownership and the current scope.
 
 An optional event/history table and achievements tables are deferred. Do not build them into the first migration without a demonstrated need.
 
