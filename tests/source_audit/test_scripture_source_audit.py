@@ -122,6 +122,32 @@ class ArchiveAuditTests(unittest.TestCase):
             self.assertIn("ROM,16,2,True,False", diff)
             self.assertNotIn("Text A", diff)
 
+    def test_extracts_only_usfm_members_to_fresh_source_directory(self):
+        import tempfile
+
+        usfm = r"\id GEN Genesis" + "\n" + r"\c 1" + "\n" + r"\v 1 Sample"
+        data = make_zip({
+            "books/GEN.usfm": usfm,
+            "copr.htm": "<html>rights notice</html>",
+            "notes.txt": "not a USFM member",
+        })
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "extracted"
+            count = audit.extract_usfm_members(data, "engwebp", root)
+            self.assertEqual(count, 1)
+            extracted = root / "engwebp" / "books" / "GEN.usfm"
+            self.assertEqual(extracted.read_text(encoding="utf-8"), usfm)
+            self.assertFalse((root / "engwebp" / "copr.htm").exists())
+            self.assertFalse((root / "engwebp" / "notes.txt").exists())
+
+    def test_extract_rejects_path_traversal(self):
+        import tempfile
+
+        data = make_zip({"../escape.usfm": r"\id GEN Genesis" + "\n" + r"\c 1" + "\n" + r"\v 1 Sample"})
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(audit.AuditError):
+                audit.extract_usfm_members(data, "engwebp", Path(tmp) / "extracted")
+
     def test_rejects_path_traversal_member(self):
         data = make_zip({"../escape.usfm": r"\id GEN Genesis" + "\n" + r"\c 1" + "\n" + r"\v 1 Text"})
         with self.assertRaises(audit.AuditError):
