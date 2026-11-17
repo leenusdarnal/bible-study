@@ -98,14 +98,12 @@ Do not assume that the archive uses USFM 3.0 merely because the current document
 
 ## 23.7 Acquisition attempt and limitation
 
-Two retrieval paths were attempted:
+Two retrieval paths were initially attempted from the chat execution environment:
 
 1. Firecrawl was asked to inspect the direct ZIP URLs. It returned an explicit unsupported-file-type result for application/zip; it supports pages and common document formats but not binary archive extraction.
 2. Direct HTTPS retrieval was attempted from the execution container. DNS resolution for ebible.org failed in that environment, so the files could not be downloaded.
 
-No archive files were created. No checksums or byte sizes are available. This is an environment/network limitation, not a source-page or licence failure.
-
-The archive gate therefore remains open. The next operator must use an environment with eBible.org network access, download each official ZIP, verify the response and ZIP integrity, calculate SHA-256, inventory members, extract safely and then run the parser tests.
+No archive files were created in that initial chat-runtime attempt. This was an environment/network limitation, not a source-page or licence failure. It was subsequently overcome using the GitHub-hosted runner; see section 23.12 for actual archive checksums and results. The runner scanned ZIP members in memory rather than extracting untrusted paths to disk.
 
 ## 23.8 Verified versus pending evidence
 
@@ -117,28 +115,27 @@ The archive gate therefore remains open. The next operator must use an environme
 | KJV online index lists extra Apocrypha/Deuterocanon sections | Verified | KJV index text |
 | WEBP public-domain notice inspected | Verified at source-page level | WEBP copyright page |
 | KJV territorial notice inspected | Verified at source-page level | KJV copyright page |
-| Exact ZIP bytes downloaded | Pending | Network access unavailable in this runtime |
-| SHA-256 and archive sizes | Pending | Requires downloaded ZIP files |
-| ZIP integrity and safe extraction | Pending | Requires downloaded ZIP files |
-| Actual archive member inventory | Pending | Requires downloaded ZIP files |
-| Actual in-file book ID and USFM version markers | Pending | Requires downloaded USFM files |
-| Chapter/verse counts and parser report | Pending | Requires parsing and validation |
+| Exact official ZIP bytes downloaded | Verified | GitHub-hosted archive audit run 44154558855 |
+| SHA-256 and actual byte sizes | Verified | Section 23.12; both sizes match the official directory listing |
+| ZIP CRC integrity and safe-member checks | Verified | Section 23.12; no unsafe member was accepted |
+| Actual archive member inventory | Verified | Section 23.12; 72 WEBP and 85 KJV entries |
+| In-file book IDs | Verified | All 66 core IDs present; supplementary IDs inventoried |
+| USFM version declaration | Not present in scanned members | No `\\usfm <version>` marker detected; do not infer a version |
+| Primary chapter/verse address counts | Structurally audited | Section 23.12; full semantic parser and mapping review remain pending |
 | Rights clearance for all launch territories | Pending | Requires legal review, especially for UK KJV distribution |
 
-## 23.9 Next operational checklist
+## 23.9 Remaining operational checklist
 
-When archive access is available:
+The acquisition and ZIP inventory tasks are complete. The following work remains before a text import can be approved:
 
-1. Download both archives from the declared HTTPS URLs.
-2. Record retrieval timestamp, final URL, content type, content length, ETag and Last-Modified if present.
-3. Compute SHA-256 and perform full ZIP integrity checks.
-4. Extract safely into separate, new temporary directories.
-5. Inventory all members and record each member's size and checksum.
-6. Read every Scripture file's in-file book ID and USFM version marker.
-7. Compare the WEBP inventory to the 66-book online declaration and the KJV inventory to its 66-book plus supplementary index.
-8. Run the parser on all files and generate book/chapter/verse, marker, unknown-marker and structural-integrity reports.
-9. Compare source-specific versification profiles and review mappings before selecting the canonical reference scheme.
-10. Complete territorial rights review and then approve a specific import run for publication.
+1. Verify the purpose and cryptographic validity of the included \\`keys.asc\\` and \\`signature.txt.asc\\` files if the publisher documents a verification procedure.
+2. Select and pin a semantic USFM parser/profile; the archive files contain no explicit \\`\\\\usfm\\` version declaration.
+3. Parse headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes without loss.
+4. Run source-text round-trip and structural tests on representative books and edge cases.
+5. Review the Romans 14/16 address relocation and all other primary verse label differences with the actual source text and a pinned TVTMS revision.
+6. Add source-specific versification records and approved non-one-to-one mapping groups.
+7. Complete territorial rights review, including KJV UK questions.
+8. Implement D1 staging and publication, then approve one complete checksummed import run.
 
 **Decision:** retain WEBP and KJV as the selected initial editions, but keep both in an unacquired/unpublished state until the binary archive and legal validation gates are complete.
 
