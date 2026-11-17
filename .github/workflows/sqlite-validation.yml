@@ -1,0 +1,34 @@
+name: SQLite schema regression tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/sql/**"
+      - "tests/sqlite/**"
+      - ".github/workflows/sqlite-validation.yml"
+  pull_request:
+    paths:
+      - "docs/sql/**"
+      - "tests/sqlite/**"
+      - ".github/workflows/sqlite-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reading-progress-sqlite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run SQLite regression tests
+        run: python -m unittest discover -s tests/sqlite -v
