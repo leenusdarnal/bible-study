@@ -1,14 +1,14 @@
 # 14. Scripture Source and Initial Text Selection
 
 - **Status:** Both initial English editions selected; acquisition and validation pending.
-- **Date reviewed:** 2026-11-17
+- **Date reviewed:** 2026-11-18
 - **Purpose:** Record the selected text editions, source evidence, rights gates and machine-readable source formats.
 
 ## 14.1 Selected initial corpus
 
 The project owner selected **both WEBP and KJV** as the initial English text corpus.
 
-1. **World English Bible Update (WEBP)** — eBible.org's 66-book protocanon edition.
+1. **World English Bible Protestant Edition (WEBP)** — eBible.org's 66-book protocanon edition.
 2. **King James Version (KJV)** — eBible.org's 1769 standardised text edition, whose supplied package includes Apocrypha/Deuterocanon.
 
 The two editions will be imported as separate translation editions using a common USFM parser. Their original archives, source metadata, rights notices, checksums, parser versions and versification profiles must remain distinct.
@@ -19,7 +19,7 @@ The first public release remains scoped to the Protestant 66-book canon. KJV sou
 
 | Candidate | Source evidence | Format / coverage | Decision |
 |---|---|---|---|
-| World English Bible Update (WEBP) | eBible.org states public domain and permits copying, redistribution and use; changed text must not be called the unchanged World English Bible | USFM and USFX; 66-book protocanon edition | **Selected** |
+| World English Bible Protestant Edition (WEBP) | eBible.org states public domain and permits copying, redistribution and use; changed text must not be called the unchanged World English Bible | USFM and USFX; 66-book protocanon edition | **Selected** |
 | King James Version (KJV) | eBible.org identifies the 1769 standardised text as public domain outside the UK and notes a UK Crown patent printing/import issue | USFM and USFX; supplied edition includes Apocrypha/Deuterocanon | **Selected, subject to territorial rights review** |
 | NIV | Rights holder permission process | Licensed text | Do not import full text until written permission covers intended uses |
 | NKJV | Rights holder permission process | Licensed text | Do not import full text until written permission covers intended uses |
@@ -57,7 +57,7 @@ Preserve each original archive immutably in R2. Do not replace an archive when t
 
 ## 14.4 Common import format
 
-Use USFM as the common interchange format. The official USFM 3.0 documentation describes book identification, chapters and verses, alternate numbering, headings, paragraphs, poetry, footnotes, cross-references, character styles and word-level attributes.
+Use USFM as the common interchange format. The official USFM documentation publishes multiple versioned specifications, including 2.5 and 3.x. It documents book identification, chapters and verses, alternate numbering, headings, paragraphs, poetry, footnotes, cross-references, character styles and word-level attributes. The version used by the eBible archives has not yet been read from their in-file version markers; the importer must detect it instead of assuming 3.0.
 
 USFM references:
 - [USFM documentation](https://ubsicap.github.io/usfm/)
@@ -105,3 +105,15 @@ The file states that it is CC BY 4.0, allows software inclusion and reformatting
 The inspected repository revision was associated with commit 5de0a47f35f0fc13dfe1430d104e5db8a4285f9c. Pin the actual file revision again when building the importer.
 
 This dataset is a candidate crosswalk, not proof that WEBP follows the KJV profile. The WEBP and KJV archives must each be parsed and evaluated independently. See [15. Dual Bible Text Import and Validation Pipeline](15-dual-bible-text-import-pipeline.md).
+
+
+## 14.9 Online listing review — 18 November 2026
+
+The current eBible.org HTML reading indexes were inspected in addition to the edition detail pages:
+
+- The [WEBP index](https://ebible.org/engwebp/) identifies this variant as the **World English Bible Protestant Edition**, describes it as a subset of the World English Bible Update and explicitly says it contains only the 66 Old and New Testament books. Its visible navigation lists the 66 canonical book pages, plus front matter and a glossary.
+- The [KJV index](https://ebible.org/eng-kjv/) lists the 66 Protestant-canon books and additional Apocrypha/Deuterocanon sections, including Tobit, Judith, Greek Esther, Wisdom, Sirach, Baruch, Daniel additions, Maccabees, Esdras and the Prayer of Manasses. These are additional online sections; do not equate an HTML page count with the ZIP archive's member count.
+- The WEBP rights page calls the text public domain, identifies “World English Bible” as a trademark and asks that modified text not be represented under that unchanged name.
+- The KJV rights notice describes the 1769-standardised text as public domain outside the UK and notes a letters-patent issue for printing in the UK or importing printed copies into the UK. This wording does not settle every legal question for a globally accessible digital application; obtain jurisdiction-specific advice before UK availability.
+
+**Evidence boundary:** this is an online-directory and rights-page review, not inspection of the binary USFM archives. The archive acquisition, checksum, ZIP member inventory, in-file \\id and \\usfm markers, chapter/verse counts and parsing remain pending. See [23. Source Package Listing Review](23-source-package-listing-review.md).
