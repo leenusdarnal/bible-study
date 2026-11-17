@@ -72,8 +72,12 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [YouVersion product reference](docs/19-product-reference-youversion.md) | Reading engagement, personal library, offline and developer platform benchmark |
 | [Competitive benchmark and product blueprint](docs/20-competitive-benchmark-and-product-blueprint.md) | Consolidated comparison, information architecture, release priorities and integration recommendations |
 | [My Bible Tracker product reference](docs/21-product-reference-my-bible-tracker.md) | Chapter-level progress, multiple trackers, statistics and low-pressure motivation benchmark |
-| [Reading Progress Tracker specification](docs/22-reading-progress-tracker-spec.md) | User stories, tracker scope, chapter states, calculations, guest data, privacy and acceptance tests |\n| [Source package listing review](docs/23-source-package-listing-review.md) | Current eBible.org edition/index evidence, source rights notes and explicit ZIP acquisition limitations |
-| [Architecture decisions](decisions/) | Important decisions and their rationale |\n\nSQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. The [SQLite validation workflow](.github/workflows/sqlite-validation.yml) runs them on relevant pushes and pull requests. D1 local/preview validation is still required.
+| [Reading Progress Tracker specification](docs/22-reading-progress-tracker-spec.md) | User stories, tracker scope, chapter states, calculations, guest data, privacy and acceptance tests |
+| [Source package listing review](docs/23-source-package-listing-review.md) | eBible.org source evidence, archive checksums, ZIP inventory and WEBP/KJV versification comparison |
+| [Source archive audit tool](docs/24-source-archive-audit-tool.md) | Reproducible download, ZIP safety, checksum, USFM marker and verse-address audit process |
+| [Architecture decisions](decisions/) | Important decisions and their rationale |
+
+SQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. Source audit tests are in `tests/source_audit/` and run with `python -m unittest discover -s tests/source_audit -v`. GitHub Actions workflows validate both suites and the official WEBP/KJV archive acquisition; D1 local/preview validation is still required.
 
 ## Status
 
