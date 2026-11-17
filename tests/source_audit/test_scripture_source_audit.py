@@ -39,6 +39,10 @@ class UsfmParserTests(unittest.TestCase):
         self.assertEqual(parsed["book_ids_in_member"], ["GEN"])
         self.assertEqual(len(parsed["books"]["GEN"]["chapters"]), 2)
         self.assertEqual(parsed["books"]["GEN"]["verse_marker_count"], 3)
+        self.assertEqual(
+            parsed["books"]["GEN"]["verse_address_occurrences"],
+            [("1", "1"), ("1", "2-3"), ("2", "1")],
+        )
         self.assertEqual(parsed["books"]["GEN"]["verse_range_marker_count"], 1)
         self.assertGreaterEqual(parsed["marker_counts"]["v"], 3)
 
@@ -71,6 +75,52 @@ class ArchiveAuditTests(unittest.TestCase):
         self.assertEqual(report["parse_summary"]["core_66_book_ids_found"], 66)
         self.assertEqual(report["parse_summary"]["missing_core_book_ids"], [])
         self.assertEqual(report["parse_summary"]["total_chapter_count"], 66)
+
+    def test_reports_duplicate_verse_addresses(self):
+        usfm = r"\id GEN Genesis" + "\n" + r"\c 1" + "\n" + r"\v 1 Text A" + "\n" + r"\v 1 Text B"
+        data = make_zip({"GEN.usfm": usfm})
+        report = audit.inspect_archive_bytes(data, "engwebp")
+        genesis = next(row for row in report["book_inventory"] if row["book_id"] == "GEN")
+        self.assertEqual(genesis["verse_marker_count"], 2)
+        self.assertEqual(genesis["distinct_chapter_verse_labels"], 1)
+        self.assertEqual(genesis["duplicate_chapter_verse_labels"], 1)
+
+    def test_writes_exact_address_comparison_without_verse_text(self):
+        import json
+        import tempfile
+
+        reports = [
+            {
+                "source_id": "engwebp",
+                "verse_address_inventory": [
+                    {"book_id": "ROM", "chapter_label": "16", "verse_label": "1"},
+                    {"book_id": "ROM", "chapter_label": "16", "verse_label": "2"},
+                ],
+                "member_inventory": [],
+                "book_inventory": [],
+                "parse_summary": {"marker_counts": {}},
+            },
+            {
+                "source_id": "eng-kjv",
+                "verse_address_inventory": [
+                    {"book_id": "ROM", "chapter_label": "16", "verse_label": "1"},
+                ],
+                "member_inventory": [],
+                "book_inventory": [],
+                "parse_summary": {"marker_counts": {}},
+            },
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            audit.write_outputs(reports, Path(tmp))
+            manifest = json.loads((Path(tmp) / "audit-manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["primary_versification_address_comparison"]["common_addresses"], 1)
+            self.assertEqual(manifest["primary_versification_address_comparison"]["webp_only"], [
+                {"book_id": "ROM", "chapter_label": "16", "verse_label": "2"}
+            ])
+            self.assertEqual(manifest["primary_versification_address_comparison"]["kjv_only"], [])
+            diff = (Path(tmp) / "verse-address-differences.csv").read_text(encoding="utf-8")
+            self.assertIn("ROM,16,2,True,False", diff)
+            self.assertNotIn("Text A", diff)
 
     def test_rejects_path_traversal_member(self):
         data = make_zip({"../escape.usfm": r"\id GEN Genesis" + "\n" + r"\c 1" + "\n" + r"\v 1 Text"})
