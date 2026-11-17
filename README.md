@@ -71,6 +71,7 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Bible Hub product reference](docs/18-product-reference-bible-hub.md) | Passage navigation, parallel reading and reference-resource benchmark |
 | [YouVersion product reference](docs/19-product-reference-youversion.md) | Reading engagement, personal library, offline and developer platform benchmark |
 | [Competitive benchmark and product blueprint](docs/20-competitive-benchmark-and-product-blueprint.md) | Consolidated comparison, information architecture, release priorities and integration recommendations |
+| [My Bible Tracker product reference](docs/21-product-reference-my-bible-tracker.md) | Chapter-level progress, multiple trackers, statistics and low-pressure motivation benchmark |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
