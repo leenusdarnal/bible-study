@@ -88,13 +88,19 @@ erDiagram
     PASSAGE_REFERENCES ||--o{ NOTE_PASSAGES : referenced_by
     USERS ||--o{ USER_BOOKMARKS : owns
     USERS ||--o{ USER_HIGHLIGHTS : owns
-    USERS ||--o{ USER_READING_PROGRESS : tracks
+    USERS ||--o{ READING_TRACKERS : owns
+    READING_TRACKERS ||--o{ READING_TRACKER_BOOKS : selects
+    READING_TRACKERS ||--o{ READING_TRACKER_CHAPTER_PROGRESS : records
+    SCHEME_CHAPTERS ||--o{ READING_TRACKER_CHAPTER_PROGRESS : chapter_state
+    CANONS ||--o{ READING_TRACKERS : defines_scope
+    VERSIFICATION_SCHEMES ||--o{ READING_TRACKERS : numbers_chapters
+    CANON_BOOKS ||--o{ READING_TRACKER_BOOKS : selected_from
+    CANON_BOOKS ||--o{ READING_TRACKER_CHAPTER_PROGRESS : validates_work
     PASSAGE_REFERENCES ||--o{ USER_BOOKMARKS : bookmarked
     PASSAGE_REFERENCES ||--o{ USER_HIGHLIGHTS : highlighted
-    PASSAGE_REFERENCES ||--o{ USER_READING_PROGRESS : tracked
 ~~~
 
-The USERS node represents the eventual authentication provider's user record; use its actual table name and key after the auth proof of concept. Private library records must be owner-scoped.
+The USERS node represents the eventual authentication provider's user record; use its actual table name and key after the auth proof of concept. Private library records must be owner-scoped. Guest trackers are stored locally in IndexedDB and do not appear as cloud user rows. Reading plans and chapter tracker progress remain separate.
 
 ## 12.5 Import and provenance lifecycle
 
@@ -124,6 +130,8 @@ An import must be repeatable without duplicating published entities. Original so
 - Every knowledge-graph edge has a type and recorded evidence or a documented exception.
 - Every imported entity retains its external ID and dataset version.
 - Every private library record belongs to one user unless sharing is explicitly introduced.
+- Tracker chapter progress belongs to the tracker's canon and versification scheme.
+- Selected-book trackers accept new progress only for selected books; excluded historical progress may remain stored but is omitted from current statistics.
 - Published content points to an approved revision.
 - Source retirement does not delete dependent citations.
 - Entity merges preserve links and can be reversed.
@@ -139,5 +147,6 @@ Before accepting the ERD:
 - Switch translations while preserving a note and highlight.
 - Test entity merge/rollback with relationships and citations.
 - Test user ownership isolation and reviewer separation.
+- Test multiple trackers, selected-book scope and chapter-level completion.
 - Compare every diagram to implemented tables and foreign keys.
 ~~~
