@@ -25,8 +25,8 @@ The first public release is intended to provide a complete basic platform:
 - Biblical people, places and events.
 - Scripture cross-references.
 - Initial maps and timelines.
-- Personal library features: notes, bookmarks, highlights and reading progress.
-- Optional accounts; public content remains accessible to guests.
+- Personal library features: notes, bookmarks, highlights and chapter-based reading progress trackers.
+- Guest-local reading progress and optional accounts; cloud personal records remain private.
 - Responsive, accessible design and offline reading capabilities.
 
 AI is deliberately deferred from the first release until the underlying knowledge base, citations and editorial controls are mature.
@@ -72,12 +72,13 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [YouVersion product reference](docs/19-product-reference-youversion.md) | Reading engagement, personal library, offline and developer platform benchmark |
 | [Competitive benchmark and product blueprint](docs/20-competitive-benchmark-and-product-blueprint.md) | Consolidated comparison, information architecture, release priorities and integration recommendations |
 | [My Bible Tracker product reference](docs/21-product-reference-my-bible-tracker.md) | Chapter-level progress, multiple trackers, statistics and low-pressure motivation benchmark |
+| [Reading Progress Tracker specification](docs/22-reading-progress-tracker-spec.md) | User stories, tracker scope, chapter states, calculations, guest data, privacy and acceptance tests |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
 
-**Discovery:** 14 rounds completed; product benchmark research expanded across four reference platforms.  
-**Current stage:** database design, source validation and import planning.  
+**Discovery:** 14 rounds completed; product benchmark research expanded across five reference platforms.  
+**Current stage:** product requirements, database design, source validation and import planning.  
 **Application implementation:** not started in this repository.
 
 Requirements in these documents represent agreed project direction unless explicitly marked as a recommendation, assumption, open question or item requiring verification. Technical limits, licensing terms and third-party integrations must be rechecked before implementation.
@@ -94,7 +95,7 @@ Requirements in these documents represent agreed project direction unless explic
 
 ## Contributing to the documentation
 
-Propose changes through issues or pull requests. Significant architectural changes should include an Architecture Decision Record (ADR) under `decisions/`.
+Propose changes through issues or pull requests. Significant architectural changes should include an Architecture Decision Record (ADR) under decisions/.
 
 ## License
 
