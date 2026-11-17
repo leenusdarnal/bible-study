@@ -72,7 +72,7 @@ BEGIN
 END;
 
 CREATE TRIGGER trg_tracker_progress_selected_scope_update
-BEFORE UPDATE OF tracker_id, canon_id, work_id, chapter_id ON reading_tracker_chapter_progress
+BEFORE UPDATE OF tracker_id, canon_id, work_id, chapter_id, progress_state, started_at, completed_at, updated_at ON reading_tracker_chapter_progress
 WHEN (SELECT scope_mode FROM reading_trackers WHERE id = NEW.tracker_id) = 'selected_books'
 AND NOT EXISTS (
   SELECT 1 FROM reading_tracker_books b
