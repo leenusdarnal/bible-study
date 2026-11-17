@@ -92,3 +92,16 @@ The TVTMS file describes KJV, Hebrew, Latin and Greek traditions and explains th
 ## 14.7 Next implementation document
 
 See [15. Dual Bible Text Import and Validation Pipeline](15-dual-bible-text-import-pipeline.md) for archive acquisition, USFM parser design, staging states, canon handling, versification comparison, validation gates and publication acceptance criteria.
+
+
+## 14.8 Detailed versification source review
+
+The STEPBible TVTMS source file has now been inspected, rather than relying only on the repository directory listing. It describes KJV, Hebrew, Latin and Greek traditions and provides both condensed identification rules and expanded mapping records.
+
+The file explicitly documents one-to-one renumbering, subdivided verses, merged verses, subverses, moved or duplicated material, absent and empty positions, text that may be missing, different verse boundaries, passage movement and epistle colophons. Some mappings use suffixes such as a/b or numbered subparts. These examples confirm that a general one-to-one verse crosswalk would be lossy.
+
+The file states that it is CC BY 4.0, allows software inclusion and reformatting, requests attribution to Tyndale House and STEPBible.org with a source link, and asks that copies of the data file not be reposted elsewhere. The project should reference the maintained upstream file, record the exact revision used, provide attribution and document any local transformations. Do not copy the full TVTMS file into this repository.
+
+The inspected repository revision was associated with commit 5de0a47f35f0fc13dfe1430d104e5db8a4285f9c. Pin the actual file revision again when building the importer.
+
+This dataset is a candidate crosswalk, not proof that WEBP follows the KJV profile. The WEBP and KJV archives must each be parsed and evaluated independently. See [15. Dual Bible Text Import and Validation Pipeline](15-dual-bible-text-import-pipeline.md).
