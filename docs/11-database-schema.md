@@ -33,7 +33,7 @@ A printed reference such as Psalm 3:1 is not a globally unique identity.
 
 | Table | Key columns and purpose |
 |---|---|
-| scriptural_works | id PK, osis_code UNIQUE where known, standard_name, testament, genre |
+| scriptural_works | id PK, usfm_code UNIQUE, osis_code UNIQUE where known, standard_name, testament, genre |
 | canons | id PK, code UNIQUE, name, tradition_label, description, status |
 | canon_books | id PK, canon_id FK, work_id FK, position, display_name, is_included; UNIQUE(canon_id, work_id), UNIQUE(canon_id, position) |
 | versification_schemes | id PK, code UNIQUE, name, description, source_id FK, version |
