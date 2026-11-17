@@ -1,0 +1,44 @@
+name: Scripture source archive audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/scripture-source-audit.yml"
+      - "tools/scripture_source_audit.py"
+      - "tests/source_audit/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Test source-audit utility
+        run: python -m unittest discover -s tests/source_audit -v
+
+      - name: Download and audit official WEBP and KJV archives
+        run: |
+          python tools/scripture_source_audit.py \
+            --download \
+            --cache-dir "$RUNNER_TEMP/source-archive-cache" \
+            --output-dir "$RUNNER_TEMP/source-audit-report"
+
+      - name: Upload metadata-only audit report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scripture-source-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/source-audit-report/
+          if-no-files-found: warn
