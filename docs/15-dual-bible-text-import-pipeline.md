@@ -9,7 +9,7 @@
 
 The first text corpus will contain two English editions:
 
-1. **WEBP** — World English Bible Update, 66-book protocanon edition, source identifier `engwebp`.
+1. **WEBP** — World English Bible Protestant Edition, the 66-book subset of the World English Bible Update, source identifier `engwebp`.
 2. **KJV** — King James Version, 1769 standardised text, source identifier `eng-kjv`, supplied by eBible.org with Apocrypha/Deuterocanon.
 
 They must be imported as separate editions. Never merge their wording, silently normalise one into the other, or assume that a verse label in one edition identifies the same text boundary in the other.
@@ -30,7 +30,7 @@ Core rules:
 
 | Field | WEBP | KJV |
 |---|---|---|
-| Display name | World English Bible Update | King James Version (1769 standardised text) |
+| Display name | World English Bible Protestant Edition (WEBP) | King James Version (1769 standardised text) |
 | Source ID | `engwebp` | `eng-kjv` |
 | Source provider | eBible.org | eBible.org; source credits Crosswire Bible Society and eBible.org |
 | Source page | [Edition details](https://ebible.org/find/details.php?id=engwebp) | [Edition details](https://ebible.org/find/details.php?id=eng-kjv) |
@@ -38,7 +38,7 @@ Core rules:
 | Import package | [USFM ZIP](https://ebible.org/Scriptures/engwebp_usfm.zip) | [USFM ZIP](https://ebible.org/Scriptures/eng-kjv_usfm.zip) |
 | Alternative | [USFX ZIP](https://ebible.org/Scriptures/engwebp_usfx.zip) | [USFX ZIP](https://ebible.org/Scriptures/eng-kjv_usfx.zip) |
 | Stated coverage | 66-book protocanon edition | Includes Apocrypha/Deuterocanon |
-| Source text edition | 2020 stable text edition (source page) | 1769 standardised text |
+| Source text edition | Source page labels the 2020 stable text edition; the online HTML was generated from source files dated 17 Nov 2026 | 1769 standardised text; online HTML generated from source files dated 15 Nov 2026 |
 | Release scope | Protestant 66 books | Protestant 66 books only |
 | Rights gate | Public-domain notice; do not rename a modified text as WEB | Source says public domain outside UK and notes UK Crown patent printing/import restriction; obtain jurisdiction-specific review before global distribution |
 
@@ -64,11 +64,11 @@ Store the original ZIP in a private or restricted R2 source bucket using a conte
 
 Do not overwrite an archive at the same key. A changed checksum means a new source acquisition and a new import run. Keep the source archive separate from parsed JSON/records and from public reader assets.
 
-**Acquisition status:** the source pages and download links have been verified, but the ZIP archives have not yet been downloaded in this work session. No archive checksum, byte count, file inventory or parsed-book count is claimed. The next implementation run must download both archives and complete the inventory gate before any database import.
+**Acquisition status as of 18 Nov 2026:** the official edition pages, rights notices, direct USFM download URLs and HTML book indexes have been inspected. The actual ZIP archives have not been downloaded in this runtime: Firecrawl reports that it cannot process `application/zip`, and direct retrieval from the execution environment failed because the eBible.org host could not be resolved. No archive checksum, byte size, ZIP member inventory, in-file marker inventory or archive-derived chapter/verse count is claimed. The online directory listing is corroborating evidence only. Acquisition must be performed from an environment with network access before any import.
 
 ## 15.4 USFM parser design
 
-Use USFM as the common interchange format for both editions. The official USFM 3.0 documentation describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes.
+Use USFM as the common interchange format for both editions. The official USFM documentation has multiple versioned specifications, including 2.5 and 3.x, and describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes. The version marker inside each actual source file has not yet been inspected; detect and record it per file rather than assuming USFM 3.0.
 
 Parser should be a marker-aware state machine, not a regular expression that strips markers and concatenates everything into plain text.
 
@@ -399,4 +399,4 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] A reviewer approves the exact source checksums and import run.
 - [ ] Publication and rollback are tested.
 
-**Current status:** source pages, rights notices, direct USFM URLs, official USFM documentation and the STEPBible TVTMS file have been inspected. The actual ZIP archives have not been downloaded, checksummed or parsed. No translation text has been imported into D1 or published. The next implementation gate is acquisition and inventory of both archives, followed by real-file parser tests.
+**Current status (18 Nov 2026):** official source pages, rights notices, direct USFM URLs, online HTML book indexes, official USFM documentation and the STEPBible TVTMS file have been inspected. The WEBP online index confirms its stated 66-book coverage; the KJV online index shows additional Apocrypha/Deuterocanon sections. The actual ZIP archives have not been downloaded, checksummed or parsed. No translation text has been imported into D1 or published. The binary acquisition and archive-derived validation gate remains open; see [23. Source Package Listing Review](23-source-package-listing-review.md).
