@@ -82,11 +82,23 @@ BEGIN
   SELECT RAISE(ABORT, 'chapter is outside selected tracker book scope');
 END;
 
-CREATE TRIGGER trg_tracker_books_selected_mode_insert
-BEFORE INSERT ON reading_tracker_books
-WHEN (SELECT scope_mode FROM reading_trackers WHERE id = NEW.tracker_id) <> 'selected_books'
+-- Selected-book scope is activated by a transactional sequence:
+-- create tracker as all_books, insert one or more selected-book rows,
+-- then update scope_mode to selected_books. This avoids committing an empty selection.
+
+CREATE TRIGGER trg_tracker_selected_scope_insert_requires_selection
+BEFORE INSERT ON reading_trackers
+WHEN NEW.scope_mode = 'selected_books'
 BEGIN
-  SELECT RAISE(ABORT, 'book selections require selected_books scope');
+  SELECT RAISE(ABORT, 'create selected scope by adding books before activating selected_books');
+END;
+
+CREATE TRIGGER trg_tracker_books_prevent_empty_selected_scope
+BEFORE DELETE ON reading_tracker_books
+WHEN (SELECT scope_mode FROM reading_trackers WHERE id = OLD.tracker_id) = 'selected_books'
+AND (SELECT COUNT(*) FROM reading_tracker_books WHERE tracker_id = OLD.tracker_id) = 1
+BEGIN
+  SELECT RAISE(ABORT, 'selected_books scope must retain at least one selected book');
 END;
 
 CREATE TRIGGER trg_tracker_books_scope_requires_selection
@@ -97,13 +109,6 @@ BEGIN
   SELECT RAISE(ABORT, 'selected_books scope requires at least one selected book');
 END;
 
-
-CREATE TRIGGER trg_tracker_books_selected_mode_update
-BEFORE UPDATE OF tracker_id, canon_id, work_id ON reading_tracker_books
-WHEN (SELECT scope_mode FROM reading_trackers WHERE id = NEW.tracker_id) <> 'selected_books'
-BEGIN
-  SELECT RAISE(ABORT, 'book selections require selected_books scope');
-END;
 
 -- Create a selected-books tracker and its first selected book in one transaction.
 -- Excluded historical progress is retained but excluded from current calculations.
