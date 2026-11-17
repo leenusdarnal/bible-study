@@ -262,3 +262,141 @@ The dual-text corpus is ready for initial release only when:
 - [USFM cross-references](https://ubsicap.github.io/usfm/notes_basic/xrefs.html)
 - [STEPBible Data repository and CC BY 4.0 terms](https://github.com/STEPBible/STEPBible-Data)
 - [STEPBible Versification / TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/tree/master/Versification)
+
+
+## 15.12 Archive validation and safe extraction
+
+The archive download step must be implemented separately from page scraping. The source ZIP links resolve to binary archives; the current web-page extraction service cannot inspect ZIP contents. Archive inspection therefore remains an explicit pending implementation task.
+
+Before extraction:
+
+1. Require HTTPS and record the final response URL and HTTP status.
+2. Record content type, content length, ETag and Last-Modified when supplied.
+3. Verify the file has a valid ZIP signature and passes a full archive integrity test.
+4. Compute SHA-256 over the exact archive bytes.
+5. Reject absolute paths, parent-directory traversal, symlinks and any entry that would escape the extraction root.
+6. Enforce limits for archive bytes, expanded bytes, number of entries and individual file size.
+7. Reject encrypted entries and unsupported file types.
+8. Extract into a newly created temporary directory; never extract over a previous run.
+9. Inventory all entries before parsing.
+10. Store the original archive as an immutable R2 object before moving into the parse stage.
+
+Suggested R2 key:
+
+    scripture-source/{source-id}/{archive-sha256}/{original-filename}
+
+The SHA-256, not the source URL or filename, identifies the exact downloaded bytes. If the upstream URL later serves a changed archive, create a new acquisition record and retain the earlier archive.
+
+## 15.13 Lossless source representation and schema gap
+
+The current draft Scripture SQL schema stores one text value per edition and Scripture unit, with limited footnote metadata. That is not a sufficient lossless representation of all USFM structures.
+
+Before production import, add a structured content layer capable of preserving:
+
+- source file identity and source byte/character offsets;
+- ordered source spans and verse bridges;
+- block nodes for headings, paragraphs, poetry, lists and introductions;
+- inline nodes for character markers, added words, quotations and divine-name markers;
+- nested footnote and cross-reference containers;
+- marker names, marker attributes and paired closing markers;
+- primary, alternate and published chapter/verse labels;
+- source text and normalized search text separately;
+- a link from each source span to zero, one or many canonical Scripture units.
+
+A source span does not always equal one canonical verse. A verse bridge, subverse, merged verse, heading, superscription or colophon may need a different representation. Do not flatten these structures into translation_texts and then discard the source representation.
+
+The logical staging model should include at least:
+
+| Logical record | Important fields |
+|---|---|
+| Source acquisition | source ID, URL, retrieved_at, archive SHA-256, byte size, rights snapshot |
+| Import run | acquisition ID, parser version, config hash, status, timestamps |
+| Archive member | path, byte size, SHA-256, detected format, book code |
+| Staged source unit | book, chapter label, verse label, subverse, order, raw source span |
+| Content node | node type, marker, attributes, nesting, source offsets, text |
+| Numbering alias | primary/alternate label, chapter/verse relation, source marker |
+| Mapping group | source span(s), target unit(s), relation type, order, source, review status |
+| Validation finding | rule ID, severity, expected, actual, source location, disposition |
+| Publication event | approved run, approver, timestamp, published version |
+
+The exact physical table names and DDL should be reviewed in the application repository before full import. Keep the original archive as the recovery source even after structured nodes are persisted.
+
+## 15.14 Versification dataset findings and attribution
+
+The project inspected the actual STEPBible TVTMS text file through its Git repository. It identifies itself as data for KJV, Hebrew, Latin and Greek traditions and describes both condensed human-readable rules and expanded verse-by-verse mappings.
+
+The data explicitly discusses one-to-one renumbering, split and merged verses, subverses, text moved to another location, duplicated text, absent/empty references, passages that may be missing, different verse starting points and epistle colophons. It also gives KJV-related examples in the New Testament. This is direct evidence that the project must not assume a one-to-one reference conversion.
+
+The file states that it is CC BY 4.0, allows inclusion and reformatting in software, requests attribution to Tyndale House and STEPBible.org with a link to the source repository, and asks users not to post copies of the file elsewhere so that the repository remains the maintained source. Accordingly:
+
+- link to the authoritative STEPBible repository rather than committing a full copy of TVTMS;
+- record the inspected Git commit/revision in each import manifest;
+- provide the requested attribution wherever the dataset informs published mappings;
+- record local transformations and corrections;
+- preserve the source mapping label and rationale;
+- review mappings rather than blindly applying them.
+
+The source revision inspected during this review was associated with repository commit 5de0a47f35f0fc13dfe1430d104e5db8a4285f9c. Pin the exact file revision used at implementation time; do not assume the branch named master remains unchanged.
+
+## 15.15 Import lifecycle, idempotency and reporting
+
+Use a controlled TypeScript command-line importer for the initial two editions. Do not upload or parse a full corpus through a user-facing request handler. The importer should support dry-run, resumable batches, a validation-only mode and an explicit publish command.
+
+Suggested lifecycle:
+
+    discovered
+      -> acquired
+      -> checksum_verified
+      -> archive_tested
+      -> inventoried
+      -> parsed
+      -> structurally_validated
+      -> versification_review
+      -> rights_review
+      -> approved
+      -> published
+
+A run may instead become quarantined, rejected or failed. A failed run must never partially change the currently published edition.
+
+Use an idempotency key derived from source ID, archive SHA-256, parser version and parser configuration hash. An identical rerun must not duplicate staged or published records. A changed archive or parser version creates a new run.
+
+Each run should emit machine-readable artifacts, including:
+
+- archive-manifest.json
+- book-inventory.json
+- parse-summary.json
+- chapter-verse-counts.csv
+- marker-coverage.json
+- unknown-markers.csv
+- versification-differences.csv
+- mapping-review.csv
+- rights-review.json
+- publication-manifest.json
+
+Do not report only a total verse count. Report books, chapters, source verse labels, subverses, bridges, headings, poetry blocks, footnotes, cross-references, colophons, unknown markers, and mapping exceptions separately.
+
+Publication must be an explicit reviewed promotion of one complete run. Retain the previous published version so that rollback does not delete source archives, import history or user notes.
+
+## 15.16 Acceptance checklist and current status
+
+The first dual-edition import is accepted only when all boxes below are supported by recorded evidence:
+
+- [ ] WEBP and KJV archives downloaded from their declared source URLs.
+- [ ] Archive SHA-256, byte size, response metadata and immutable R2 keys recorded.
+- [ ] ZIP integrity and safe-extraction checks pass.
+- [ ] Every archive member is inventoried and every Scripture file's in-file book code is verified.
+- [ ] WEBP's declared 66-book scope is confirmed from the actual archive.
+- [ ] All KJV source books, including Apocrypha/Deuterocanon material, are inventoried; only the approved release canon is published.
+- [ ] Parser passes synthetic fixtures and real-file samples from both editions.
+- [ ] Unknown markers and all structural warnings are resolved or explicitly approved.
+- [ ] The source structure is preserved without flattening away USFM semantics.
+- [ ] Independent WEBP and KJV versification profiles are generated.
+- [ ] STEPBible TVTMS candidate mappings are pinned, attributed and reviewed.
+- [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented.
+- [ ] The schema can represent structured content and non-one-to-one mappings.
+- [ ] Rights review is recorded for intended publication territories.
+- [ ] All blocking validation findings are cleared.
+- [ ] A reviewer approves the exact source checksums and import run.
+- [ ] Publication and rollback are tested.
+
+**Current status:** source pages, rights notices, direct USFM URLs, official USFM documentation and the STEPBible TVTMS file have been inspected. The actual ZIP archives have not been downloaded, checksummed or parsed. No translation text has been imported into D1 or published. The next implementation gate is acquisition and inventory of both archives, followed by real-file parser tests.
