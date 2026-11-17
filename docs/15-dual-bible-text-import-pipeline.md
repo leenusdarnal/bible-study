@@ -133,8 +133,8 @@ Book recognition must use identifiers, not filename sorting or display-name matc
 - Preserve original source code and filename.
 - Reject duplicate book files unless the package explicitly declares a legitimate supplement.
 - Record unknown book identifiers as blocking review items.
-- For WEBP, expect the declared 66-book protocanon edition.
-- For KJV, inventory every supplied book, including Apocrypha/Deuterocanon; map each to a work identity and record whether it belongs to the first-release Protestant 66-book canon.
+- For WEBP, the current official HTML index identifies the Protestant Edition as a 66-book corpus and lists the 66 book pages. Confirm the ZIP independently after acquisition; the HTML index is not archive proof.
+- For KJV, the current official HTML index lists the Protestant-canon books plus additional Apocrypha/Deuterocanon sections. Inventory every archive member, map each to a work identity and record whether it belongs to the first-release Protestant 66-book canon. Do not infer exact ZIP contents from the HTML page list.
 - Do not count a book as missing merely because its display name differs; use validated identifiers and an explicit alias table.
 
 The 66-book seed already in the repository supplies book identities and order. It does not supply chapter counts, verse counts or text.
