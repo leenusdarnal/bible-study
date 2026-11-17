@@ -158,6 +158,15 @@ class ReadingProgressMigrationTests(unittest.TestCase):
             ("selected-delete",),
         )
 
+    def test_selected_scope_cannot_move_its_last_book_to_another_tracker(self):
+        self.make_tracker("selected-source", scope="selected_books")
+        self.make_tracker("destination")
+        self.assert_integrity_error(
+            """UPDATE reading_tracker_books SET tracker_id = ?
+               WHERE tracker_id = ? AND work_id = ?""",
+            ("destination", "selected-source", "work-gen"),
+        )
+
     def test_progress_cannot_be_edited_after_its_book_leaves_selected_scope(self):
         self.make_tracker("scope-edit", scope="selected_books")
         # Add a second selected book, record progress, then remove that book from the scope.
