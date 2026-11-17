@@ -25,7 +25,7 @@ The draft SQL uses a safe selected-scope activation sequence: create the tracker
 
 Benefits include support for any reading medium, multiple independent goals, stable identity across translation switching, multiple canons, and reliable derived statistics.
 
-Costs include scheme/canon validation, local export and migration work, and more complex future sync. The draft schema has passed a local SQLite smoke test against compatible parent-table definitions. The repository test suite exercises the full documented migration chain. D1 behaviour, auth ownership and guest migration still require validation before production migration.
+Costs include scheme/canon validation, local export and migration work, and more complex future sync. The draft schema has passed a local SQLite smoke test against compatible parent-table definitions. A standard-library unittest suite now exercises migrations 0001, 0002 and 0003 together; a GitHub Actions workflow was added to run it on relevant pushes and pull requests. An Actions result has not yet been observed. D1 behaviour, auth ownership and guest migration still require validation before production migration.
 
 ## Rejected alternatives
 
