@@ -1,6 +1,6 @@
 # 15. Dual Bible Text Import and Validation Pipeline
 
-- **Status:** Proposed implementation design; source packages not yet downloaded or parsed.
+- **Status:** Proposed implementation design; official archives downloaded, checksummed and structurally audited; full semantic USFM parsing, versification approval and D1 import remain pending.
 - **Decision:** Import WEBP and KJV as two distinct translation editions.
 - **Target:** Cloudflare R2 + D1 staging and publication workflow.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Scripture core implementation](13-scripture-core-implementation-spec.md), [database schema](11-database-schema.md), ADR-006.
@@ -64,7 +64,7 @@ Store the original ZIP in a private or restricted R2 source bucket using a conte
 
 Do not overwrite an archive at the same key. A changed checksum means a new source acquisition and a new import run. Keep the source archive separate from parsed JSON/records and from public reader assets.
 
-**Acquisition status as of 18 Nov 2026:** official edition pages, rights notices, direct archive URLs, HTML book indexes and the official eBible.org file directory have been inspected. The directory lists WEBP USFM at 2,908,410 bytes (last modified 2026-11-17 01:18:23) and KJV USFM at 2,771,068 bytes (last modified 2026-11-15 09:36:58). These are published listing values, not locally verified measurements. The actual ZIP archives have not been downloaded in this runtime: Firecrawl reports that it cannot process `application/zip`, and direct retrieval from the execution environment failed because the eBible.org host could not be resolved. No SHA-256 checksum, ZIP member inventory, in-file marker inventory or archive-derived chapter/verse count is claimed. See [23. Source Package Listing Review](23-source-package-listing-review.md) for full metadata and a separate derived-corpus cross-check.
+**Acquisition status as of 18 Nov 2026:** both official archives were downloaded successfully by GitHub Actions. Their actual byte sizes match the eBible.org file directory; ZIP CRC tests passed; SHA-256, member inventories, book IDs, chapter/verse marker counts and exact primary chapter–verse address differences were generated. The 66 Protestant book IDs are present in each package. The WEBP archive contains 68 USFM members and the KJV archive contains 81; source-only content remains inventoried. The exact checksums and Romans numbering comparison are recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). This structural report does not claim a complete semantic parse or publication approval.
 
 ## 15.4 USFM parser design
 
@@ -133,8 +133,8 @@ Book recognition must use identifiers, not filename sorting or display-name matc
 - Preserve original source code and filename.
 - Reject duplicate book files unless the package explicitly declares a legitimate supplement.
 - Record unknown book identifiers as blocking review items.
-- For WEBP, the current official HTML index identifies the Protestant Edition as a 66-book corpus and lists the 66 book pages. Confirm the ZIP independently after acquisition; the HTML index is not archive proof.
-- For KJV, the current official HTML index lists the Protestant-canon books plus additional Apocrypha/Deuterocanon sections. Inventory every archive member, map each to a work identity and record whether it belongs to the first-release Protestant 66-book canon. Do not infer exact ZIP contents from the HTML page list.
+- The audited WEBP ZIP contains all 66 Protestant book IDs plus `FRT` and `GLO` supplementary IDs. The audit did not find any missing core book ID.
+- The audited KJV ZIP contains all 66 Protestant book IDs, 14 Apocrypha/Deuterocanon book IDs and `FRT`. Keep all source entries in the import inventory; publish only the approved 66-book canon in the first reader release.
 - Do not count a book as missing merely because its display name differs; use validated identifiers and an explicit alias table.
 
 The 66-book seed already in the repository supplies book identities and order. It does not supply chapter counts, verse counts or text.
@@ -264,28 +264,25 @@ The dual-text corpus is ready for initial release only when:
 - [STEPBible Versification / TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/tree/master/Versification)
 
 
-## 15.12 Archive validation and safe extraction
+## 15.12 Archive validation and safe extraction — executed
 
-The archive download step must be implemented separately from page scraping. The source ZIP links resolve to binary archives; the current web-page extraction service cannot inspect ZIP contents. Archive inspection therefore remains an explicit pending implementation task.
+The official WEBP and KJV USFM archives have now been acquired by the GitHub Actions workflow and passed the checks below:
 
-Before extraction:
+- HTTPS download from the declared eBible.org URLs.
+- Final host validation restricted to eBible.org.
+- Response byte count recorded and matched against the official directory snapshot.
+- SHA-256 recorded for the exact downloaded bytes.
+- ZIP member count, paths, sizes and compression ratios checked.
+- Full ZIP CRC test passed for both archives.
+- No path traversal, symlink or oversized member was accepted.
+- All USFM members decoded as UTF-8 and contained a source \\id marker.
+- Complete archive member and marker inventories produced.
 
-1. Require HTTPS and record the final response URL and HTTP status.
-2. Record content type, content length, ETag and Last-Modified when supplied.
-3. Verify the file has a valid ZIP signature and passes a full archive integrity test.
-4. Compute SHA-256 over the exact archive bytes.
-5. Reject absolute paths, parent-directory traversal, symlinks and any entry that would escape the extraction root.
-6. Enforce limits for archive bytes, expanded bytes, number of entries and individual file size.
-7. Reject encrypted entries and unsupported file types.
-8. Extract into a newly created temporary directory; never extract over a previous run.
-9. Inventory all entries before parsing.
-10. Store the original archive as an immutable R2 object before moving into the parse stage.
+The archive hashes, exact sizes, member counts, core book coverage, chapter/verse address counts and workflow run are documented in [23. Source Package Listing Review](23-source-package-listing-review.md).
 
-Suggested R2 key:
+The audit tool reads USFM members in memory and writes metadata-only reports; it does not write Bible wording or extract files into a public repository. The original ZIP bytes are not stored in this documentation repository or published as a workflow artifact. The workflow runner's temporary source cache is ephemeral.
 
-    scripture-source/{source-id}/{archive-sha256}/{original-filename}
-
-The SHA-256, not the source URL or filename, identifies the exact downloaded bytes. If the upstream URL later serves a changed archive, create a new acquisition record and retain the earlier archive.
+The archive also contains `keys.asc` and `signature.txt.asc`. Their presence was recorded, but detached-signature verification has not yet been performed. Complete signature verification if the source publisher documents the required verification procedure.
 
 ## 15.13 Lossless source representation and schema gap
 
@@ -399,4 +396,11 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] A reviewer approves the exact source checksums and import run.
 - [ ] Publication and rollback are tested.
 
-**Current status (18 Nov 2026):** official source pages, rights notices, direct USFM URLs, online HTML book indexes, official USFM documentation and the STEPBible TVTMS file have been inspected. The WEBP online index confirms its stated 66-book coverage; the KJV online index shows additional Apocrypha/Deuterocanon sections. The actual ZIP archives have not been downloaded, checksummed or parsed. No translation text has been imported into D1 or published. The binary acquisition and archive-derived validation gate remains open; see [23. Source Package Listing Review](23-source-package-listing-review.md).
+**Current status (18 Nov 2026):** both official binary archives have been downloaded, SHA-256 checksummed and CRC-validated by the source-audit workflow. All 66 core book IDs are present; WEBP contains 68 USFM members and KJV 81, including KJV Apocrypha/Deuterocanon. The source-level chapter and verse address comparison reveals a Romans placement/numbering difference, recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). Full semantic USFM parsing, source-text round-trip validation, detached-signature verification, mapping approval, rights review and D1 publication remain open.
+
+
+## 15.17 Results of the first binary archive audit
+
+The structural audit completed successfully in GitHub Actions. The 66-book chapter counts match at 1,189 in both editions. The audit found 31,103 primary chapter–verse addresses in WEBP and 31,102 in KJV, with 31,100 shared addresses. The only address-set differences are Romans 14:24–26 in WEBP and Romans 16:26–27 in KJV; Romans 16:25 is common. The WEB footnote on [BibleGateway](https://www.biblegateway.com/passage/?search=Romans%2014%3A24-26&version=WEB%3BKJV) describes the Textus Receptus placement of Romans 14:24–26 after Romans 16:24 as 16:25–27. Treat this as a mapping-review lead, not an approved automatic mapping.
+
+The structural scanner did not detect a `\\usfm` version declaration inside the files. Record the source's declared version as unknown/not provided until verified by the publisher or an appropriate parser profile. The scanner also found no verse-range markers or duplicate primary chapter–verse labels, but it is not a complete USFM semantic parser.
