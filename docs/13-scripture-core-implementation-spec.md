@@ -67,7 +67,7 @@ PRAGMA foreign_key_check;
 
 ### D1 migration handling
 
-Use Wrangler's documented D1 migration workflow and keep migration files in the application repository once that repository exists. Review generated Drizzle migrations, especially table rebuilds and foreign-key handling. Do not assume that every generic SQLite migration sequence behaves identically under D1's migration execution.
+Use Wrangler's documented D1 migration workflow and keep migration files in the application repository once that repository exists. D1 enforces foreign keys by default. Cloudflare documents `PRAGMA defer_foreign_keys = on` for migrations that temporarily need to violate constraints within a transaction; unresolved violations still fail at transaction end. Do not use `PRAGMA defer_foreign_keys = off` as a validation step. Run `PRAGMA foreign_key_check` to inspect violations. Review generated Drizzle migrations, especially table rebuilds and foreign-key handling. If using Drizzle's nested migration layout, configure Wrangler's `migrations_pattern` to match the generated files. Do not assume every generic SQLite migration sequence behaves identically under D1.
 
 ## 13.5 Acceptance criteria
 
@@ -78,3 +78,10 @@ This slice is ready to be considered implementation-approved only when:
 - A real chosen versification import is mapped without forcing false one-to-one assumptions.
 - The implementation's Drizzle schema and generated migrations match the SQL specification.
 - The documentation and ERD are updated from the tested implementation.
+
+
+## 13.6 Current implementation references
+
+- [Cloudflare D1 foreign keys](https://developers.cloudflare.com/d1/sql-api/foreign-keys/) — enforcement defaults and deferred validation.
+- [Cloudflare D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) — migration files, Wrangler configuration and migration patterns.
+- [Drizzle ORM with Cloudflare D1](https://orm.drizzle.team/docs/sqlite/connect-cloudflare-d1) — D1 driver and Workers integration.
