@@ -1,6 +1,6 @@
 # ADR-008: Chapter-Based Reading Progress and Independent Trackers
 
-- **Status:** Accepted for product and logical data-model direction; physical migration pending.
+- **Status:** Accepted for product and logical data-model direction; draft SQLite migration and regression tests added; D1 validation pending.
 - **Date:** 17 November 2026
 
 ## Context
@@ -21,11 +21,11 @@ The platform needs progress tracking that works with its own reader, a printed B
 10. Defer multi-device sync until conflict and deletion semantics are specified.
 11. Keep achievements, reminders and streaks optional and outside the initial core.
 
-## Consequences
+The draft SQL uses a safe selected-scope activation sequence: create the tracker in all-books mode, add one or more selected-book rows, then switch to selected-books mode in the same transaction. SQL triggers prevent an empty selected scope and validate progress mutations against current scope. Regression coverage is maintained in `tests/sqlite/test_reading_progress_migration.py`.\n\n## Consequences
 
 Benefits include support for any reading medium, multiple independent goals, stable identity across translation switching, multiple canons, and reliable derived statistics.
 
-Costs include scheme/canon validation, local export and migration work, and more complex future sync. The proposed schema must be validated against actual D1 constraints and Scripture seed data before migration.
+Costs include scheme/canon validation, local export and migration work, and more complex future sync. The draft schema has passed a local SQLite smoke test against compatible parent-table definitions. The repository test suite exercises the full documented migration chain. D1 behaviour, auth ownership and guest migration still require validation before production migration.
 
 ## Rejected alternatives
 
