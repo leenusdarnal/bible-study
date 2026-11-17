@@ -101,6 +101,15 @@ BEGIN
   SELECT RAISE(ABORT, 'selected_books scope must retain at least one selected book');
 END;
 
+CREATE TRIGGER trg_tracker_books_prevent_moving_last_selected_book
+BEFORE UPDATE OF tracker_id, canon_id ON reading_tracker_books
+WHEN (OLD.tracker_id <> NEW.tracker_id OR OLD.canon_id <> NEW.canon_id)
+AND (SELECT scope_mode FROM reading_trackers WHERE id = OLD.tracker_id) = 'selected_books'
+AND (SELECT COUNT(*) FROM reading_tracker_books WHERE tracker_id = OLD.tracker_id) = 1
+BEGIN
+  SELECT RAISE(ABORT, 'selected_books scope must retain at least one selected book');
+END;
+
 CREATE TRIGGER trg_tracker_books_scope_requires_selection
 BEFORE UPDATE OF scope_mode ON reading_trackers
 WHEN NEW.scope_mode = 'selected_books'
