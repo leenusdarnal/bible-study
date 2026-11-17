@@ -9,8 +9,9 @@
 
 - `sql/0001_scripture_core.sql` — core Scripture and translation tables.
 - `sql/0002_seed_protestant_66.sql` — 66-book identity and order seed only.
+- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
 
-These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository.
+These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records.
 
 ## 13.2 What migration 0001 creates
 
@@ -69,7 +70,13 @@ PRAGMA foreign_key_check;
 
 Use Wrangler's documented D1 migration workflow and keep migration files in the application repository once that repository exists. D1 enforces foreign keys by default. Cloudflare documents `PRAGMA defer_foreign_keys = on` for migrations that temporarily need to violate constraints within a transaction; unresolved violations still fail at transaction end. Do not use `PRAGMA defer_foreign_keys = off` as a validation step. Run `PRAGMA foreign_key_check` to inspect violations. Review generated Drizzle migrations, especially table rebuilds and foreign-key handling. If using Drizzle's nested migration layout, configure Wrangler's `migrations_pattern` to match the generated files. Do not assume every generic SQLite migration sequence behaves identically under D1.
 
-## 13.5 Acceptance criteria
+## 13.5 Reading progress migration 0003
+
+Migration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject new progress outside a selected-book scope. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
+
+Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
+
+## 13.6 Acceptance criteria
 
 This slice is ready to be considered implementation-approved only when:
 - DDL applies cleanly to a fresh D1 database.
@@ -80,7 +87,7 @@ This slice is ready to be considered implementation-approved only when:
 - The documentation and ERD are updated from the tested implementation.
 
 
-## 13.6 Current implementation references
+## 13.7 Current implementation references
 
 - [Cloudflare D1 foreign keys](https://developers.cloudflare.com/d1/sql-api/foreign-keys/) — enforcement defaults and deferred validation.
 - [Cloudflare D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) — migration files, Wrangler configuration and migration patterns.
