@@ -431,7 +431,7 @@ def write_outputs(reports: list[dict[str, Any]], output_dir: Path) -> None:
         "primary_versification_address_comparison": comparison,
     }
     (output_dir / "audit-manifest.json").write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8"
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
     with (output_dir / "member-inventory.csv").open("w", newline="", encoding="utf-8") as handle:
