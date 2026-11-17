@@ -196,3 +196,79 @@ The same repository's `translations.csv` has different source-level chapter/vers
 - The separate `eng-kjv2006` entry is a protocanon-only KJV variant with Strong's numbers added. It is not silently substituted for the selected `eng-kjv` source package.
 
 **Evidence boundary:** this is an independently maintained derivative dataset and metadata review. It does not supply the current official USFM ZIP bytes or prove that the present eBible archive matches the derivative corpus snapshot.
+
+
+## 23.12 Binary archive audit — completed 17 November 2026
+
+The official archives were subsequently downloaded by a GitHub-hosted runner and audited using the repository's metadata-only source audit tool. This supersedes the earlier “archive not acquired” status in sections 23.7–23.9.
+
+### Exact archive results
+
+| Measure | WEBP | KJV |
+|---|---:|---:|
+| Archive filename | `engwebp_usfm.zip` | `eng-kjv_usfm.zip` |
+| Actual archive size | 2,908,410 bytes | 2,771,068 bytes |
+| SHA-256 | `707aea4a010c535af87c6d919f43674f076590d343137eb9f3e264c2b782a424` | `9d37aa78180ceefd5e4aeeaedceccf16f21484e5eb17d5662e8beff31bc3d8a5` |
+| ZIP entries | 72 | 85 |
+| USFM members | 68 | 81 |
+| Total uncompressed bytes | 19,094,315 | 13,452,479 |
+| ZIP CRC/integrity test | Passed | Passed |
+| Actual size matches official directory listing | Yes | Yes |
+| Expected Protestant book IDs found | 66 of 66 | 66 of 66 |
+| All book IDs found, including front matter/extras | 68 | 81 |
+| Chapters across all identified books | 1,189 | 1,362 |
+| Primary verse markers across all identified books | 31,103 | 36,822 |
+
+The WEBP archive contains the 66 canonical book IDs plus `FRT` and `GLO` (front matter and glossary). The KJV archive contains the same 66 canonical IDs, 14 Apocrypha/Deuterocanon IDs, and `FRT`. The 14 additional KJV IDs are `1ES`, `1MA`, `2ES`, `2MA`, `BAR`, `BEL`, `ESG`, `JDT`, `MAN`, `S3Y`, `SIR`, `SUS`, `TOB` and `WIS`.
+
+Each package also contains four non-USFM files: `copr.htm`, `keys.asc`, `signature.txt.asc`, and a CSS file (`gentiumplus.css` for WEBP; `latin.css` for KJV). They were inventoried and retained in the metadata report. The presence of key and signature files was noted, but cryptographic signature verification was **not** performed during this audit.
+
+No USFM version declaration matching `\\usfm <version>` was found in the USFM members. The version must therefore remain **not declared / not detected** in the import metadata; do not infer a particular USFM version from the file extension or current online documentation. All USFM members contained a book ID, and no duplicate primary chapter–verse address labels or verse-range markers were detected by the structural scanner.
+
+### Protestant 66-book chapter and verse totals
+
+Both editions have exactly 1,189 chapters over the 66 Protestant-canon book IDs. Their chapter counts match for every one of the 66 books.
+
+| Source | Distinct primary chapter–verse addresses in the 66-book scope |
+|---|---:|
+| WEBP | 31,103 |
+| KJV | 31,102 |
+| Common addresses | 31,100 |
+
+The KJV archive has an additional 173 chapters and 5,720 primary verse markers across its 14 additional Apocrypha/Deuterocanon books. These counts are source-marker counts, not a universal statement about the total number of biblical verses under every counting convention.
+
+### Exact primary address differences
+
+The source-address comparison found the following labels only in WEBP:
+
+| Book | Chapter | Verse label |
+|---|---:|---:|
+| Romans | 14 | 24 |
+| Romans | 14 | 25 |
+| Romans | 14 | 26 |
+
+The following labels occur only in KJV:
+
+| Book | Chapter | Verse label |
+|---|---:|---:|
+| Romans | 16 | 26 |
+| Romans | 16 | 27 |
+
+Romans 16:25 is a common address in both source profiles. A displayed WEB footnote on [BibleGateway's Romans 14:24–26 page](https://www.biblegateway.com/passage/?search=Romans%2014%3A24-26&version=WEB%3BKJV) states that the Textus Receptus places verses 24–26 after Romans 16:24 as verses 25–27. This is a strong explanation candidate for the observed location/numbering divergence, but the address comparison alone does not prove text equivalence or prescribe an automatic 3-to-2 mapping. A reviewer must compare the actual source passages and the pinned versification crosswalk before approving a mapping group.
+
+**Implementation rule:** keep the WEBP source references and KJV source references distinct. Represent moved, split or combined passage boundaries through reviewed mapping groups with explicit provenance. Do not rename source verse IDs or move source text during ingestion.
+
+### Audit execution evidence
+
+- GitHub Actions workflow: [Scripture source archive audit](https://github.com/leenusdarnal/bible-study/actions/runs/44154558855)
+- Commit: `31e71250cdde3dbc2446ef65313db950aa6022fd`
+- Final audit unit tests: 9 passed.
+- Both archive download and structural audit steps completed successfully.
+- Metadata-only workflow artifact: `scripture-source-audit-44154558855`, artifact ID `14360936095`, SHA-256 `475388c6238d4415ee85e9a552a3d60af253302f5a5a64ec0fea32c490a4f97c`.
+- The uploaded artifact contains the manifest and CSV inventories, not the original Bible ZIP files or verse wording. GitHub's artifact expiry is 15 February 2027; the archive SHA-256 values above are also recorded in this document.
+
+### Audit boundary and remaining checks
+
+The utility validates the ZIP structure, CRCs, paths, sizes, member inventory, UTF-8 decoding and basic primary `\\id`, `\\c` and `\\v` address structure. It inventories marker frequency and exact primary chapter–verse labels without writing Scripture wording to reports.
+
+It is a structural audit utility, **not** a complete semantic USFM parser. It does not validate every marker's nesting/attributes, prove text round-tripping, verify the detached package signature, decide textual variants, or publish text into D1. A full marker-aware parser and reviewer-led versification reconciliation are still required before import approval.
