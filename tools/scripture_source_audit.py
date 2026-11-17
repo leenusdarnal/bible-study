@@ -98,6 +98,7 @@ def parse_usfm_text(text: str, member_name: str = "") -> dict[str, Any]:
             books.setdefault(current_book, {
                 "chapters": set(),
                 "verse_labels": set(),
+                "verse_address_occurrences": [],
                 "verse_marker_count": 0,
                 "verse_range_marker_count": 0,
                 "member_names": set(),
@@ -119,6 +120,7 @@ def parse_usfm_text(text: str, member_name: str = "") -> dict[str, Any]:
             label = verse_match.group(1)
             books[current_book]["verse_marker_count"] += 1
             books[current_book]["verse_labels"].add((current_chapter or "", label))
+            books[current_book]["verse_address_occurrences"].append((current_chapter or "", label))
             if "-" in label:
                 books[current_book]["verse_range_marker_count"] += 1
 
@@ -234,12 +236,14 @@ def inspect_archive_bytes(
                     target = book_data.setdefault(book_id, {
                         "chapters": set(),
                         "verse_labels": set(),
+                        "verse_address_occurrences": [],
                         "verse_marker_count": 0,
                         "verse_range_marker_count": 0,
                         "members": set(),
                     })
                     target["chapters"].update(parsed_book["chapters"])
                     target["verse_labels"].update(parsed_book["verse_labels"])
+                    target["verse_address_occurrences"].extend(parsed_book["verse_address_occurrences"])
                     target["verse_marker_count"] += parsed_book["verse_marker_count"]
                     target["verse_range_marker_count"] += parsed_book["verse_range_marker_count"]
                     target["members"].update(parsed_book["member_names"])
@@ -257,6 +261,7 @@ def inspect_archive_bytes(
             "chapter_count": len(item["chapters"]),
             "verse_marker_count": item["verse_marker_count"],
             "distinct_chapter_verse_labels": len(item["verse_labels"]),
+            "duplicate_chapter_verse_labels": len(item["verse_address_occurrences"]) - len(item["verse_labels"]),
             "verse_range_marker_count": item["verse_range_marker_count"],
             "members": sorted(item["members"]),
         })
@@ -267,6 +272,15 @@ def inspect_archive_bytes(
     total_chapters = sum(row["chapter_count"] for row in book_inventory)
     total_verse_markers = sum(row["verse_marker_count"] for row in book_inventory)
     total_ranges = sum(row["verse_range_marker_count"] for row in book_inventory)
+    verse_address_inventory = [
+        {
+            "book_id": book_id,
+            "chapter_label": chapter_label,
+            "verse_label": verse_label,
+        }
+        for book_id, item in sorted(book_data.items())
+        for chapter_label, verse_label in item["verse_address_occurrences"]
+    ]
 
     return {
         "schema_version": 1,
@@ -300,12 +314,18 @@ def inspect_archive_bytes(
             "additional_book_ids": extra_books,
             "total_chapter_count": total_chapters,
             "total_verse_marker_count": total_verse_markers,
+            "distinct_verse_address_count": sum(len(item["verse_labels"]) for item in book_data.values()),
+            "duplicate_verse_address_occurrence_count": sum(
+                len(item["verse_address_occurrences"]) - len(item["verse_labels"])
+                for item in book_data.values()
+            ),
             "total_verse_range_marker_count": total_ranges,
             "usfm_members_without_id": usfm_members_without_id,
             "marker_counts": dict(sorted(marker_counts.items())),
         },
         "member_inventory": inventory,
         "book_inventory": book_inventory,
+        "verse_address_inventory": verse_address_inventory,
         "warnings": (
             ["One or more of the 66 Protestant-canon book IDs were not found; do not approve this package for first-release import."]
             if missing_core else []
@@ -370,13 +390,48 @@ def inspect_local_archive(path: Path, source_id: str) -> dict[str, Any]:
 
 def write_outputs(reports: list[dict[str, Any]], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
+    report_by_source = {report["source_id"]: report for report in reports}
+    comparison: dict[str, Any] | None = None
+    webp = report_by_source.get("engwebp")
+    kjv = report_by_source.get("eng-kjv")
+    if webp and kjv:
+        webp_addresses = {
+            (row["book_id"], row["chapter_label"], row["verse_label"])
+            for row in webp["verse_address_inventory"]
+            if row["book_id"] in EXPECTED_CORE_BOOKS
+        }
+        kjv_addresses = {
+            (row["book_id"], row["chapter_label"], row["verse_label"])
+            for row in kjv["verse_address_inventory"]
+            if row["book_id"] in EXPECTED_CORE_BOOKS
+        }
+        webp_only = sorted(webp_addresses - kjv_addresses)
+        kjv_only = sorted(kjv_addresses - webp_addresses)
+        comparison = {
+            "scope": "66 Protestant-canon book IDs only; compares primary c/v labels, not verse wording or semantic equivalence",
+            "webp_distinct_addresses": len(webp_addresses),
+            "kjv_distinct_addresses": len(kjv_addresses),
+            "common_addresses": len(webp_addresses & kjv_addresses),
+            "webp_only_count": len(webp_only),
+            "kjv_only_count": len(kjv_only),
+            "webp_only": [
+                {"book_id": b, "chapter_label": c, "verse_label": v}
+                for b, c, v in webp_only
+            ],
+            "kjv_only": [
+                {"book_id": b, "chapter_label": c, "verse_label": v}
+                for b, c, v in kjv_only
+            ],
+        }
+
     manifest = {
         "generated_at_utc": utc_now(),
         "description": "Metadata-only audit. No Scripture wording is written to this report.",
         "sources": reports,
+        "primary_versification_address_comparison": comparison,
     }
     (output_dir / "audit-manifest.json").write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(manifest, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8"
     )
 
     with (output_dir / "member-inventory.csv").open("w", newline="", encoding="utf-8") as handle:
@@ -397,7 +452,8 @@ def write_outputs(reports: list[dict[str, Any]], output_dir: Path) -> None:
     with (output_dir / "book-inventory.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=[
             "source_id", "book_id", "chapter_count", "verse_marker_count",
-            "distinct_chapter_verse_labels", "verse_range_marker_count", "members",
+            "distinct_chapter_verse_labels", "duplicate_chapter_verse_labels",
+            "verse_range_marker_count", "members",
         ])
         writer.writeheader()
         for report in reports:
@@ -414,6 +470,24 @@ def write_outputs(reports: list[dict[str, Any]], output_dir: Path) -> None:
         for report in reports:
             for marker, count in report["parse_summary"]["marker_counts"].items():
                 writer.writerow({"source_id": report["source_id"], "marker": marker, "occurrences": count})
+
+    with (output_dir / "verse-addresses.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["source_id", "book_id", "chapter_label", "verse_label"])
+        writer.writeheader()
+        for report in reports:
+            for address in report["verse_address_inventory"]:
+                writer.writerow({"source_id": report["source_id"], **address})
+
+    if comparison is not None:
+        with (output_dir / "verse-address-differences.csv").open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=[
+                "book_id", "chapter_label", "verse_label", "present_in_webp", "present_in_kjv",
+            ])
+            writer.writeheader()
+            for key in comparison["webp_only"]:
+                writer.writerow({**key, "present_in_webp": True, "present_in_kjv": False})
+            for key in comparison["kjv_only"]:
+                writer.writerow({**key, "present_in_webp": False, "present_in_kjv": True})
 
 
 def main() -> int:
