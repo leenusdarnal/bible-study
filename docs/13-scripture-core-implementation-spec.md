@@ -31,7 +31,7 @@ The segment endpoints can span chapters within one book. A reference that crosse
 
 ## 13.3 What the seed does not do
 
-The seed inserts the 66 book identities and Protestant book order. It deliberately does **not** invent or insert chapter counts, verse counts, versification details or Bible text. Those must come from a verified import source and a selected versification profile.
+The seed inserts the 66 book identities and Protestant book order, retaining separate USFM identifiers and OSIS identifiers. It deliberately does **not** invent or insert chapter counts, verse counts, versification details or Bible text. Those must come from a verified import source and a selected versification profile.
 
 The initial versification scheme remains an open decision. A scheme record should only be seeded after its source, version and numbering rules are selected and documented.
 
