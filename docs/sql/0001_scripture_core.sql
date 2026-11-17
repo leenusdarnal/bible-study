@@ -5,7 +5,8 @@
 
 CREATE TABLE scriptural_works (
   id TEXT PRIMARY KEY NOT NULL,
-  osis_code TEXT NOT NULL UNIQUE,
+  usfm_code TEXT NOT NULL UNIQUE,
+  osis_code TEXT UNIQUE,
   standard_name TEXT NOT NULL,
   testament TEXT NOT NULL CHECK (testament IN ('old', 'new')),
   genre TEXT,
