@@ -55,10 +55,12 @@ Keep review state, decision, reviewer, timestamps, reasons and revision history.
 
 ## 4.8 User data
 
-Authentication-provider tables are selected only after a compatibility proof of concept. Application tables hold user profiles, roles, preferences, notes, bookmarks, highlights, reading plans and progress. Personal records are private by default and reference stable passage identities. Enforce ownership on the server.
+Authentication-provider tables are selected only after a compatibility proof of concept. Application tables hold user profiles, roles, preferences, notes, bookmarks, highlights, reading plans, reading trackers and chapter progress. Personal records are private by default and reference stable passage or chapter identities. Enforce ownership on the server.
+
+Guest data is local-first in IndexedDB; a client-generated installation identifier is not authentication. Cloud records require a verified account owner. Guest migration and multi-device sync must be idempotent, exportable and governed by explicit conflict rules.
 
 ## 4.9 Detailed physical design
 
-The detailed table catalogue, key columns, integrity rules, index plan and migration slices are maintained in [11. Database Schema Proposal](11-database-schema.md). The domain relationships are illustrated in [12. Entity Relationship Diagrams](12-entity-relationship-diagrams.md).
+The detailed table catalogue, key columns, integrity rules, index plan and migration slices are maintained in [11. Database Schema Proposal](11-database-schema.md). The domain relationships are illustrated in [12. Entity Relationship Diagrams](12-entity-relationship-diagrams.md). Reading tracker requirements are specified in [22. Reading Progress Tracker Specification](22-reading-progress-tracker-spec.md).
 
 The detailed schema is a proposed physical design, not a frozen migration. Validate it against real datasets and the deployed D1/SQLite runtime before production migrations.
