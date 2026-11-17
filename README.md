@@ -66,6 +66,7 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Scripture core implementation specification](docs/13-scripture-core-implementation-spec.md) | Draft SQLite DDL, 66-book seed and validation plan |
 | [Scripture source selection](docs/14-scripture-source-selection.md) | Selected WEBP and KJV editions, rights and source formats |
 | [Dual-text import pipeline](docs/15-dual-bible-text-import-pipeline.md) | Archive, USFM parsing, staging, versification, validation and publication |
+| [Blue Letter Bible product reference](docs/16-product-reference-blue-letter-bible.md) | Product benchmark, feature lessons, original platform requirements and copyright boundaries |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
