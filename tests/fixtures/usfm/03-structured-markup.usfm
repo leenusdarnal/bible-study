@@ -1,11 +1,11 @@
-\\id EXO
-\\ide UTF-8
-\\h Exodus
-\\c 1
-\\s1 Synthetic structured-markup test
-\\p
-\\v 1 An invented line with an inline \\add supplied phrase\\add* and a \\nd sacred-name marker\\nd*.
-\\v 2 A synthetic sentence with a footnote\\f + \\fr 1:2 \\ft This is an invented explanatory note.\\f*.
-\\v 3 A synthetic sentence with a cross-reference\\x + \\xo 1:3 \\xt EXO 2:1\\x*.
-\\q1 A line of synthetic poetry.
-\\q2 A following poetic line.
+\id EXO
+\ide UTF-8
+\h Exodus
+\c 1
+\s1 Synthetic structured-markup test
+\p
+\v 1 An invented line with an inline \add supplied phrase\add* and a \nd sacred-name marker\nd*.
+\v 2 A synthetic sentence with a footnote\f + \fr 1:2 \ft This is an invented explanatory note.\f*.
+\v 3 A synthetic sentence with a cross-reference\x + \xo 1:3 \xt EXO 2:1\x*.
+\q1 A line of synthetic poetry.
+\q2 A following poetic line.
