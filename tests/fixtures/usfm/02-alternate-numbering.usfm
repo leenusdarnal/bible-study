@@ -1,0 +1,10 @@
+\\id PSA
+\\ide UTF-8
+\\h Psalms
+\\c 54
+\\ca 53\\ca*
+\\s1 A synthetic psalm heading
+\\q1 First poetic line with invented words.
+\\q2 Second poetic line with invented words.
+\\v 1 \\va 3\\va* This is the first synthetic verse in the primary scheme.
+\\v 2 \\va 4\\va* This is the second synthetic verse in the primary scheme.
