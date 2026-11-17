@@ -60,12 +60,14 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Security, privacy and operations](docs/08-security-privacy-operations.md) | Roles, authentication, privacy, backups and recovery |
 | [Licensing and attribution](docs/09-licensing-attribution.md) | Translation rights, datasets and provenance |
 | [Release roadmap](docs/10-release-roadmap.md) | Phases, milestones and acceptance principles |
+| [Detailed database schema](docs/11-database-schema.md) | Proposed D1 tables, keys, constraints, indexes and migration slices |
+| [Entity relationship diagrams](docs/12-entity-relationship-diagrams.md) | Domain ERDs and cross-domain integrity rules |
 | [Architecture decisions](decisions/) | Important decisions and their rationale |
 
 ## Status
 
 **Discovery:** 14 rounds completed.  
-**Current stage:** documentation and implementation planning.  
+**Current stage:** database design and implementation planning.  
 **Application implementation:** not started in this repository.
 
 Requirements in these documents represent agreed project direction unless explicitly marked as a recommendation, assumption, open question or item requiring verification. Technical limits, licensing terms and third-party integrations must be rechecked before implementation.
