@@ -148,14 +148,14 @@ Authentication-provider tables are owned by the selected auth library after a co
 **Reading progress integrity rules:**
 - Cloud trackers belong to a verified account. Guest trackers live in IndexedDB; installation IDs do not authenticate users.
 - Every tracker declares canon, scheme and scope mode (all_books or selected_books).
-- Selected-book rows must reference works in the tracker's canon; selected scope cannot be empty.
-- Chapter progress references stable scheme_chapters IDs. Services validate scheme, canon and scope membership.
+- Selected-book rows must reference works in the tracker's canon; selected scope cannot be empty. Create a selected-books tracker by inserting the base row in all-books mode, adding one or more selected book rows, then switching scope to selected-books in the same transaction. The triggers prevent direct empty selected-scope insertion, empty scope activation, deleting the final selected book or moving the final selected book to another tracker.
+- Chapter progress references stable scheme_chapters IDs. Composite foreign keys validate the tracker's scheme, canon and chapter work; triggers validate the selected-book scope on insert and on progress edits. Services still enforce owner access and validate the complete operation.
 - No progress row means unread. Stored states are in_progress or read. A read state requires completed_at.
 - Overall percentages and book states are derived, not stored counters.
 - Reading plans and chapter completion are separate.
 - Guest-to-account migration is explicit and idempotent. Multi-device sync needs mutation IDs, tombstones and conflict rules.
 
-The legacy user_reading_progress proposal is superseded by these tracker tables. Draft DDL and selected-scope triggers are in [0003_reading_progress.sql](sql/0003_reading_progress.sql). Do not create both models for the same chapter-completion purpose. If plan-step completion is needed, add a separately named table.
+The legacy user_reading_progress proposal is superseded by these tracker tables. Draft DDL and selected-scope triggers are in [0003_reading_progress.sql](sql/0003_reading_progress.sql). SQLite regression tests are in [test_reading_progress_migration.py](../tests/sqlite/test_reading_progress_migration.py). Do not create both models for the same chapter-completion purpose. If plan-step completion is needed, add a separately named table.
 
 Every private library operation must enforce user ownership on the server. Notes, bookmarks and highlights reference stable passage identities, not copied translation text. Offline sync should be a later migration with explicit conflict rules.
 
