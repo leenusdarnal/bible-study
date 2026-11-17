@@ -388,6 +388,43 @@ def inspect_local_archive(path: Path, source_id: str) -> dict[str, Any]:
     return inspect_archive_bytes(data, source_id, final_url=str(path), retrieved_at_utc=utc_now())
 
 
+
+def extract_usfm_members(archive_bytes: bytes, source_id: str, output_dir: Path) -> int:
+    """Extract only validated USFM members to an explicit temporary workspace.
+
+    The caller must use a fresh output directory. Other ZIP members are not
+    extracted. This is intended for ephemeral parser runs, not repository storage.
+    """
+    if source_id not in SOURCES:
+        raise AuditError(f"Unknown source ID: {source_id}")
+    root = (output_dir / source_id).resolve()
+    root.mkdir(parents=True, exist_ok=False)
+    extracted = 0
+    with zipfile.ZipFile(io.BytesIO(archive_bytes)) as zip_file:
+        for info in zip_file.infolist():
+            _validate_member_path(info)
+            if info.is_dir():
+                continue
+            if PurePosixPath(info.filename.lower()).suffix not in USFM_FILE_SUFFIXES:
+                continue
+            relative = PurePosixPath(info.filename)
+            target = (root / Path(*relative.parts)).resolve()
+            if not target.is_relative_to(root):
+                raise AuditError(f"ZIP member would escape extraction root: {info.filename!r}")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            raw = zip_file.read(info)
+            try:
+                raw.decode("utf-8-sig")
+            except UnicodeDecodeError as exc:
+                raise AuditError(f"USFM member is not UTF-8: {info.filename!r}") from exc
+            with target.open("xb") as handle:
+                handle.write(raw)
+            extracted += 1
+    if extracted == 0:
+        raise AuditError(f"No USFM members were extracted for {source_id}.")
+    return extracted
+
+
 def write_outputs(reports: list[dict[str, Any]], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     report_by_source = {report["source_id"]: report for report in reports}
@@ -496,6 +533,7 @@ def main() -> int:
     parser.add_argument("--source-dir", type=Path, default=Path("source-archives"), help="Directory containing local ZIPs when not downloading.")
     parser.add_argument("--cache-dir", type=Path, default=Path(".source-audit-cache"), help="Local directory for downloaded source ZIPs.")
     parser.add_argument("--output-dir", type=Path, default=Path("source-audit-output"), help="Directory for JSON and CSV audit reports.")
+    parser.add_argument("--extract-usfm-dir", type=Path, default=None, help="Optional fresh temporary directory for safe extraction of USFM members only.")
     args = parser.parse_args()
 
     reports: list[dict[str, Any]] = []
@@ -515,7 +553,16 @@ def main() -> int:
                 archive_path = args.source_dir / f"{source_id}_usfm.zip"
                 if not archive_path.is_file():
                     raise AuditError(f"Local archive not found: {archive_path}")
-                report = inspect_local_archive(archive_path, source_id)
+                data = archive_path.read_bytes()
+                report = inspect_archive_bytes(
+                    data,
+                    source_id,
+                    final_url=str(archive_path),
+                    retrieved_at_utc=utc_now(),
+                )
+            if args.extract_usfm_dir is not None:
+                extracted_count = extract_usfm_members(data, source_id, args.extract_usfm_dir)
+                report["archive"]["extracted_usfm_member_count"] = extracted_count
             reports.append(report)
             print(json.dumps({
                 "source_id": report["source_id"],
