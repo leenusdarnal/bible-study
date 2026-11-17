@@ -43,7 +43,7 @@ NKJV permissions: https://www.harpercollinschristian.com/sales-and-rights/permis
 
 ## 14.3 Acquisition status
 
-The source detail and rights pages and their USFM/USFX download links have been reviewed. The actual ZIP archives have **not yet been downloaded, checksummed or parsed**. No archive file inventory, checksum, byte size, book count or import validation result is claimed.
+The source detail and rights pages and their USFM/USFX download links have been reviewed. The actual ZIP archives have **not yet been downloaded, checksummed or parsed**. The official file directory now provides listed sizes and last-modified timestamps, but these are not locally verified measurements. No archive checksum, ZIP member inventory, archive-derived book count or import validation result is claimed.
 
 Before ingestion, record:
 - exact source page and direct download URL;
@@ -117,3 +117,14 @@ The current eBible.org HTML reading indexes were inspected in addition to the ed
 - The KJV rights notice describes the 1769-standardised text as public domain outside the UK and notes a letters-patent issue for printing in the UK or importing printed copies into the UK. This wording does not settle every legal question for a globally accessible digital application; obtain jurisdiction-specific advice before UK availability.
 
 **Evidence boundary:** this is an online-directory and rights-page review, not inspection of the binary USFM archives. The archive acquisition, checksum, ZIP member inventory, in-file \\id and \\usfm markers, chapter/verse counts and parsing remain pending. See [23. Source Package Listing Review](23-source-package-listing-review.md).
+
+
+## 14.10 Official archive file-directory metadata
+
+The official [eBible.org Scripture file directory](https://ebible.org/scriptures/dir.php), queried on 18 November 2026, listed:
+- WEBP USFM archive: 2,908,410 bytes, last modified 2026-11-17 01:18:23.
+- KJV USFM archive: 2,771,068 bytes, last modified 2026-11-15 09:36:58.
+- WEBP USFX alternative: 3,316,038 bytes, last modified 2026-11-17 01:18:25.
+- KJV USFX alternative: 2,825,185 bytes, last modified 2026-11-15 09:37:00.
+
+These are official directory listing values only. No SHA-256 was exposed by the listing, and the binary archives remain unacquired in this runtime. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the full evidence and the independent BibleNLP-derived corpus cross-check.
