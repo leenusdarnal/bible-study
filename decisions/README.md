@@ -10,9 +10,9 @@ This directory records decisions that materially shape the Bible Study Repo. Sta
 | [ADR-004](ADR-004-first-release-scope.md) | First-release scope | Recorded |
 | [ADR-005](ADR-005-database-schema.md) | Database schema | Recorded; implementation validation remains ongoing |
 | [ADR-006](ADR-006-scripture-core-schema.md) | Scripture core schema | Proposed; fresh local D1 migrations and integrity checks pass; behavioural and Drizzle validation remain open |
-| [ADR-007](ADR-007-dual-bible-text-corpus.md) | Dual Bible text corpus and lossless USFM import | Proposed; source archive acquisition and structural audit complete; semantic, versification and rights gates remain open |
+| [ADR-007](ADR-007-dual-bible-text-corpus.md) | Dual Bible text corpus and lossless USFM import | Proposed; source acquisition, structural audit and 149-file semantic round-trip complete; versification and rights gates remain open |
 | [ADR-008](ADR-008-reading-progress-trackers.md) | Reading progress trackers | Proposed; SQLite regression and local D1 migration/selected-scope trigger checks pass; preview/auth/sync validation remains open |
-| [ADR-009](ADR-009-dual-edition-scripture-import.md) | Dual-edition Scripture import implementation | Proposed; semantic parsing and mapping review remain open |
+| [ADR-009](ADR-009-dual-edition-scripture-import.md) | Dual-edition Scripture import implementation | Proposed; semantic parsing complete; mapping approval and legal review remain open |
 
 ## Change control
 
