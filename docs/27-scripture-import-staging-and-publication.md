@@ -122,3 +122,16 @@ The migration/test suite must demonstrate:
 - zero foreign-key violations.
 
 CI coverage is implemented in `tests/sqlite/test_scripture_import_staging_migration.py` and the SQLite/D1 workflow. A passing local D1 run validates SQL behaviour; the live staging D1 deployment separately confirms that migrations 0001–0007 were applied remotely. Neither result proves that a real USFM corpus has been imported or published.
+
+
+## 27.9 Scripture Import Preflight implementation
+
+The first fail-closed preflight engine is implemented in tools/scripture_import_preflight.py; its contract and usage are documented in [31. Scripture Import Preflight and Validation Engine](31-scripture-import-preflight-engine.md).
+
+Preflight checks that the manifest covers the complete archive inventory, every member passed semantic parsing and canonical XML round-trip, all canonical USX objects are checksum-verified in private storage, and each release-included member has a matching converter output. It also checks the marker registry, source-native verse references and content states, rights for the requested territory and required uses, source-specific versification approval, and explicit treatment of pending cross-edition mapping proposals.
+
+The archive inventory and release scope are deliberately separate. All source USFM members must be retained in the audit record; members outside the initial 66-book Protestant canon must be explicitly marked as excluded with a reason. They must not be silently dropped or included in the public edition.
+
+The preflight report contains metadata and finding codes only. A successful preflight does not publish content or create D1 import rows; it only permits a later, separately reviewed staging transition to be considered. Synthetic preflight regression tests use test-only approvals and content and do not change the real WEBP/KJV rights or marker-review status.
+
+The real WEBP and KJV packages remain blocked by pending rights/marker review, pending versification work, unfinished detached-signature verification and the unavailable private R2 object storage. No real Scripture text has been processed by this preflight implementation.
