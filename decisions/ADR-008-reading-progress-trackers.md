@@ -1,6 +1,6 @@
 # ADR-008: Chapter-Based Reading Progress and Independent Trackers
 
-- **Status:** Accepted for product and logical data-model direction; SQLite regression tests and fresh local D1 migration/schema checks pass in GitHub Actions; D1 behavioural, authentication and sync validation remain pending.
+- **Status:** Accepted for product and logical data-model direction; SQLite regression tests and fresh local D1 migration/schema checks pass in GitHub Actions; D1 local migration and selected-scope trigger checks pass; preview, authentication and sync validation remain pending.
 - **Date:** 17 November 2026
 
 ## Context
@@ -27,7 +27,7 @@ The draft SQL uses a safe selected-scope activation sequence: create the tracker
 
 Benefits include support for any reading medium, multiple independent goals, stable identity across translation switching, multiple canons, and reliable derived statistics.
 
-Costs include scheme/canon validation, local export and migration work, and more complex future sync. The draft schema has passed a local SQLite smoke test against compatible parent-table definitions. A standard-library unittest suite now exercises migrations 0001, 0002 and 0003 together; a GitHub Actions workflow was added to run it on relevant pushes and pull requests. The SQLite regression suite passes in GitHub Actions. A separate D1 local workflow applies migrations 0001–0003, seeds all 66 Protestant books and verifies foreign-key integrity (run 44249782265). D1-specific trigger behaviour, auth ownership and guest migration still require validation before production migration.
+Costs include scheme/canon validation, local export and migration work, and more complex future sync. The draft schema has passed a local SQLite smoke test against compatible parent-table definitions. A standard-library unittest suite now exercises migrations 0001, 0002 and 0003 together; a GitHub Actions workflow was added to run it on relevant pushes and pull requests. The SQLite regression suite passes in GitHub Actions. A separate D1 local workflow applies migrations 0001–0003, seeds all 66 Protestant books and verifies foreign-key integrity (run 44249782265). Local D1 CI also exercises selected-scope activation, valid progress, rejection of out-of-scope progress, last-book deletion and empty-scope creation (run 44250072396). Remaining work includes additional D1 edge cases, preview validation, auth ownership, guest storage, sync and account deletion.
 
 ## Rejected alternatives
 
