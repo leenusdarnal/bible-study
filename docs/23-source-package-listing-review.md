@@ -2,7 +2,7 @@
 
 - **Reviewed:** 18 November 2026
 - **Status:** Official WEBP and KJV archives acquired, checksummed, structurally audited and semantically round-tripped; versification approval and territorial rights review remain open.
-- **Purpose:** Record what has been verified before downloading and parsing the two selected USFM source packages.
+- **Purpose:** Maintain the source provenance, archive audit, semantic parser results and remaining import gates for the two selected USFM editions.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Import pipeline](15-dual-bible-text-import-pipeline.md), [Licensing](09-licensing-attribution.md).
 
 ## 23.1 Executive finding
@@ -12,7 +12,7 @@ The eBible.org edition pages confirm the direct USFM download links and the righ
 - **WEBP:** eBible.org identifies engwebp as its World English Bible Protestant Edition and states that this variant contains only the 66 books of the Old and New Testaments.
 - **KJV:** eBible.org identifies eng-kjv as the 1769-standardised King James Version with Apocrypha/Deuterocanon. Its online index lists the 66 Protestant-canon books plus 14 additional apocryphal/additional-corpus page entries.
 
-The exact ZIP member inventories, SHA-256 hashes, CRC integrity, primary book IDs, chapter/verse markers and source-address comparison have now been verified by a GitHub-hosted audit. Exact results are recorded in section 23.12. This structural scan is not a full semantic USFM parse and does not approve publication.
+The exact ZIP member inventories, SHA-256 hashes, CRC integrity, primary book IDs, chapter/verse markers and source-address comparison were verified by the GitHub-hosted structural audit in section 23.12. All 149 USFM members then passed USFMTC semantic parsing and canonical XML round-trip validation, as documented in section 23.13. These checks do not approve the versification mappings, territorial rights or publication.
 
 ## 23.2 Official source register
 
@@ -121,26 +121,22 @@ No archive files were created in that initial chat-runtime attempt. This was an 
 | Actual archive member inventory | Verified | Section 23.12; 72 WEBP and 85 KJV entries |
 | In-file book IDs | Verified | All 66 core IDs present; supplementary IDs inventoried |
 | USFM version declaration | Not present in scanned members | No `\\usfm <version>` marker detected; do not infer a version |
-| Primary chapter/verse address counts | Structurally audited | Section 23.12; full semantic parser and mapping review remain pending |
+| Primary chapter/verse address counts | Structurally audited | Section 23.12; semantic parse/round-trip passed in 23.13; specific moved-passage review is in 23.14 and document 25 |
 | Rights clearance for all launch territories | Pending | Requires legal review, especially for UK KJV distribution |
 
-## 23.9 Remaining operational checklist (initial pre-run snapshot)
+## 23.9 Remaining operational checklist
 
-> **Historical status note:** This checklist records the position before the GitHub-hosted archive audit was implemented. Its archive-acquisition items were subsequently completed and are superseded by section 23.12. The semantic parser and canonical XML round-trip gate was subsequently completed for all 149 members in section 23.13. Manual marker review, versification approval, signature verification and legal clearance remain open.
-
-The acquisition and ZIP inventory tasks are complete. The following work remains before a text import can be approved:
+The archive acquisition, ZIP safety/inventory checks and initial semantic parse/round-trip gate are complete for the two recorded archive checksums. The following work remains before a text import can be approved:
 
 1. Verify the purpose and cryptographic validity of the included `keys.asc` and `signature.txt.asc` files if the publisher documents a verification procedure.
-2. Keep the tested USFMTC 0.4.10 parser pinned for the current source packages; the files contain no declared USFM version, so parser compatibility must not be reported as a publisher version.
-3. Review representative headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes against the canonicalised USX output; add regression fixtures for any marker-specific concern.
-4. Completed: semantic parse and canonical XML round-trip validation passed for all 149 USFM members; continue adding focused regression fixtures for marker-specific edge cases.
-5. Review the Romans 14/16 address relocation and all other primary verse label differences with the actual source text and a pinned TVTMS revision.
-6. Add source-specific versification records and approved non-one-to-one mapping groups.
-7. Complete territorial rights review, including KJV UK questions.
-8. Implement D1 staging and publication, then approve one complete checksummed import run.
+2. Review representative headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes against canonicalised USX output; add synthetic or rights-cleared regression fixtures for marker-specific edge cases.
+3. Complete reviewer-approved WEBP and KJV source versification profiles. The source-supported Romans 14:24–26 / 16:25–27 moved-passage proposal and its WEBP note-only anchor are recorded in section 23.14 and [25. Romans 14/16 Versification Review](25-romans-versification-review.md).
+4. Resolve any other non-identical chapter/verse addresses, alternate-numbering markers, empty source markers and subverse relationships without rewriting native source references.
+5. Complete territorial rights review, especially KJV distribution in the UK.
+6. Implement D1 staging, deterministic imports, content/markup preservation checks and atomic publication/rollback tests.
+7. Approve a complete import run by exact source checksums, parser version, scheme versions and reviewer decision before exposing any translation to users.
 
-**Historical decision at this stage:** WEBP and KJV remained the selected initial editions, but were not yet acquired. The binary acquisition and structural ZIP checks were later completed as documented in section 23.12. Both editions remain unpublished pending approved versification mappings, signature/legal review and a tested D1 import/publication workflow.
-
+Both editions remain unpublished pending these gates.
 
 ## 23.10 Official archive directory metadata
 
@@ -308,3 +304,12 @@ The source files are no longer awaiting initial semantic parsing or round-trip v
 - reviewer-approved WEBP/KJV versification profiles and the Romans 14/16 mapping group;
 - territorial rights review, particularly KJV distribution in the UK;
 - staging, deterministic import and publication/rollback tests in the application environment.
+
+
+## 23.14 Romans moved-passage evidence
+
+Direct inspection of the source files confirms that the WEBP edition carries Romans 14:24–26 at its native location and includes a footnote explaining that the Textus Receptus places those verses after Romans 16:24, numbered 16:25–27. The KJV source file contains the corresponding three consecutive units at Romans 16:25–27. The proposed correspondence is therefore 3-to-3 and classified as a moved passage.
+
+The WEBP source also retains a Romans 16:25 marker used only as a footnote anchor describing that relocation. The importer must preserve the footnote and native anchor separately; it must not count the anchor as another text-bearing occurrence of the moved passage. This source example motivated migration 0005's explicit `text`, `annotation_only` and `empty_marker` content states.
+
+The mapping is documented as **pending human review**, not as an approved canonical mapping. See [25. Romans 14/16 Versification Review](25-romans-versification-review.md) and the [machine-readable mapping proposal](../data/versification/proposals/romans-14-24-26-to-16-25-27.json). The proposal records both archive checksums and the pinned STEPBible TVTMS context. Do not seed it as approved until the actual source units have been staged and an editor has reviewed the relationship.
