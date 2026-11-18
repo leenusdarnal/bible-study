@@ -86,7 +86,7 @@ SQLite regression tests for the draft reading-progress migration are in `tests/s
 ## Status
 
 **Discovery:** 14 rounds completed; product benchmark research expanded across five reference platforms.  
-**Current stage:** product requirements and database design, verified WEBP/KJV source archives, structural and semantic USFM validation, local D1 schema regression checks, and source-specific versification review.  
+**Current stage:** product requirements and database design, verified WEBP/KJV source archives, structural and semantic USFM validation, a partial marker registry, the initial deterministic USFM-to-structured-content converter, local D1 schema regression checks, and source-specific versification review.  
 **Application implementation:** not started in this repository.
 
 Requirements in these documents represent agreed project direction unless explicitly marked as a recommendation, assumption, open question or item requiring verification. Technical limits, licensing terms and third-party integrations must be rechecked before implementation.
