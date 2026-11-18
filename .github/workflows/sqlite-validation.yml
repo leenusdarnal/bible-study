@@ -1,4 +1,4 @@
-name: SQLite schema regression tests
+name: SQLite and D1 local schema validation
 
 on:
   push:
@@ -18,9 +18,9 @@ permissions:
   contents: read
 
 jobs:
-  reading-progress-sqlite:
+  schema-validation:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -32,3 +32,51 @@ jobs:
 
       - name: Run SQLite regression tests
         run: python -m unittest discover -s tests/sqlite -v
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Install pinned Wrangler CLI
+        run: npm install --no-save --package-lock=false wrangler@4.162.0
+
+      - name: Create temporary local D1 configuration
+        run: |
+          cat > "$RUNNER_TEMP/wrangler.toml" <<'EOF'
+          name = "bible-study-schema-validation"
+          compatibility_date = "2026-11-18"
+
+          [[d1_databases]]
+          binding = "DB"
+          database_name = "bible-study-schema-validation"
+          database_id = "00000000-0000-0000-0000-000000000000"
+          EOF
+
+      - name: Apply Scripture core migration to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0001_scripture_core.sql
+
+      - name: Seed Protestant 66-book canon in local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0002_seed_protestant_66.sql
+
+      - name: Apply reading progress migration to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0003_reading_progress.sql
+
+      - name: Assert D1 schema, canon seed and foreign-key integrity
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "CREATE TEMP TABLE assert_66_books (book_count INTEGER CHECK(book_count = 66)); INSERT INTO assert_66_books SELECT COUNT(*) FROM canon_books WHERE canon_id = 'canon-protestant-66' AND is_included = 1; CREATE TEMP TABLE assert_foreign_keys (ok INTEGER CHECK(ok = 1)); INSERT INTO assert_foreign_keys SELECT CASE WHEN COUNT(*) = 0 THEN 1 ELSE 0 END FROM pragma_foreign_key_check; SELECT COUNT(*) AS protestant_book_count FROM canon_books WHERE canon_id = 'canon-protestant-66' AND is_included = 1;"
