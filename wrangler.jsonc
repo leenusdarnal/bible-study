@@ -4,6 +4,13 @@
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-11-18",
   "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bible-study-staging",
+      "database_id": "0d805b79-01c6-4789-ab5a-7efbbf93610f"
+    }
+  ],
   "assets": {
     "directory": ".svelte-kit/cloudflare",
     "binding": "ASSETS"
