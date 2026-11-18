@@ -126,20 +126,20 @@ No archive files were created in that initial chat-runtime attempt. This was an 
 
 ## 23.9 Remaining operational checklist (initial pre-run snapshot)
 
-> **Historical status note:** This checklist records the position before the GitHub-hosted archive audit was implemented. Its archive-acquisition items were subsequently completed and are superseded by section 23.12. The remaining semantic, versification, signature and legal gates are still open.
+> **Historical status note:** This checklist records the position before the GitHub-hosted archive audit was implemented. Its archive-acquisition items were subsequently completed and are superseded by section 23.12. The semantic parser and canonical XML round-trip gate was subsequently completed for all 149 members in section 23.13. Manual marker review, versification approval, signature verification and legal clearance remain open.
 
 The acquisition and ZIP inventory tasks are complete. The following work remains before a text import can be approved:
 
-1. Verify the purpose and cryptographic validity of the included \\`keys.asc\\` and \\`signature.txt.asc\\` files if the publisher documents a verification procedure.
+1. Verify the purpose and cryptographic validity of the included `keys.asc` and `signature.txt.asc` files if the publisher documents a verification procedure.
 2. Keep the tested USFMTC 0.4.10 parser pinned for the current source packages; the files contain no declared USFM version, so parser compatibility must not be reported as a publisher version.
 3. Review representative headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes against the canonicalised USX output; add regression fixtures for any marker-specific concern.
-4. Run source-text round-trip and structural tests on representative books and edge cases.
+4. Completed: semantic parse and canonical XML round-trip validation passed for all 149 USFM members; continue adding focused regression fixtures for marker-specific edge cases.
 5. Review the Romans 14/16 address relocation and all other primary verse label differences with the actual source text and a pinned TVTMS revision.
 6. Add source-specific versification records and approved non-one-to-one mapping groups.
 7. Complete territorial rights review, including KJV UK questions.
 8. Implement D1 staging and publication, then approve one complete checksummed import run.
 
-**Historical decision at this stage:** WEBP and KJV remained the selected initial editions, but were not yet acquired. The binary acquisition and structural ZIP checks were later completed as documented in section 23.12. Both editions remain unpublished pending semantic parsing, versification review and applicable rights clearance.
+**Historical decision at this stage:** WEBP and KJV remained the selected initial editions, but were not yet acquired. The binary acquisition and structural ZIP checks were later completed as documented in section 23.12. Both editions remain unpublished pending approved versification mappings, signature/legal review and a tested D1 import/publication workflow.
 
 
 ## 23.10 Official archive directory metadata
