@@ -7,10 +7,10 @@ import json
 import sys
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "tools"))
 
 from scripture_import_preflight import CORE_66, run_preflight  # noqa: E402
@@ -120,7 +120,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
                     "compatibility_profile": "2.5",
                     "publisher_declared_version": None,
                 },
-            ).convert(__import__("xml.etree.ElementTree", fromlist=["ElementTree"]).fromstring(root_xml))
+            ).convert(ET.fromstring(root_xml))
             destination = cls.output_dir / f"{book_code}.json"
             destination.write_text(json.dumps(converted, ensure_ascii=False), encoding="utf-8")
             members.append({
