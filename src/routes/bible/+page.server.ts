@@ -1,4 +1,5 @@
-import type { PageServerLoad } from './$types';\nimport { resolveInitialBook, type CanonBook } from '$lib/bible-catalogue';
+import type { PageServerLoad } from './$types';
+import { resolveInitialBook, type CanonBook } from '$lib/bible-catalogue';
 
 
 
