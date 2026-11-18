@@ -71,7 +71,7 @@ Reports deliberately omit the Bible verse wording. Exact verse addresses are ref
 - The tool does not copy Bible wording into its metadata reports.
 - It does not publish archives or extracted text.
 - It does not verify the detached package signature files included in the ZIP; this must be a separately documented integrity check if eBible.org provides the verification procedure.
-- It only performs a structural scan for primary `\\id`, `\\c` and `\\v` lines plus marker-frequency inventory. It does not semantically validate every USFM construct, nested marker, attribute, footnote, paragraph or poetry block.
+- The Python ZIP inventory tool performs a structural scan for primary `\\id`, `\\c` and `\\v` lines plus marker-frequency inventory. The separate USFMTC semantic audit described in section 24.8 parses and round-trips the source members.
 - It does not detect a USFM version if no `\\usfm` declaration is present.
 - It does not establish that two verse labels contain equivalent wording or approve a mapping.
 - It does not create Scripture rows, update D1, stage content or publish a translation.
@@ -84,7 +84,7 @@ The workflow:
 2. sets up Python 3.12;
 3. runs the source-audit unit tests;
 4. downloads and structurally audits both official archives;
-5. uploads a metadata-only artifact containing the JSON/CSV reports.
+5. runs the USFMTC semantic parse and canonical XML round-trip audit over every USFM member;\n6. uploads metadata-only structural and semantic reports.
 
 The official binary archives are held only in the GitHub runner's temporary cache for the duration of the job; they are not committed to the repository or uploaded as workflow artifacts. The report artifact is temporary and subject to GitHub retention limits. Archive hashes and key results are preserved in document 23.
 
@@ -108,7 +108,7 @@ See [23. Source Package Listing Review](23-source-package-listing-review.md) for
 
 The semantic audit uses the **USFM Technical Committee's reference implementation**, the Python package `usfmtc`, pinned to version `0.4.10` (MIT licence). The project describes USFMTC as a reference implementation for reading and writing USFM, USX and USJ. Its documented API reads a USFM file into a USX model, canonicalises it and serialises it back to USFM.
 
-This is preferred over a USFM 3.x-only parser because the eBible source files contain no explicit `\\usfm <version>` declaration. The audit therefore tests each source member under candidate USFM 2.5 and 3.1 parser profiles. A successful profile establishes parser compatibility only; it does not prove which version the publisher authored or declared.
+This is preferred over a USFM 3.x-only parser because the eBible source files contain no explicit `\\usfm <version>` declaration. The audit tries the USFM 2.5 profile first and tries 3.1 only for members that do not pass 2.5. A successful profile establishes parser compatibility only; it does not prove which version the publisher authored or declared.
 
 For each member, the diagnostic:
 1. reads the source file under each candidate profile;
@@ -122,6 +122,27 @@ The report contains no Scripture wording. It records source hashes, parser profi
 The GitHub Actions workflow installs the pinned USFMTC version, safely extracts only validated USFM members into the ephemeral runner workspace and executes this audit over both editions. The original ZIP archives and extracted Scripture files are not committed or uploaded. Only metadata-only reports are retained as workflow artifacts.
 
 - Reference implementation: [usfm-bible/usfmtc](https://github.com/usfm-bible/usfmtc)
-- Diagnostic workflow: [USFMTC-based run 44249381803](https://github.com/leenusdarnal/bible-study/actions/runs/44249381803) (result pending at the time of this document update)
+- Diagnostic workflow: [USFMTC-based run 44250112893](https://github.com/leenusdarnal/bible-study/actions/runs/44250112893) (completed successfully; see section 24.9)
 - Acceptance condition: every source member must parse and round-trip under the first successful candidate profile with an identical canonical XML fingerprint. The profile is recorded as a compatibility profile, never as a publisher-declared source version.
 - A successful round-trip is a strong structural/text preservation check, not a substitute for manual review of marker semantics, versification exceptions or legal publication rights.
+
+
+## 24.9 Semantic audit result — 18 November 2026
+
+The pinned USFMTC parser successfully parsed and round-tripped all 149 source USFM members:
+
+| Source | Files | Passed | Review required | 3.1 fallback |
+|---|---:|---:|---:|---:|
+| WEBP | 68 | 68 | 0 | 0 |
+| KJV | 81 | 81 | 0 | 0 |
+| **Total** | **149** | **149** | **0** | **0** |
+
+Every member passed under the first USFM 2.5 compatibility profile. This is not a claim that the publisher declared USFM 2.5; the source files contain no explicit version marker.
+
+- Workflow: [44250112893](https://github.com/leenusdarnal/bible-study/actions/runs/44250112893)
+- Commit: `89494243ee8c0db99c25a5090a5d74aec541f59b`
+- Parser: `usfmtc 0.4.10`
+- Metadata-only artifact: `scripture-source-audit-44250112893`, artifact ID `14403203746`
+- Artifact SHA-256: `823c0975de780d602ec23a8bcc3824b502143aaaffa8195237a0bdf8f466606e`
+
+The result closes initial source parsing and canonical XML round-trip validation for these exact archive checksums. It does not close source-signature verification, marker interpretation review, verse mapping approval, territorial rights clearance or D1 publication.
