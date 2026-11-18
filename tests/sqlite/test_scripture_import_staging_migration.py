@@ -14,7 +14,8 @@ MIGRATIONS = [
     ROOT / "docs/sql/0003_reading_progress.sql",
     ROOT / "docs/sql/0004_versification_mapping_groups.sql",
     ROOT / "docs/sql/0005_translation_text_content_states.sql",
-    ROOT / "docs/sql/0006_scripture_import_staging.sql",
+    ROOT / "docs/sql/0006_structured_translation_content.sql",
+    ROOT / "docs/sql/0007_scripture_import_staging.sql",
 ]
 
 
