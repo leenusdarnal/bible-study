@@ -134,6 +134,22 @@ class USFMToStructuredContentTests(unittest.TestCase):
             [("2", "7")],
         )
 
+
+    def test_usx_end_verse_milestone_stops_projection_assignment(self):
+        xml = """<usx version="3.1"><book code="GEN" style="id">Genesis</book>
+        <chapter sid="GEN 1"/>
+        <para style="p"><verse sid="GEN 1:1"/>First unit.
+        <verse eid="GEN 1:1"/>Between units.
+        <verse sid="GEN 1:2"/>Second unit.<verse eid="GEN 1:2"/></para>
+        </usx>"""
+        result = convert(xml)
+        projections = result["verse_projections"]
+        self.assertEqual([(x["chapter_label"], x["verse_label"]) for x in projections],
+                         [("1", "1"), ("1", "2")])
+        self.assertIn("First unit.", projections[0]["text"])
+        self.assertNotIn("Between units.", projections[0]["text"])
+        self.assertIn("Second unit.", projections[1]["text"])
+
     def test_malformed_document_without_book_is_rejected(self):
         converter = USXConverter(
             registry=REGISTRY,
