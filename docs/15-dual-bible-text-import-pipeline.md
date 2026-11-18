@@ -1,6 +1,6 @@
 # 15. Dual Bible Text Import and Validation Pipeline
 
-- **Status:** Proposed implementation design; official archives downloaded, checksummed and structurally audited; full semantic USFM parsing, versification approval and D1 import remain pending.
+- **Status:** Proposed implementation design; official archives downloaded, checksummed, structurally audited and all 149 USFM members parsed/round-tripped; versification approval, rights review and D1 publication remain pending.
 - **Decision:** Import WEBP and KJV as two distinct translation editions.
 - **Target:** Cloudflare R2 + D1 staging and publication workflow.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Scripture core implementation](13-scripture-core-implementation-spec.md), [database schema](11-database-schema.md), ADR-006.
@@ -405,7 +405,7 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] A reviewer approves the exact source checksums and complete semantic import run.
 - [ ] D1 publication and rollback are tested.
 
-**Current status (18 Nov 2026):** both official binary archives have been downloaded, SHA-256 checksummed and CRC-validated by the source-audit workflow. All 66 core book IDs are present; WEBP contains 68 USFM members and KJV 81, including KJV Apocrypha/Deuterocanon. The source-level chapter and verse address comparison reveals a Romans placement/numbering difference, recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). Full semantic USFM parsing, source-text round-trip validation, detached-signature verification, mapping approval, rights review and D1 publication remain open.
+**Current status (18 Nov 2026):** both official binary archives have been downloaded, SHA-256 checksummed and CRC-validated by the source-audit workflow. All 66 core book IDs are present; WEBP contains 68 USFM members and KJV 81, including KJV Apocrypha/Deuterocanon. The source-level chapter and verse address comparison reveals a Romans placement/numbering difference, recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). Initial semantic parsing and canonical XML round-trip validation are complete for all 149 USFM members. Manual marker review, detached-signature verification, mapping approval, rights review and D1 publication remain open.
 
 
 ## 15.17 Results of the first binary archive audit
@@ -413,3 +413,8 @@ The first dual-edition import is accepted only when all boxes below are supporte
 The structural audit completed successfully in GitHub Actions. The 66-book chapter counts match at 1,189 in both editions. The audit found 31,103 primary chapter–verse addresses in WEBP and 31,102 in KJV, with 31,100 shared addresses. The only address-set differences are Romans 14:24–26 in WEBP and Romans 16:26–27 in KJV; Romans 16:25 is common. The WEB footnote on [BibleGateway](https://www.biblegateway.com/passage/?search=Romans%2014%3A24-26&version=WEB%3BKJV) describes the Textus Receptus placement of Romans 14:24–26 after Romans 16:24 as 16:25–27. Treat this as a mapping-review lead, not an approved automatic mapping.
 
 The structural scanner did not detect a `\\usfm` version declaration inside the files. Record the source's declared version as unknown/not provided until verified by the publisher or an appropriate parser profile. The scanner also found no verse-range markers or duplicate primary chapter–verse labels, but it is not a complete USFM semantic parser.
+
+
+### Semantic parser result
+
+The USFM Technical Committee reference parser (`usfmtc 0.4.10`) parsed and round-tripped all 68 WEBP and 81 KJV USFM members under the USFM 2.5 compatibility profile, with zero review-required files and no 3.1 fallback. The source packages contain no declared `\\usfm <version>` marker, so this result is a compatibility finding, not a source-version declaration. See [source audit result 23.13](23-source-package-listing-review.md#2313-semantic-usfm-parsing-and-round-trip-results--completed-18-november-2026) and [audit tool result 24.9](24-source-archive-audit-tool.md#249-semantic-audit-result--18-november-2026).
