@@ -1,6 +1,6 @@
 # 15. Dual Bible Text Import and Validation Pipeline
 
-- **Status:** Proposed implementation design; official archives downloaded, checksummed, structurally audited and all 149 USFM members parsed/round-tripped; versification approval, rights review and D1 publication remain pending.
+- **Status:** Proposed implementation design; official archives downloaded, checksummed, structurally audited and all 149 USFM members parsed/round-tripped; draft structured-content schema is locally tested; full marker review, versification approval, rights review, import staging and D1 publication remain pending.
 - **Decision:** Import WEBP and KJV as two distinct translation editions.
 - **Target:** Cloudflare R2 + D1 staging and publication workflow.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Scripture core implementation](13-scripture-core-implementation-spec.md), [database schema](11-database-schema.md), ADR-006.
@@ -403,7 +403,7 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] STEPBible TVTMS revision is pinned, attributed and applied only after editorial review.
 - [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented in reviewed mapping groups.
 - [x] The draft schema now preserves grouped non-one-to-one mapping membership; migration 0004 applies and a three-to-two mapping group is tested in local D1.
-- [ ] The production schema can preserve structured USFM content and approved source mappings.
+- [x] A draft structured-content model for ordered blocks and nested nodes has been added and locally validated in SQLite and D1 CI (migration 0006); full marker-to-node mapping and renderer validation remain open.
 - [ ] Rights review is recorded for intended publication territories.
 - [ ] All blocking validation findings are cleared, including the Romans address divergence.
 - [ ] A reviewer approves the exact source checksums and complete semantic import run.
@@ -422,3 +422,10 @@ The structural scanner did not detect a `\\usfm` version declaration inside the 
 ### Semantic parser result
 
 The USFM Technical Committee reference parser (`usfmtc 0.4.10`) parsed and round-tripped all 68 WEBP and 81 KJV USFM members under the USFM 2.5 compatibility profile, with zero review-required files and no 3.1 fallback. The source packages contain no declared `\\usfm <version>` marker, so this result is a compatibility finding, not a source-version declaration. See [source audit result 23.13](23-source-package-listing-review.md#2313-semantic-usfm-parsing-and-round-trip-results--completed-18-november-2026) and [audit tool result 24.9](24-source-archive-audit-tool.md#249-semantic-audit-result--18-november-2026).
+
+
+### Structured content storage gate
+
+Migration 0006 adds a draft normalized content tree. The `translation_texts` row remains a plain-text projection; ordered content blocks and nested nodes preserve structural and inline content such as headings, paragraphs, poetry, footnotes, cross-references, marker attributes and unknown markers. The migration is applied in local D1 CI and covered by SQLite regression tests. See [26. Structured Scripture Content Model](26-structured-scripture-content-model.md).
+
+This is a schema foundation only. It does not yet prove that every marker in the real WEBP/KJV archives has a reviewed node mapping or that the UI renderer reproduces the source structure faithfully.
