@@ -103,24 +103,25 @@ The final address-comparison run completed successfully on 17 November 2026:
 See [23. Source Package Listing Review](23-source-package-listing-review.md) for exact archive SHA-256 hashes, per-edition counts and the Romans address divergence.
 
 
+
 ## 24.8 Semantic USFM parser diagnostic
 
-A second audit layer has been added in `tools/usfm_semantic_audit.cjs`. It uses the pinned npm dependency `usfm-grammar@3.2.3` to parse each extracted USFM member into USJ, regenerate USFM from that structure, parse the regenerated source again and compare the book/chapter/verse node structure.
+The semantic audit uses the **USFM Technical Committee's reference implementation**, the Python package `usfmtc`, pinned to version `0.4.10` (MIT licence). The project describes USFMTC as a reference implementation for reading and writing USFM, USX and USJ. Its documented API reads a USFM file into a USX model, canonicalises it and serialises it back to USFM.
 
-The diagnostic report records only:
-- source member path and source-byte hash;
-- parse error and warning counts and error positions;
-- USJ conversion success/failure;
-- chapter and verse node totals;
-- marker and node-type counts;
-- whether the regenerated structure matches the original.
+This is preferred over a USFM 3.x-only parser because the eBible source files contain no explicit `\\usfm <version>` declaration. The audit therefore tests each source member under candidate USFM 2.5 and 3.1 parser profiles. A successful profile establishes parser compatibility only; it does not prove which version the publisher authored or declared.
 
-It does not write Scripture wording into the report. It is a parser-compatibility and structural round-trip diagnostic, not a proof that every editorial nuance, marker attribute or textual distinction is losslessly preserved. Human review and dedicated semantic fixtures remain required.
+For each member, the diagnostic:
+1. reads the source file under each candidate profile;
+2. canonicalises the parsed USX representation;
+3. serialises it back to USFM;
+4. reparses the generated USFM;
+5. compares full canonical XML fingerprints, including text, while writing only hashes and structural metadata to the report.
 
-The GitHub Actions workflow now installs Node.js 24 and the pinned parser, safely extracts only validated USFM members into the ephemeral runner workspace, and executes the semantic audit over both editions. The original ZIP archives and extracted Scripture files are not committed or uploaded. Only metadata-only reports are retained as workflow artifacts.
+The report contains no Scripture wording. It records source hashes, parser profile results, parse error counts, round-trip status and structural element counts. The source text is held only in the ephemeral runner process.
 
-The archive files do not declare a `\\usfm` version marker. The parser dependency's grammar family must not be mistaken for a version declaration in the source files.
+The GitHub Actions workflow installs the pinned USFMTC version, safely extracts only validated USFM members into the ephemeral runner workspace and executes this audit over both editions. The original ZIP archives and extracted Scripture files are not committed or uploaded. Only metadata-only reports are retained as workflow artifacts.
 
-- Diagnostic workflow: [run 44248908061](https://github.com/leenusdarnal/bible-study/actions/runs/44248908061)
-- Acceptance condition: all source members must parse, convert and round-trip without parser errors or structural mismatches. Any failures require investigation and a documented parser/profile decision before import approval.
-- This run's result must be recorded after completion; do not treat a running or failed diagnostic as an accepted source import.
+- Reference implementation: [usfm-bible/usfmtc](https://github.com/usfm-bible/usfmtc)
+- Diagnostic workflow: [run 44248908061](https://github.com/leenusdarnal/bible-study/actions/runs/44248908061) (superseded by the USFMTC-based run triggered after this tool change)
+- Acceptance condition: every source member must parse and round-trip under at least one candidate profile with an identical canonical XML fingerprint. Files that pass more than one profile remain version-ambiguous and require explicit metadata treatment.
+- A successful round-trip is a strong structural/text preservation check, not a substitute for manual review of marker semantics, versification exceptions or legal publication rights.
