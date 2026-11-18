@@ -123,5 +123,5 @@ The GitHub Actions workflow installs the pinned USFMTC version, safely extracts 
 
 - Reference implementation: [usfm-bible/usfmtc](https://github.com/usfm-bible/usfmtc)
 - Diagnostic workflow: [USFMTC-based run 44249381803](https://github.com/leenusdarnal/bible-study/actions/runs/44249381803) (result pending at the time of this document update)
-- Acceptance condition: every source member must parse and round-trip under at least one candidate profile with an identical canonical XML fingerprint. Files that pass more than one profile remain version-ambiguous and require explicit metadata treatment.
+- Acceptance condition: every source member must parse and round-trip under the first successful candidate profile with an identical canonical XML fingerprint. The profile is recorded as a compatibility profile, never as a publisher-declared source version.
 - A successful round-trip is a strong structural/text preservation check, not a substitute for manual review of marker semantics, versification exceptions or legal publication rights.
