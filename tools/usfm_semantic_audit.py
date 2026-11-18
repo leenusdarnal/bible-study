@@ -142,7 +142,12 @@ def audit_directory(source_dir: Path) -> dict[str, Any]:
         source_results = []
         for path in source_files:
             raw = path.read_bytes()
-            profiles = [audit_profile(path, version) for version in CANDIDATE_PROFILES]
+            profiles = []
+            for version in CANDIDATE_PROFILES:
+                profile_result = audit_profile(path, version)
+                profiles.append(profile_result)
+                if profile_result["status"] == "passed":
+                    break
             passed = [x for x in profiles if x["status"] == "passed"]
             result = {
                 "source_id": source_id,
@@ -150,7 +155,8 @@ def audit_directory(source_dir: Path) -> dict[str, Any]:
                 "source_byte_size": len(raw),
                 "source_sha256": sha256(raw),
                 "status": "passed" if passed else "review_required",
-                "compatible_profiles": [x["profile"] for x in passed],
+                "passing_profiles": [x["profile"] for x in passed],
+                "attempted_profiles": [x["profile"] for x in profiles],
                 "profile_results": profiles,
             }
             source_results.append(result)
@@ -161,7 +167,7 @@ def audit_directory(source_dir: Path) -> dict[str, Any]:
             "member_count": len(source_results),
             "passed_count": sum(x["status"] == "passed" for x in source_results),
             "review_required_count": sum(x["status"] != "passed" for x in source_results),
-            "profile_ambiguity_count": sum(len(x["compatible_profiles"]) > 1 for x in source_results),
+            "fallback_profile_count": sum("3.1" in [p["profile"] for p in x["profile_results"]] for x in source_results),
         }
 
     failures = sum(x["status"] != "passed" for x in files)
@@ -171,7 +177,8 @@ def audit_directory(source_dir: Path) -> dict[str, Any]:
             "package": "usfmtc",
             "version": PARSER_VERSION,
             "publisher": "USFM Technical Committee",
-            "candidate_profiles": list(CANDIDATE_PROFILES),
+            "candidate_profiles_in_order": list(CANDIDATE_PROFILES),
+            "profile_strategy": "Try 2.5 first; try 3.1 only when 2.5 does not pass.",
         },
         "description": "Metadata-only semantic parse and full canonical XML round-trip fingerprints. No Scripture wording is included.",
         "summary_by_source": summary_by_source,
