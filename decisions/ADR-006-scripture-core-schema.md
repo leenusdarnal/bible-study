@@ -1,6 +1,6 @@
 # ADR-006: Scripture Core Physical Schema
 
-- **Status:** Proposed; SQL draft only, not yet applied to D1.
+- **Status:** Proposed; draft migrations 0001–0003 apply to fresh local D1 and the 66-book seed/foreign-key integrity checks pass; D1 behavioural and Drizzle reconciliation remain open.
 - **Date:** 2026-11-17
 - **Related:** ADR-005, [Scripture Core SQL Specification](../docs/13-scripture-core-implementation-spec.md).
 
@@ -24,7 +24,7 @@ Use composite foreign keys where they enforce that units, translation text and p
 - Referential integrity can catch several classes of cross-scheme and cross-book errors in the database itself.
 - Passage ranges remain stable and can span chapters within a book.
 - More complex import mapping and domain validation still require application-level services and tests.
-- The SQL is a draft until it is tested against local SQLite and Cloudflare D1 and reconciled with Drizzle-generated migrations.
+- The SQL remains a draft until D1 behavioural edge cases are tested and the schema is reconciled with Drizzle-generated migrations. A GitHub Actions job now applies migrations 0001–0003 to a fresh Wrangler local D1 database, seeds 66 Protestant books and verifies foreign-key integrity (run 44249782265).
 
 ## Review gates
 
