@@ -398,7 +398,8 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] Independent WEBP and KJV source versification profiles are complete and approved; primary address comparison is preliminary only.
 - [ ] STEPBible TVTMS revision is pinned, attributed and applied only after editorial review.
 - [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented in reviewed mapping groups.
-- [x] The draft schema now preserves grouped non-one-to-one mapping membership; migration 0004 applies and a three-to-two mapping group is tested in local D1.\n- [ ] The production schema can preserve structured USFM content and approved source mappings.
+- [x] The draft schema now preserves grouped non-one-to-one mapping membership; migration 0004 applies and a three-to-two mapping group is tested in local D1.
+- [ ] The production schema can preserve structured USFM content and approved source mappings.
 - [ ] Rights review is recorded for intended publication territories.
 - [ ] All blocking validation findings are cleared, including the Romans address divergence.
 - [ ] A reviewer approves the exact source checksums and complete semantic import run.
