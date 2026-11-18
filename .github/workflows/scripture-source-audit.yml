@@ -1,4 +1,4 @@
-name: Scripture source archive audit
+name: Scripture source archive and semantic audit
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/scripture-source-audit.yml"
       - "tools/scripture_source_audit.py"
+      - "tools/usfm_semantic_audit.cjs"
       - "tests/source_audit/**"
   workflow_dispatch:
 
@@ -15,7 +16,7 @@ permissions:
 jobs:
   source-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -25,17 +26,32 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
       - name: Test source-audit utility
         run: python -m unittest discover -s tests/source_audit -v
 
-      - name: Download and audit official WEBP and KJV archives
+      - name: Install pinned USFM semantic parser
+        run: npm install --no-save --package-lock=false usfm-grammar@3.2.3
+
+      - name: Download, audit and safely extract official WEBP and KJV archives
         run: |
           python tools/scripture_source_audit.py \
             --download \
             --cache-dir "$RUNNER_TEMP/source-archive-cache" \
+            --extract-usfm-dir "$RUNNER_TEMP/usfm-source" \
             --output-dir "$RUNNER_TEMP/source-audit-report"
 
-      - name: Upload metadata-only audit report
+      - name: Parse and round-trip every source USFM member
+        run: |
+          node tools/usfm_semantic_audit.cjs \
+            --source-dir "$RUNNER_TEMP/usfm-source" \
+            --output "$RUNNER_TEMP/source-audit-report/semantic-audit.json"
+
+      - name: Upload metadata-only audit reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
