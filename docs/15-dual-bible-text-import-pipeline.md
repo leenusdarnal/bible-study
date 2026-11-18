@@ -64,11 +64,11 @@ Store the original ZIP in a private or restricted R2 source bucket using a conte
 
 Do not overwrite an archive at the same key. A changed checksum means a new source acquisition and a new import run. Keep the source archive separate from parsed JSON/records and from public reader assets.
 
-**Acquisition status as of 18 Nov 2026:** both official archives were downloaded successfully by GitHub Actions. Their actual byte sizes match the eBible.org file directory; ZIP CRC tests passed; SHA-256, member inventories, book IDs, chapter/verse marker counts and exact primary chapter–verse address differences were generated. The 66 Protestant book IDs are present in each package. The WEBP archive contains 68 USFM members and the KJV archive contains 81; source-only content remains inventoried. The exact checksums and Romans numbering comparison are recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). This structural report does not claim a complete semantic parse or publication approval.
+**Acquisition status as of 18 Nov 2026:** both official archives were downloaded successfully by GitHub Actions. Their actual byte sizes match the eBible.org file directory; ZIP CRC tests passed; SHA-256, member inventories, book IDs, chapter/verse marker counts and exact primary chapter–verse address differences were generated. The 66 Protestant book IDs are present in each package. The WEBP archive contains 68 USFM members and the KJV archive contains 81; source-only content remains inventoried. The exact checksums and Romans numbering comparison are recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). All 149 USFM members subsequently passed the pinned USFMTC 0.4.10 semantic parse and canonical XML round-trip audit (68 WEBP; 81 KJV; zero review-required files). This closes the initial parser gate for these exact archive checksums, but does not approve verse mappings, territorial rights or publication.
 
 ## 15.4 USFM parser design
 
-Use USFM as the common interchange format for both editions. The official USFM documentation has multiple versioned specifications, including 2.5 and 3.x, and describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes. The source scan found no explicit `\\usfm <version>` marker in the USFM members. Do not infer a declared version from the extension. The semantic audit tests candidate USFM 2.5 and 3.1 parser profiles and records compatibility separately from source-declared version metadata.
+Use USFM as the common interchange format for both editions. The official USFM documentation has multiple versioned specifications, including 2.5 and 3.x, and describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes. The source scan found no explicit `\\usfm <version>` marker in the USFM members. Do not infer a declared version from the extension. The pinned USFMTC 0.4.10 audit tested USFM 2.5 first and 3.1 only as a fallback; all 149 members passed 2.5. This is a compatibility profile, not a publisher-declared source version.
 
 Parser should be a marker-aware state machine, not a regular expression that strips markers and concatenates everything into plain text.
 
@@ -155,7 +155,7 @@ Each translation edition initially receives its own source versification profile
 
 ### Candidate crosswalk
 
-The STEPBible Data repository provides a Versification dataset called TVTMS (Translators Versification Traditions with Methodology for Standardisation). The source file describes KJV, Hebrew, Latin and Greek traditions, plus a method for mapping source references to a standard reference. It is licensed CC BY 4.0 and requests attribution to Tyndale House and STEPBible.org with a link to the source repository.
+The STEPBible Data repository provides a Versification dataset called TVTMS (Translators Versification Traditions with Methodology for Standardisation). The source file describes KJV, Hebrew, Latin and Greek traditions, plus a method for mapping source references to a standard reference. It is licensed CC BY 4.0 and requests attribution to Tyndale House and STEPBible.org with a link to the source repository. The source-confirmed Romans move has been documented separately as a pending three-to-three group: WEBP Romans 14:24–26 to KJV Romans 16:25–27. WEBP also has a note-only Romans 16:25 anchor that must be preserved as footnote metadata, not treated as another text copy. See [25. Romans 14/16 Versification Review](25-romans-versification-review.md) and its [machine-readable proposal](../data/versification/proposals/romans-14-24-26-to-16-25-27.json).
 
 Use TVTMS as a candidate research crosswalk, not as an automatic import truth. Its own documentation explains that verse alignment can involve:
 - one source verse mapping to multiple standard units;
@@ -166,6 +166,10 @@ Use TVTMS as a candidate research crosswalk, not as an automatic import truth. I
 - chapter-level differences and non-verse material such as Psalm superscriptions.
 
 Consequently, a simple `source_verse_id → canonical_verse_id` one-to-one foreign key is insufficient. Migration 0004 adds `scripture_mapping_groups` and ordered `scripture_mapping_group_members` so complete source and target unit sets can represent one-to-one, one-to-many, many-to-one, many-to-many, moved, subverse and absent relationships. Optional `scripture_unit_mappings` pairwise edges are constrained to endpoints already present in the same group. The migration preserves legacy pairwise rows as ungrouped records. This grouped structure was exercised against local D1 in CI run [44250525247](https://github.com/leenusdarnal/bible-study/actions/runs/44250525247).
+
+### Note-only source anchors
+
+A source verse marker can carry a footnote or other annotation without carrying verse wording. The WEBP Romans 16:25 marker is an observed example. Do not silently drop it or publish an empty string as if it were a normal text-bearing verse. Migration 0005 adds `translation_texts.content_state` values for `text`, `annotation_only` and `empty_marker`, with insert/update triggers that enforce the relationship between the text body and annotation metadata. The importer must preserve the note and its native anchor exactly.
 
 **Proposed comparison sequence:**
 1. Parse both corpora independently into source-specific staging profiles.
