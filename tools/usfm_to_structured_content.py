@@ -75,10 +75,18 @@ def _marker_for(element: ET.Element) -> str:
 
 
 def _sid_reference(value: str) -> tuple[str | None, str | None]:
-    """Extract chapter/verse from common BOOK.CHAPTER.VERSE milestone IDs."""
-    parts = value.split(".")
+    """Extract chapter/verse from common USX 3.x milestone identifiers."""
+    token = value.strip().split()[-1] if value.strip() else ""
+    if ":" in token:
+        chapter, verse = token.split(":", 1)
+        return chapter or None, verse or None
+    parts = token.split(".")
     if len(parts) >= 3:
         return parts[-2], parts[-1]
+    if len(parts) == 2:
+        return parts[0], parts[1]
+    if token.isdigit():
+        return token, None
     return None, None
 
 
@@ -434,6 +442,7 @@ class USXConverter:
         for index, element in enumerate(list(root), start=1):
             tag = local_name(element.tag)
             if tag == "book":
+                self._record_marker("id", self._registry_entry("id"))
                 self.events.append({
                     "source_order": index,
                     "kind": "book_identity",
@@ -442,6 +451,7 @@ class USXConverter:
                     "attributes": _attrs(element),
                 })
             elif tag == "chapter":
+                self._record_marker("c", self._registry_entry("c"))
                 attrs = _attrs(element)
                 number = attrs.get("number")
                 if number:
@@ -580,6 +590,10 @@ def validate_output(data: dict[str, Any]) -> list[str]:
                 errors.append(f"unsupported node_type: {node.get('node_type')}")
             if node.get("id") in node_ids:
                 errors.append(f"duplicate node id: {node.get('id')}")
+            if not isinstance(node.get("source_order"), int) or node["source_order"] < 1:
+                errors.append("node source_order must be a positive integer")
+            if not isinstance(node.get("node_order_path"), str) or not node["node_order_path"]:
+                errors.append("node_order_path must be a non-empty string")
             if node.get("source_order") in node_orders:
                 errors.append("duplicate node source_order within block")
             if node.get("node_order_path") in node_paths:
