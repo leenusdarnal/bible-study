@@ -39,7 +39,7 @@ The initial versification scheme remains an open decision. A scheme record shoul
 
 ## 13.4 Validation plan
 
-Run these checks in a disposable SQLite database and then against a D1 local/preview database:
+Run these checks in a disposable SQLite database and against D1 local. The repository CI now applies migrations 0001–0003 to a fresh local D1 database, seeds the Protestant 66-book canon and asserts the book count and foreign-key integrity. D1 preview/remote behavioural validation remains a separate pre-production gate:
 
 1. Apply the schema to an empty database.
 2. Apply the 66-book seed; verify 66 books and positions 1–66.
@@ -77,12 +77,12 @@ Migration 0003 adds account-owned trackers with explicit canon, scheme and scope
 
 Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
 
-Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite only; repeat the migration and behavioural checks against Wrangler's D1 local/preview database before production.
+Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite. A separate GitHub Actions job also applies all three migrations to Wrangler local D1 and checks the 66-book seed plus foreign-key integrity. Behavioural trigger tests against D1 preview and production safety review remain outstanding.
 
 ## 13.6 Acceptance criteria
 
 This slice is ready to be considered implementation-approved only when:
-- DDL applies cleanly to a fresh D1 database.
+- [x] DDL migrations 0001–0003 apply cleanly to a fresh Wrangler local D1 database (CI run 44249782265).
 - The 66-book seed is repeatable only through the migration history (not by blindly re-running inserts).
 - All listed integrity tests pass.
 - A real chosen versification import is mapped without forcing false one-to-one assumptions.
