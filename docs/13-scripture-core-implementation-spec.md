@@ -77,12 +77,12 @@ Migration 0004 adds mapping groups and ordered group members so one-to-many, man
 
 Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
 
-Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite. A separate GitHub Actions job also applies all three migrations to Wrangler local D1 and checks the 66-book seed plus foreign-key integrity. Local D1 trigger tests now cover selected-scope activation and the key rejection cases; D1 preview/remote validation and production safety review remain outstanding.
+Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite. A separate GitHub Actions job also applies all four migrations to Wrangler local D1 and checks the 66-book seed plus foreign-key integrity. Local D1 trigger tests now cover selected-scope activation and the key rejection cases; D1 preview/remote validation and production safety review remain outstanding.
 
-## 13.6 Acceptance criteria
+## 13.7 Acceptance criteria
 
 This slice is ready to be considered implementation-approved only when:
-- [x] DDL migrations 0001–0003 apply cleanly to a fresh Wrangler local D1 database (CI run 44249782265).
+- [x] DDL migrations 0001–0004 apply cleanly to a fresh Wrangler local D1 database; grouped three-to-two mapping storage is exercised in CI run 44250525247.
 - The 66-book seed is repeatable only through the migration history (not by blindly re-running inserts).
 - All listed integrity tests pass.
 - A real chosen versification import is mapped without forcing false one-to-one assumptions.
@@ -90,7 +90,7 @@ This slice is ready to be considered implementation-approved only when:
 - The documentation and ERD are updated from the tested implementation.
 
 
-## 13.7 Current implementation references
+## 13.8 Current implementation references
 
 - [Cloudflare D1 foreign keys](https://developers.cloudflare.com/d1/sql-api/foreign-keys/) — enforcement defaults and deferred validation.
 - [Cloudflare D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) — migration files, Wrangler configuration and migration patterns.
