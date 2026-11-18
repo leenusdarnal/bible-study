@@ -9,7 +9,8 @@
 
 - `sql/0001_scripture_core.sql` — core Scripture and translation tables.
 - `sql/0002_seed_protestant_66.sql` — 66-book identity and order seed only.
-- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.\n- `sql/0004_versification_mapping_groups.sql` — grouped source/target unit sets and constrained pairwise mapping edges.
+- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
+- `sql/0004_versification_mapping_groups.sql` — grouped source/target unit sets and constrained pairwise mapping edges.
 - `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
 
 These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups.
@@ -71,9 +72,13 @@ PRAGMA foreign_key_check;
 
 Use Wrangler's documented D1 migration workflow and keep migration files in the application repository once that repository exists. D1 enforces foreign keys by default. Cloudflare documents `PRAGMA defer_foreign_keys = on` for migrations that temporarily need to violate constraints within a transaction; unresolved violations still fail at transaction end. Do not use `PRAGMA defer_foreign_keys = off` as a validation step. Run `PRAGMA foreign_key_check` to inspect violations. Review generated Drizzle migrations, especially table rebuilds and foreign-key handling. If using Drizzle's nested migration layout, configure Wrangler's `migrations_pattern` to match the generated files. Do not assume every generic SQLite migration sequence behaves identically under D1.
 
-## 13.5 Reading progress migration 0003
+## 13.5 Versification mapping groups migration 0004
 
-Migration 0004 adds mapping groups and ordered group members so one-to-many, many-to-one, moved, subverse, absent and complex mappings can be represented explicitly. It preserves pre-existing pairwise mappings as ungrouped rows and requires optional pairwise edges to use units already registered as members of the referenced group.\n\nMigration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject progress outside selected-book scope, re-check edits to historic out-of-scope progress, require at least one selected book before activating selected scope, and prevent removing or moving the final selected book. Selected scope is created transactionally by inserting a tracker as all-books, adding selected-book rows, then switching its scope before commit. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
+Migration 0004 adds mapping groups and ordered group members so one-to-many, many-to-one, moved, subverse, absent and complex mappings can be represented explicitly. It preserves pre-existing pairwise mappings as ungrouped rows and requires optional pairwise edges to use units already registered as members of the referenced group.
+
+## 13.6 Reading progress migration 0003
+
+Migration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject progress outside selected-book scope, re-check edits to historic out-of-scope progress, require at least one selected book before activating selected scope, and prevent removing or moving the final selected book. Selected scope is created transactionally by inserting a tracker as all-books, adding selected-book rows, then switching its scope before commit. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
 
 Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
 
