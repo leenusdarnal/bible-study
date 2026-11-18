@@ -25,7 +25,7 @@ export const GET: RequestHandler = async ({ platform }) => {
     INNER JOIN scriptural_works sw ON sw.id = cb.work_id
     WHERE cb.canon_id = ? AND cb.is_included = 1
     ORDER BY cb.position ASC
-  `).all<CanonBook>('canon-protestant-66');
+  `).bind('canon-protestant-66').all<CanonBook>();
 
   return json({
     canon: 'protestant-66',
