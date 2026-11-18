@@ -9,6 +9,7 @@ on:
       - "tools/usfm_semantic_audit.py"
       - "tools/validate_translation_rights.py"
       - "tools/validate_usfm_marker_registry.py"
+      - "tools/usfm_to_structured_content.py"
       - "data/usfm/**"
       - "data/rights/**"
       - "tests/source_audit/**"
@@ -47,6 +48,14 @@ jobs:
 
       - name: Install pinned USFM Technical Committee reference parser
         run: python -m pip install "usfmtc==0.4.10"
+
+      - name: Smoke-test parser-backed structured conversion with synthetic USFM
+        run: |
+          python tools/usfm_to_structured_content.py tests/usfm_registry/fixtures/minimal.usfm \
+            --edition-id SYNTHETIC \
+            --source-id synthetic             --source-member fixtures/minimal.usfm \
+            --registry data/usfm/marker-registry.json \
+            --output "$RUNNER_TEMP/synthetic-structured-content.json"
 
       - name: Download, audit and safely extract official WEBP and KJV archives
         run: |
