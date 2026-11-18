@@ -234,24 +234,31 @@ class USXConverter:
         if tag in {"chapter", "verse"}:
             self._record_marker(marker, entry)
             is_end = "eid" in attrs and "number" not in attrs
-            if tag == "chapter" and not is_end:
-                number = attrs.get("number")
-                if number:
-                    self.current_chapter = number
+            if tag == "chapter":
+                if is_end:
+                    self.current_chapter = None
                     self.current_verse_key = None
-                elif attrs.get("sid"):
-                    chapter_from_sid, _ = _sid_reference(attrs["sid"])
-                    self.current_chapter = chapter_from_sid or self.current_chapter
+                else:
+                    number = attrs.get("number")
+                    if number:
+                        self.current_chapter = number
+                        self.current_verse_key = None
+                    elif attrs.get("sid"):
+                        chapter_from_sid, _ = _sid_reference(attrs["sid"])
+                        self.current_chapter = chapter_from_sid or self.current_chapter
+                        self.current_verse_key = None
+            elif tag == "verse":
+                if is_end:
                     self.current_verse_key = None
-            elif tag == "verse" and not is_end:
-                number = attrs.get("number")
-                if not number and attrs.get("sid"):
-                    _, number = _sid_reference(attrs["sid"])
-                projection = self._projection(self.current_chapter, number)
-                if projection is not None:
-                    self.current_verse_key = (
-                        self.book_code or "", self.current_chapter or "", number or ""
-                    )
+                else:
+                    number = attrs.get("number")
+                    if not number and attrs.get("sid"):
+                        _, number = _sid_reference(attrs["sid"])
+                    projection = self._projection(self.current_chapter, number)
+                    if projection is not None:
+                        self.current_verse_key = (
+                            self.book_code or "", self.current_chapter or "", number or ""
+                        )
             node = self._new_node(
                 marker=marker,
                 node_type="milestone",
@@ -460,6 +467,7 @@ class USXConverter:
                 self._record_marker("c", self._registry_entry("c"))
                 attrs = _attrs(element)
                 number = attrs.get("number")
+                chapter_label = number
                 if number:
                     self.current_chapter = number
                     self.current_verse_key = None
@@ -468,10 +476,14 @@ class USXConverter:
                     if chapter_from_sid:
                         self.current_chapter = chapter_from_sid
                         self.current_verse_key = None
+                        chapter_label = chapter_from_sid
+                elif attrs.get("eid"):
+                    self.current_chapter = None
+                    self.current_verse_key = None
                 self.events.append({
                     "source_order": index,
                     "kind": "chapter_boundary",
-                    "chapter_label": number,
+                    "chapter_label": chapter_label,
                     "attributes": attrs,
                 })
             elif tag == "para":
