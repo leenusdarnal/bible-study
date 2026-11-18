@@ -121,6 +121,9 @@ class USXConverter:
             self.unresolved_markers.add(marker)
         elif entry.get("review_status") != "reviewed":
             self.pending_mappings.add(marker)
+        if marker not in {"c", "v"} and self.current_verse_key in self.projections:
+            if entry is None or entry.get("review_status") != "reviewed":
+                self.projections[self.current_verse_key]["review_required"] = True
 
     def _projection(self, chapter: str | None, verse: str | None) -> dict[str, Any] | None:
         if self.book_code is None or chapter is None or verse is None:
@@ -173,10 +176,9 @@ class USXConverter:
             "node_type": node_type,
             "source_marker": marker,
             "text_content": text_content,
-            "attributes": attributes,
+            "attributes": ({**attributes, "_registry_semantic": semantic} if semantic else attributes),
             "raw_value": raw_value,
             "source_order": source_order,
-            "semantic": semantic,
             "children": [],
         }
 
@@ -265,7 +267,8 @@ class USXConverter:
             else:
                 node_type = "unknown_marker"
                 semantic = None
-            self._record_marker(style or "note", self._registry_entry(style) if style else None)
+            self.marker_counts[style or "note"] += 1
+            self.pending_mappings.add(style or "note")
             projection = self.projections.get(self.current_verse_key) if self.current_verse_key else None
             if projection is not None:
                 projection["annotation_count"] += 1
@@ -384,6 +387,15 @@ class USXConverter:
                 child.tail, nodes, parent_id=None, parent_path="",
                 block_id=block_id, in_note=False,
             )
+        flat_nodes: list[dict[str, Any]] = []
+
+        def flatten(items: list[dict[str, Any]]) -> None:
+            for item in items:
+                children = item.get("children", [])
+                flat_nodes.append({key: value for key, value in item.items() if key != "children"})
+                flatten(children)
+
+        flatten(nodes)
         return {
             "id": block_id,
             "edition_id": self.edition_id,
@@ -404,7 +416,7 @@ class USXConverter:
                     if style and self._registry_entry(style) else "pending_review"
                 ),
             },
-            "nodes": nodes,
+            "nodes": flat_nodes,
         }
 
     def convert(self, root: ET.Element) -> dict[str, Any]:
@@ -568,16 +580,15 @@ def validate_output(data: dict[str, Any]) -> list[str]:
                 errors.append(f"unsupported node_type: {node.get('node_type')}")
             if node.get("id") in node_ids:
                 errors.append(f"duplicate node id: {node.get('id')}")
-            node_ids.add(node.get("id"))
             if node.get("source_order") in node_orders:
                 errors.append("duplicate node source_order within block")
-            node_orders.add(node.get("source_order"))
             if node.get("node_order_path") in node_paths:
                 errors.append("duplicate node_order_path within block")
-            node_paths.add(node.get("node_order_path"))
             if node.get("parent_node_id") is not None and node["parent_node_id"] not in node_ids:
-                # Nodes are emitted in pre-order, so a parent must already exist.
                 errors.append("node parent must precede its child")
+            node_ids.add(node.get("id"))
+            node_orders.add(node.get("source_order"))
+            node_paths.add(node.get("node_order_path"))
     return errors
 
 
