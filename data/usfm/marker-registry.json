@@ -504,6 +504,27 @@
       "semantic": "remark",
       "node_type": "peripheral",
       "review_status": "pending_review"
+    },
+    {
+      "marker": "fe",
+      "category": "annotation",
+      "semantic": "endnote_container",
+      "node_type": "footnote",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ef",
+      "category": "annotation",
+      "semantic": "extended_note_container",
+      "node_type": "footnote",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ex",
+      "category": "annotation",
+      "semantic": "extended_cross_reference_container",
+      "node_type": "cross_reference",
+      "review_status": "pending_review"
     }
   ]
 }
