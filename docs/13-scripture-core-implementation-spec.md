@@ -1,6 +1,6 @@
 # 13. Scripture Core SQL Implementation Specification
 
-- **Status:** Draft SQL specification; not an applied migration.
+- **Status:** Draft SQL specification; migrations 0001–0007 apply in local SQLite/D1 CI, but none has been deployed to the project's remote D1 environment.
 - **Target:** Cloudflare D1 / SQLite.
 - **Purpose:** Turn the logical Scripture model into testable DDL and initial canon seed data.
 - **Related:** [Database schema](11-database-schema.md), [ERDs](12-entity-relationship-diagrams.md), [ADR-005](../decisions/ADR-005-database-schema.md).
@@ -12,10 +12,14 @@
 - `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
 - `sql/0004_versification_mapping_groups.sql` — grouped source/target unit sets and constrained pairwise mapping edges.
 - `sql/0005_translation_text_content_states.sql` — explicit text-bearing, annotation-only and empty source-marker states.
+- `sql/0006_structured_translation_content.sql` — ordered structural blocks and nested content nodes for USFM-derived content.
+- `sql/0007_scripture_import_staging.sql` — immutable import-run provenance, source file/member inventory, staging units, validation evidence and publication guards.
 - `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
 - `tests/sqlite/test_translation_text_content_state_migration.py` — standard-library SQLite tests for source text/annotation state integrity.
+- `tests/sqlite/test_structured_translation_content_migration.py` — standard-library SQLite tests for block/node ordering, anchors, nesting and JSON validity.
+- `tests/sqlite/test_scripture_import_staging_migration.py` — standard-library SQLite tests for import-run provenance, staging integrity, guarded transitions and publication.
 
-These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups. Migration 0005 requires migration 0001 and enforces consistent translation text states when a source unit contains text, only annotations, or an explicitly empty marker.
+These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups. Migration 0005 requires migration 0001 and enforces consistent translation text states when a source unit contains text, only annotations, or an explicitly empty marker. Migration 0006 requires migrations 0001–0005 and preserves USFM-derived structured blocks/nodes. Migration 0007 requires migrations 0001–0006 and adds the audited staging/publication contract.
 
 ## 13.2 What migration 0001 creates
 
