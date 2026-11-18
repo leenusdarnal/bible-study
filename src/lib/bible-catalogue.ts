@@ -14,9 +14,9 @@ export function filterCanonBooks(
   search: string,
   testament: TestamentFilter
 ): CanonBook[] {
-  const term = search.trim().toLocaleLowerCase();
+  const term = search.trim().toLowerCase();
   return books.filter((book) => {
-    const matchesSearch = book.display_name.toLocaleLowerCase().includes(term);
+    const matchesSearch = book.display_name.toLowerCase().includes(term);
     const matchesTestament = testament === 'all' || book.testament === testament;
     return matchesSearch && matchesTestament;
   });
