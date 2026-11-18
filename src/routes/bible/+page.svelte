@@ -32,7 +32,7 @@
       <p>The Bible catalogue could not be loaded. Please try again later.</p>
     </div>
   {:else}
-    <div class="library-layout">
+    <main class="library-layout" id="reader-content" tabindex="-1">
       <aside class="book-browser" aria-label="Bible book catalogue">
         <div class="browser-heading">
           <div><span class="eyebrow">THE CANON</span><h2>Books</h2></div>
@@ -67,7 +67,7 @@
         </div>
       </aside>
 
-      <main class="reader-panel" id="reader-content" tabindex="-1">
+      <section class="reader-panel">
         {#if selectedBook}
           <div class="reader-kicker">{selectedBook.testament === 'old' ? 'OLD TESTAMENT' : 'NEW TESTAMENT'} <span>·</span> BOOK {selectedBook.position}</div>
           <h2>{selectedBook.display_name}</h2>
