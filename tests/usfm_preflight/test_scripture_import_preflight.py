@@ -297,8 +297,9 @@ class ScriptureImportPreflightTests(unittest.TestCase):
         }
         report = self.run_check()
         self.assertTrue(report["ready_for_import"])
-        self.assertEqual(report["summary"]["warning_count"], 1)
+        self.assertEqual(report["summary"]["warning_count"], 2)
         self.assertIn("ARCHIVE_SIGNATURE_WAIVED", self.findings(report))
+        self.assertIn("PENDING_MAPPING_EXCLUDED", self.findings(report))
 
     def test_rights_checksum_must_match_exact_archive(self):
         self.rights["editions"][0]["evidence"][0]["sha256"] = "e" * 64
