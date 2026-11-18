@@ -62,3 +62,41 @@ CREATE TABLE translation_content_nodes (
 
 CREATE INDEX idx_translation_content_nodes_parent_order
   ON translation_content_nodes(block_id, parent_node_id, source_order);
+
+CREATE UNIQUE INDEX idx_translation_content_blocks_chapter_order
+  ON translation_content_blocks(edition_id, work_id, chapter_id, block_order)
+  WHERE chapter_id IS NOT NULL;
+CREATE UNIQUE INDEX idx_translation_content_blocks_book_order
+  ON translation_content_blocks(edition_id, work_id, block_order)
+  WHERE chapter_id IS NULL;
+CREATE UNIQUE INDEX idx_translation_content_nodes_source_order
+  ON translation_content_nodes(block_id, source_order);
+
+CREATE TRIGGER trg_translation_content_block_anchor_insert
+BEFORE INSERT ON translation_content_blocks
+WHEN NEW.anchor_unit_id IS NOT NULL
+AND NOT EXISTS (
+  SELECT 1 FROM scripture_units u
+  WHERE u.id = NEW.anchor_unit_id
+    AND u.scheme_id = NEW.versification_scheme_id
+    AND u.work_id = NEW.work_id
+    AND u.chapter_id = NEW.chapter_id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'content block anchor must belong to its declared chapter');
+END;
+
+CREATE TRIGGER trg_translation_content_block_anchor_update
+BEFORE UPDATE OF anchor_unit_id, chapter_id, work_id, versification_scheme_id
+ON translation_content_blocks
+WHEN NEW.anchor_unit_id IS NOT NULL
+AND NOT EXISTS (
+  SELECT 1 FROM scripture_units u
+  WHERE u.id = NEW.anchor_unit_id
+    AND u.scheme_id = NEW.versification_scheme_id
+    AND u.work_id = NEW.work_id
+    AND u.chapter_id = NEW.chapter_id
+)
+BEGIN
+  SELECT RAISE(ABORT, 'content block anchor must belong to its declared chapter');
+END;
