@@ -9,10 +9,10 @@
 
 - `sql/0001_scripture_core.sql` — core Scripture and translation tables.
 - `sql/0002_seed_protestant_66.sql` — 66-book identity and order seed only.
-- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
+- `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.\n- `sql/0004_versification_mapping_groups.sql` — grouped source/target unit sets and constrained pairwise mapping edges.
 - `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
 
-These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records.
+These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups.
 
 ## 13.2 What migration 0001 creates
 
@@ -39,7 +39,7 @@ The initial versification scheme remains an open decision. A scheme record shoul
 
 ## 13.4 Validation plan
 
-Run these checks in a disposable SQLite database and against D1 local. The repository CI now applies migrations 0001–0003 to a fresh local D1 database, seeds the Protestant 66-book canon and asserts the book count and foreign-key integrity. D1 preview/remote behavioural validation remains a separate pre-production gate:
+Run these checks in a disposable SQLite database and against D1 local. The repository CI now applies migrations 0001–0004 to a fresh local D1 database, seeds the Protestant 66-book canon, asserts the book count and foreign-key integrity, and tests a grouped three-to-two mapping. D1 preview/remote behavioural validation remains a separate pre-production gate:
 
 1. Apply the schema to an empty database.
 2. Apply the 66-book seed; verify 66 books and positions 1–66.
@@ -48,7 +48,7 @@ Run these checks in a disposable SQLite database and against D1 local. The repos
 5. Insert a translation edition and its text; verify a unit from another scheme is rejected.
 6. Insert a passage spanning two chapters of the same book; verify it succeeds.
 7. Attempt a passage whose start/end belong to different books; verify the composite foreign key rejects it.
-8. Insert one-to-many and many-to-one mappings across schemes.
+8. Insert one-to-many, many-to-one and many-to-many mapping groups; verify group-side membership and optional pairwise edge constraints.
 9. Attempt to delete a referenced published unit; verify RESTRICT prevents it.
 10. Run `PRAGMA foreign_key_check;` and verify it returns no rows.
 
@@ -73,7 +73,7 @@ Use Wrangler's documented D1 migration workflow and keep migration files in the 
 
 ## 13.5 Reading progress migration 0003
 
-Migration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject progress outside selected-book scope, re-check edits to historic out-of-scope progress, require at least one selected book before activating selected scope, and prevent removing or moving the final selected book. Selected scope is created transactionally by inserting a tracker as all-books, adding selected-book rows, then switching its scope before commit. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
+Migration 0004 adds mapping groups and ordered group members so one-to-many, many-to-one, moved, subverse, absent and complex mappings can be represented explicitly. It preserves pre-existing pairwise mappings as ungrouped rows and requires optional pairwise edges to use units already registered as members of the referenced group.\n\nMigration 0003 adds account-owned trackers with explicit canon, scheme and scope, selected-book membership, chapter progress, indexes and triggers that reject progress outside selected-book scope, re-check edits to historic out-of-scope progress, require at least one selected book before activating selected scope, and prevent removing or moving the final selected book. Selected scope is created transactionally by inserting a tracker as all-books, adding selected-book rows, then switching its scope before commit. Guest progress remains in IndexedDB. The auth-provider user foreign key is deferred until the authentication provider is selected; server-side ownership validation remains mandatory.
 
 Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
 
