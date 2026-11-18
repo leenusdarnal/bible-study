@@ -9,11 +9,11 @@
 
 The project has verified the selected WEBP and KJV source archives and parsed/round-tripped all 149 USFM members. It has **not** imported their Bible text into a live database or published either edition.
 
-Migration `0007_scripture_import_staging.sql` adds a proposed staging/provenance layer to the documentation schema. It is tested against fresh SQLite and temporary local Cloudflare D1 in CI. It is not yet a production migration and has not been applied to a remote D1 database.
+Migration `0007_scripture_import_staging.sql` adds the staging/provenance layer. Migrations 0001–0007 have been applied to the live Cloudflare D1 staging database. This is a staging deployment only; it does not mean that any Bible text has been imported or published.
 
 The import pipeline has three separate data zones:
 
-1. **Immutable source archive:** the exact ZIP bytes in a restricted R2 bucket, addressed by archive SHA-256. Never overwrite an object when the source changes.
+1. **Immutable source archive:** the exact ZIP bytes are intended for a restricted R2 bucket, addressed by archive SHA-256. R2 is not yet enabled on the connected Cloudflare account, so this storage step is blocked. Never overwrite an object when the source changes.
 2. **Canonical parse artefacts:** canonical USX per source file in a restricted R2 location, each with its own SHA-256, parser version and compatibility profile.
 3. **D1 import staging and published projection:** structured source inventory, source-specific verse-address units, text/annotation projections, validation evidence and controlled publication state.
 
@@ -100,7 +100,7 @@ For a new edition version, keep the previous published run available until the n
 
 ## 27.7 Cloudflare and deployment boundary
 
-The connected Cloudflare account currently has no D1 database for this project. GitHub Actions has successfully applied migrations 0001–0007 to ephemeral local D1 during CI, but there is no remote project D1 deployment, R2 source bucket or application Worker yet.
+The connected Cloudflare account has a live APAC staging D1 database named `bible-study-staging` (ID `0d805b79-01c6-4789-ab5a-7efbbf93610f`). Migrations 0001–0007 are applied and the 66-book Protestant canon is present. The database currently has no verified scheme chapters, translation editions or translation text. R2 is not enabled on the account, so restricted source-archive and canonical-USX storage remain blocked. The SvelteKit application foundation is in a draft pull request and has not been deployed as a Worker.
 
 When the application source repository and environments are established, create separate development/staging and production resources. Apply reviewed migrations in development first, run importer/publication tests, back up production before a schema rollout, and keep raw/canonical Scripture artefacts in restricted R2 storage. Do not upload the source ZIPs to GitHub or public buckets.
 
