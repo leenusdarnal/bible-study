@@ -130,6 +130,9 @@ class ScriptureImportPreflightTests(unittest.TestCase):
                 "parse_status": "passed",
                 "roundtrip_matches": True,
                 "compatibility_profile": "2.5",
+                "canonical_usx_object_key": f"canonical-usx/{book_code}.usx.xml",
+                "canonical_usx_sha256": hashlib.sha256((book_code + "-canonical-usx").encode()).hexdigest(),
+                "canonical_usx_object_status": "verified",
                 "conversion_output": f"converted/{book_code}.json",
             })
 
@@ -230,10 +233,9 @@ class ScriptureImportPreflightTests(unittest.TestCase):
 
     def test_archive_member_omission_breaks_expected_coverage_and_canon(self):
         self.manifest["archive_members"].pop()
-        self.manifest["expected"]["member_count"] -= 1
         report = self.run_check()
         self.assertIn("CORE_CANON_INCOMPLETE", self.findings(report))
-        self.assertIn("CONVERSION_COVERAGE_INCOMPLETE", self.findings(report))
+        self.assertIn("ARCHIVE_MEMBER_COUNT_MISMATCH", self.findings(report))
 
     def test_hash_mismatch_between_manifest_and_conversion_is_blocked(self):
         self.replace_output("GEN", lambda data: data["source"].update({"source_sha256": "d" * 64}))
