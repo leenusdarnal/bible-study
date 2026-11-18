@@ -362,7 +362,8 @@ def run_preflight(
     versification = manifest.get("versification")
     storage = manifest.get("storage")
 
-    if edition_id not in EXPECTED_SOURCE_IDS or source_id != EXPECTED_SOURCE_IDS.get(edition_id):
+    expected_source_id = EXPECTED_SOURCE_IDS.get(edition_id) if isinstance(edition_id, str) else None
+    if expected_source_id is None or source_id != expected_source_id:
         add("EDITION_SOURCE_MISMATCH", "blocking", "Edition ID and source package ID are not a supported matching pair.")
     if not isinstance(territory, str) or not re.fullmatch(r"[A-Z]{2}", territory):
         add("TERRITORY_INVALID", "blocking", "A two-letter uppercase publication territory is required.")
@@ -375,6 +376,7 @@ def run_preflight(
         add("ARCHIVE_HASH_INVALID", "blocking", "Source archive SHA-256 is missing or malformed.")
     if (
         not isinstance(archive.get("url"), str)
+        or not isinstance(source_id, str)
         or archive.get("url") != EXPECTED_ARCHIVE_URLS.get(source_id)
     ):
         add("ARCHIVE_URL_INVALID", "blocking", "Source archive URL does not match the pinned official source URL.")
@@ -423,6 +425,8 @@ def run_preflight(
 
     registry_index = _marker_index(marker_registry)
     registry_coverage = marker_registry.get("coverage", {}) if isinstance(marker_registry, dict) else {}
+    if not isinstance(registry_coverage, dict):
+        registry_coverage = {}
     registry_version = marker_registry.get("registry_version") if isinstance(marker_registry, dict) else None
     if not isinstance(marker_registry, dict) or marker_registry.get("schema_version") != 1 or not registry_index:
         add("MARKER_REGISTRY_INVALID", "blocking", "A valid marker registry is required.")
