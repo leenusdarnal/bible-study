@@ -1,7 +1,7 @@
 # 23. Source Package Listing Review — WEBP and KJV
 
 - **Reviewed:** 18 November 2026
-- **Status:** Official WEBP and KJV archives acquired, checksummed and structurally audited; semantic parsing, versification review and territorial rights review remain open.
+- **Status:** Official WEBP and KJV archives acquired, checksummed, structurally audited and semantically round-tripped; versification approval and territorial rights review remain open.
 - **Purpose:** Record what has been verified before downloading and parsing the two selected USFM source packages.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Import pipeline](15-dual-bible-text-import-pipeline.md), [Licensing](09-licensing-attribution.md).
 
@@ -131,8 +131,8 @@ No archive files were created in that initial chat-runtime attempt. This was an 
 The acquisition and ZIP inventory tasks are complete. The following work remains before a text import can be approved:
 
 1. Verify the purpose and cryptographic validity of the included \\`keys.asc\\` and \\`signature.txt.asc\\` files if the publisher documents a verification procedure.
-2. Select and pin a semantic USFM parser/profile; the archive files contain no explicit \\`\\\\usfm\\` version declaration.
-3. Parse headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes without loss.
+2. Keep the tested USFMTC 0.4.10 parser pinned for the current source packages; the files contain no declared USFM version, so parser compatibility must not be reported as a publisher version.
+3. Review representative headings, paragraphs, poetry, footnotes, cross-references, inline character styles and word attributes against the canonicalised USX output; add regression fixtures for any marker-specific concern.
 4. Run source-text round-trip and structural tests on representative books and edge cases.
 5. Review the Romans 14/16 address relocation and all other primary verse label differences with the actual source text and a pinned TVTMS revision.
 6. Add source-specific versification records and approved non-one-to-one mapping groups.
