@@ -72,9 +72,9 @@ Use a marker-aware parser. Preserve semantic markup and unknown markers for revi
 Do not assume the two editions use identical verse boundaries. Import each into its own source-specific versification profile first. Compare book/chapter coverage, verse labels, subverses, alternate numbering and known edge cases before selecting a canonical reference profile.
 
 STEPBible Data is a candidate crosswalk source:
-- [STEPBible Data repository](https://github.com/STEPBible/STEPBible-Data)
-- [Versification directory](https://github.com/STEPBible/STEPBible-Data/tree/master/Versification)
-- [TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/blob/master/Versification/TVTMS%20-%20Translators%20Versification%20Traditions%20with%20Methodology%20for%20Standardisation%20for%20Eng%2BHeb%2BLat%2BGrk%2BOthers%20-%20STEPBible.org%20CC%20BY.txt)
+- [STEPBible Data repository (inspected at commit 5de0a47f35f0fc13dfe1430d104e5db8a4285f9c, 2 November 2026)](https://github.com/STEPBible/STEPBible-Data)
+- [Versification directory](https://github.com/STEPBible/STEPBible-Data/tree/5de0a47f35f0fc13dfe1430d104e5db8a4285f9c/Versification)
+- [TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/blob/5de0a47f35f0fc13dfe1430d104e5db8a4285f9c/Versification/TVTMS%20-%20Translators%20Versification%20Traditions%20with%20Methodology%20for%20Standardisation%20for%20Eng%2BHeb%2BLat%2BGrk%2BOthers%20-%20STEPBible.org%20CC%20BY.txt)
 
 The TVTMS file describes KJV, Hebrew, Latin and Greek traditions and explains that alignments may require split, merged, moved, absent and subverse mappings. It identifies its data as CC BY 4.0, requests attribution to Tyndale House and STEPBible.org, and asks users not to repost copies of the dataset elsewhere so that the source remains the single up-to-date version. Record its version, attribution, source link and any transformations. Use it as a reviewed candidate, not as unquestioned authority.
 
