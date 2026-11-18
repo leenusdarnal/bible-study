@@ -512,16 +512,26 @@ def run_preflight(
         add("VERSIFICATION_EXCLUSIONS_INVALID", "blocking", "Excluded pending proposal IDs must be an array.")
     for proposal in matching:
         proposal_id = proposal.get("proposal_id")
-        approved = proposal.get("status") == "approved" and (
-            isinstance(proposal.get("review"), dict)
-            and proposal["review"].get("review_status") == "approved"
+        review = proposal.get("review")
+        approved = (
+            proposal.get("status") == "approved"
+            and isinstance(review, dict)
+            and review.get("review_status") == "approved"
+            and all(
+                isinstance(review.get(key), str) and review[key].strip()
+                for key in ("reviewer", "reviewed_at", "decision_reference")
+            )
         )
         if approved:
             continue
-        if mode == "cross_edition":
+        if not isinstance(proposal_id, str) or not proposal_id.strip():
+            add("VERSIFICATION_PROPOSAL_ID_INVALID", "blocking", "A matching versification proposal has no stable proposal ID.")
+        elif mode == "cross_edition":
             add("PENDING_MAPPING_APPLICABLE", "blocking", f"Cross-edition import is blocked by unapproved mapping proposal {proposal_id}.")
         elif mode == "native_source_only" and proposal_id not in excluded_ids:
             add("PENDING_MAPPING_NOT_EXPLICITLY_EXCLUDED", "blocking", f"Pending mapping proposal {proposal_id} must be explicitly excluded from a native-source-only import.")
+        elif mode == "native_source_only":
+            add("PENDING_MAPPING_EXCLUDED", "warning", f"Pending mapping proposal {proposal_id} is explicitly excluded; source-native references remain unchanged.")
 
     seen_members: set[str] = set()
     seen_books: set[str] = set()
