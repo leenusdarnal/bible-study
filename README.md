@@ -75,14 +75,15 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Reading Progress Tracker specification](docs/22-reading-progress-tracker-spec.md) | User stories, tracker scope, chapter states, calculations, guest data, privacy and acceptance tests |
 | [Source package listing review](docs/23-source-package-listing-review.md) | eBible.org source evidence, archive checksums, ZIP inventory and WEBP/KJV versification comparison |
 | [Source archive audit tool](docs/24-source-archive-audit-tool.md) | Reproducible download, ZIP safety, checksum, USFM marker and verse-address audit process |
+| [Romans 14/16 versification review](docs/25-romans-versification-review.md) | Source-supported, pending three-to-three moved-passage mapping and note-only WEBP anchor |
 | [Architecture decisions](decisions/README.md) | Numbered decision register, statuses and decision history |
 
-SQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. Source audit tests are in `tests/source_audit/` and run with `python -m unittest discover -s tests/source_audit -v`. GitHub Actions validates both test suites, acquires and audits the official WEBP/KJV archives, and applies the draft migrations to a fresh local D1 database. D1 local migration and selected-scope trigger checks pass; D1 preview tests, initial semantic parsing and round-trip validation pass for all 149 source files; versification mapping approval and rights review remain open.
+SQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. Source audit tests are in `tests/source_audit/` and run with `python -m unittest discover -s tests/source_audit -v`. GitHub Actions validates the SQLite regression suites, acquires and audits the official WEBP/KJV archives, semantically parses and round-trips all 149 USFM members, and applies migrations 0001–0005 to a fresh local D1 database. Local validation covers the 66-book canon, foreign keys, progress-scope integrity, grouped mappings and translation text content states. Live D1 deployment, import staging/publication, versification approval and rights review remain open.
 
 ## Status
 
 **Discovery:** 14 rounds completed; product benchmark research expanded across five reference platforms.  
-**Current stage:** product requirements, database design, verified WEBP/KJV archive acquisition, structural source audit, and semantic import planning.  
+**Current stage:** product requirements and database design, verified WEBP/KJV source archives, structural and semantic USFM validation, local D1 schema regression checks, and source-specific versification review.  
 **Application implementation:** not started in this repository.
 
 Requirements in these documents represent agreed project direction unless explicitly marked as a recommendation, assumption, open question or item requiring verification. Technical limits, licensing terms and third-party integrations must be rechecked before implementation.
