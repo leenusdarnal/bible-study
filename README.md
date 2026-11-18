@@ -77,7 +77,8 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Source archive audit tool](docs/24-source-archive-audit-tool.md) | Reproducible download, ZIP safety, checksum, USFM marker and verse-address audit process |
 | [Romans 14/16 versification review](docs/25-romans-versification-review.md) | Source-supported, pending three-to-three moved-passage mapping and note-only WEBP anchor |
 | [Structured Scripture content model](docs/26-structured-scripture-content-model.md) | Loss-preserving blocks and nested nodes for USFM-derived headings, paragraphs, poetry, notes and inline markup |
-| [Scripture import staging and publication](docs/27-scripture-import-staging-and-publication.md) | Import-run provenance, immutable source inventory, staging validation, guarded publication and rollback requirements |\n| [Translation rights register](docs/28-translation-rights-register.md) | Machine-readable translation rights, territory-specific approval and fail-closed publication gate |
+| [Scripture import staging and publication](docs/27-scripture-import-staging-and-publication.md) | Import-run provenance, immutable source inventory, staging validation, guarded publication and rollback requirements |
+| [Translation rights register](docs/28-translation-rights-register.md) | Machine-readable translation rights, territory-specific approval and fail-closed publication gate |
 | [USFM marker interpretation registry](docs/29-usfm-marker-interpretation-registry.md) | Versioned marker mappings, structured content targets and lossless unknown-marker handling |\n| [USFM-to-Structured Scripture Converter](docs/30-usfm-to-structured-scripture-converter.md) | Deterministic USX-to-block/node conversion and source-verse text projections |
 | [Architecture decisions](decisions/README.md) | Numbered decision register, statuses and decision history |
 
