@@ -1,6 +1,6 @@
 # 11. Database Schema Proposal
 
-- **Status:** Proposed physical design; migrations 0001–0004 apply in local D1 CI with core integrity and mapping-group checks; preview and production validation remain open.
+- **Status:** Proposed physical design; migrations 0001–0005 are included in local SQLite/D1 CI; live preview and production validation remain open.
 - **Target:** Cloudflare D1 (SQLite) + Drizzle ORM.
 - **Related:** [Data model](04-data-model.md), [Architecture](03-technical-architecture.md), [ADR-005](../decisions/ADR-005-database-schema.md), [Reading Progress specification](22-reading-progress-tracker-spec.md).
 
@@ -43,9 +43,9 @@ A printed reference such as Psalm 3:1 is not a globally unique identity.
 | scripture_mapping_group_members | id PK, mapping_group_id FK, side, scheme_id FK, unit_id FK, member_order; ordered source and target unit sets |
 | scripture_unit_mappings | id PK, from_unit_id FK, to_unit_id FK, mapping_group_id FK nullable, mapping_type, source_id, confidence, notes, review_status |
 | translation_editions | id PK, code UNIQUE, name, abbreviation, language_tag, publisher, edition_label, publication_year, versification_scheme_id FK, rights_status, rights_notes, source_url, status |
-| translation_texts | id PK, edition_id FK, versification_scheme_id FK, scripture_unit_id FK, text, paragraph_marker, poetry_level, footnote_metadata_json; UNIQUE(edition_id, scripture_unit_id) |
+| translation_texts | id PK, edition_id FK, versification_scheme_id FK, scripture_unit_id FK, text, content_state, paragraph_marker, poetry_level, footnote_metadata_json; UNIQUE(edition_id, scripture_unit_id) |
 
-Mapping groups are the canonical representation of a reviewed relationship between two versification schemes. Ordered group members explicitly capture the source-side and target-side unit sets, supporting one-to-one, one-to-many, many-to-one, many-to-many (for example, three source units to two target units), moved, subverse and absent relationships. Pairwise scripture_unit_mappings rows are optional edges within a group and are constrained to use group-member endpoints. Legacy pairwise rows remain valid with a null mapping_group_id. Translation text is attached to a unit in the edition's own scheme. The first release can seed one primary Protestant scheme and the 66-book canon without assuming all future editions use identical divisions.
+`translation_texts.content_state` distinguishes `text` (non-empty verse wording), `annotation_only` (empty wording with required footnote/annotation metadata) and `empty_marker` (an explicit source marker with no wording or annotation). Migration 0005 enforces these combinations on insert and update. This avoids mistaking a source footnote anchor for missing or corrupted Bible text; the WEBP Romans 16:25 anchor is the motivating example.\n\nMapping groups are the canonical representation of a reviewed relationship between two versification schemes. Ordered group members explicitly capture the source-side and target-side unit sets, supporting one-to-one, one-to-many, many-to-one, many-to-many (for example, three source units to two target units), moved, subverse and absent relationships. Pairwise scripture_unit_mappings rows are optional edges within a group and are constrained to use group-member endpoints. Legacy pairwise rows remain valid with a null mapping_group_id. Translation text is attached to a unit in the edition's own scheme. The first release can seed one primary Protestant scheme and the 66-book canon without assuming all future editions use identical divisions.
 
 ### Versification mapping groups
 
@@ -208,7 +208,7 @@ Service and integration rules:
 
 ## 11.10 Incremental migration plan
 
-**Slice A — Scripture foundation:** scriptural works, canons, canon membership, versification schemes, chapters, units, mappings, translation editions/texts and passage references.
+**Slice A — Scripture foundation:** scriptural works, canons, canon membership, versification schemes, chapters, units, mappings, translation editions/texts and passage references, including explicit text/annotation-only source states.
 
 **Slice B — Public study and encyclopedia:** entities, names, external IDs, initial specialised entity tables, relationship types/edges/evidence, content and passage/entity links.
 
