@@ -276,8 +276,7 @@ class USXConverter:
             else:
                 node_type = "unknown_marker"
                 semantic = None
-            self.marker_counts[style or "note"] += 1
-            self.pending_mappings.add(style or "note")
+            self._record_marker(style or "note", self._registry_entry(style) if style else None)
             projection = self.projections.get(self.current_verse_key) if self.current_verse_key else None
             if projection is not None:
                 projection["annotation_count"] += 1
@@ -505,7 +504,11 @@ class USXConverter:
             and registry_coverage.get("review_status") == "reviewed"
             and all(x.get("review_status") == "reviewed" for x in self.registry["markers"])
         )
-        readiness = "ready_for_editorial_validation" if registry_reviewed else "review_required"
+        readiness = (
+            "ready_for_editorial_validation"
+            if registry_reviewed and not self.unresolved_markers
+            else "review_required"
+        )
         return {
             "schema_version": 1,
             "converter": {"name": "bible-study-usfm-structured-converter", "version": "0.1.0"},
