@@ -116,6 +116,24 @@ class USFMToStructuredContentTests(unittest.TestCase):
         self.assertEqual(validate_output(result), [])
         self.assertEqual(result["readiness"], "review_required")
 
+
+    def test_empty_marker_state_is_distinct_from_annotation_only(self):
+        xml = """<usx version="2.5"><book code="GEN" style="id">Genesis</book>
+        <chapter number="1" style="c"/><para style="p">
+        <verse number="5" style="v"/></para></usx>"""
+        result = convert(xml)
+        self.assertEqual(result["verse_projections"][0]["content_state"], "empty_marker")
+
+    def test_usx_sid_milestones_resolve_native_chapter_and_verse_labels(self):
+        xml = """<usx version="3.1"><book code="GEN" style="id">Genesis</book>
+        <chapter sid="GEN 2"/><para style="p"><verse sid="GEN 2:7"/>Synthetic words.</para>
+        </usx>"""
+        result = convert(xml)
+        self.assertEqual(
+            [(x["chapter_label"], x["verse_label"]) for x in result["verse_projections"]],
+            [("2", "7")],
+        )
+
     def test_malformed_document_without_book_is_rejected(self):
         converter = USXConverter(
             registry=REGISTRY,
