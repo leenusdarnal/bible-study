@@ -1,6 +1,6 @@
 # 14. Scripture Source and Initial Text Selection
 
-- **Status:** Both initial English editions selected; official USFM archives downloaded and structurally audited; semantic parsing, import and territorial rights review remain pending.
+- **Status:** WEBP and KJV archives acquired, checksummed, structurally audited and semantically parsed/round-tripped (149/149 USFM members); a source-supported Romans mapping proposal is recorded but remains pending review; import and territorial rights gates remain open.
 - **Date reviewed:** 2026-11-18
 - **Purpose:** Record the selected text editions, source evidence, rights gates and machine-readable source formats.
 
@@ -43,7 +43,7 @@ NKJV permissions: https://www.harpercollinschristian.com/sales-and-rights/permis
 
 ## 14.3 Acquisition status
 
-The source detail and rights pages, archive directory and direct USFM/USFX URLs have been reviewed. Both official USFM ZIP archives were downloaded by the GitHub-hosted source-audit workflow, SHA-256 checksummed, passed ZIP CRC tests and had every member inventoried. The 66 Protestant book IDs were found in both. Full archive results and the Romans address differences are recorded in [23. Source Package Listing Review](23-source-package-listing-review.md). The source text has not been imported into D1, and the structural scanner is not the final semantic USFM parser.
+The source detail and rights pages, archive directory and direct USFM/USFX URLs have been reviewed. Both official USFM ZIP archives were downloaded by the GitHub-hosted source-audit workflow, SHA-256 checksummed, passed ZIP CRC tests and had every member inventoried. The 66 Protestant book IDs were found in both. All 149 USFM members then passed the pinned USFMTC 0.4.10 semantic parse and canonical XML round-trip audit (68 WEBP; 81 KJV). The source text has not been imported into D1. Full evidence is recorded in [23. Source Package Listing Review](23-source-package-listing-review.md).
 
 Before ingestion, record:
 - exact source page and direct download URL;
@@ -57,7 +57,7 @@ Preserve each original archive immutably in R2. Do not replace an archive when t
 
 ## 14.4 Common import format
 
-Use USFM as the common interchange format. The official USFM documentation publishes multiple versioned specifications, including 2.5 and 3.x. It documents book identification, chapters and verses, alternate numbering, headings, paragraphs, poetry, footnotes, cross-references, character styles and word-level attributes. The version used by the eBible archives has not yet been read from their in-file version markers; the importer must detect it instead of assuming 3.0.
+Use USFM as the common interchange format. The official USFM documentation publishes multiple versioned specifications, including 2.5 and 3.x. It documents book identification, chapters and verses, alternate numbering, headings, paragraphs, poetry, footnotes, cross-references, character styles and word-level attributes. No `\\usfm <version>` declaration was found in the eBible USFM members. USFMTC 0.4.10 tested USFM 2.5 compatibility first and all 149 members passed that profile; this demonstrates parser compatibility, not a publisher-declared source version.
 
 USFM references:
 - [USFM documentation](https://ubsicap.github.io/usfm/)
@@ -116,7 +116,7 @@ The current eBible.org HTML reading indexes were inspected in addition to the ed
 - The WEBP rights page calls the text public domain, identifies “World English Bible” as a trademark and asks that modified text not be represented under that unchanged name.
 - The KJV rights notice describes the 1769-standardised text as public domain outside the UK and notes a letters-patent issue for printing in the UK or importing printed copies into the UK. This wording does not settle every legal question for a globally accessible digital application; obtain jurisdiction-specific advice before UK availability.
 
-**Evidence boundary:** the binary packages have now been acquired and structurally audited. Full semantic USFM parsing, source-text round-trip tests, cryptographic signature verification and D1 import remain pending. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the audit hashes and results.
+**Evidence boundary:** the binary packages have been acquired, structurally audited and semantically round-tripped. Detached signature verification, reviewed versification mappings, territorial rights approval and D1 import remain open. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the audit hashes and results.
 
 
 ## 14.10 Official archive file-directory metadata
@@ -127,4 +127,11 @@ The official [eBible.org Scripture file directory](https://ebible.org/scriptures
 - WEBP USFX alternative: 3,316,038 bytes, last modified 2026-11-17 01:18:25.
 - KJV USFX alternative: 2,825,185 bytes, last modified 2026-11-15 09:37:00.
 
-These are official directory listing values only. No SHA-256 was exposed by the listing, and the binary archives remain unacquired in this runtime. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the full evidence and the independent BibleNLP-derived corpus cross-check.
+These are official directory listing values only; no SHA-256 was exposed by the listing. The actual downloaded archive sizes and SHA-256 values are recorded separately in section 23.12. See [23. Source Package Listing Review](23-source-package-listing-review.md) for the full evidence and the independent BibleNLP-derived corpus cross-check.
+
+
+## 14.11 Semantic parser and Romans mapping review
+
+The pinned USFM Technical Committee reference implementation `usfmtc 0.4.10` parsed and round-tripped all 149 source USFM members: 68 WEBP and 81 KJV. Every file passed the USFM 2.5 compatibility profile; no file required the 3.1 fallback. The archives contain no publisher-declared `\\usfm` version marker, so do not describe 2.5 as the source's declared version. See [semantic audit results](23-source-package-listing-review.md#2313-semantic-usfm-parsing-and-round-trip-results--completed-18-november-2026).
+
+The source files document a moved passage at Romans 14:24–26 / 16:25–27. A pending three-to-three mapping proposal and the WEBP Romans 16:25 footnote-only anchor are recorded in [25. Romans 14/16 Versification Review](25-romans-versification-review.md). This mapping is not approved or seeded as canonical.
