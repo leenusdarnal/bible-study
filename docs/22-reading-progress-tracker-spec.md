@@ -137,3 +137,10 @@ Before production: validate scheme_chapters keys and canon joins; implement Inde
 ## 22.13 Decision summary
 
 Adopt chapter-based progress as a first-release capability. Model independent trackers against stable Scripture chapter identities and explicit canon/scope. Support guest-local persistence and private account storage. Defer achievements, advanced reminders and multi-device sync until their privacy and conflict behaviour are tested.
+
+
+## 22.14 Validation status
+
+The draft migrations and tracker regression tests pass in SQLite. GitHub Actions also applies migrations 0001–0003 to a fresh Wrangler local D1 database, verifies the Protestant canon seed contains 66 included books and checks that no foreign-key violations are reported (run [44249782265](https://github.com/leenusdarnal/bible-study/actions/runs/44249782265)).
+
+This validates D1 migration compatibility and initial referential integrity. It does **not** yet validate every reading-tracker trigger behaviour under D1, authentication ownership, IndexedDB guest storage, sync or account deletion. Those remain pre-production tasks.
