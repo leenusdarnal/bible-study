@@ -165,7 +165,7 @@ Use TVTMS as a candidate research crosswalk, not as an automatic import truth. I
 - passages that should remain merged rather than be forcibly split;
 - chapter-level differences and non-verse material such as Psalm superscriptions.
 
-Consequently, a simple `source_verse_id → canonical_verse_id` one-to-one foreign key is insufficient. The existing unit mapping design must support one-to-many and many-to-one mappings, ordering, mapping type, notes and provenance.
+Consequently, a simple `source_verse_id → canonical_verse_id` one-to-one foreign key is insufficient. Migration 0004 adds `scripture_mapping_groups` and ordered `scripture_mapping_group_members` so complete source and target unit sets can represent one-to-one, one-to-many, many-to-one, many-to-many, moved, subverse and absent relationships. Optional `scripture_unit_mappings` pairwise edges are constrained to endpoints already present in the same group. The migration preserves legacy pairwise rows as ungrouped records. This grouped structure was exercised against local D1 in CI run [44250525247](https://github.com/leenusdarnal/bible-study/actions/runs/44250525247).
 
 **Proposed comparison sequence:**
 1. Parse both corpora independently into source-specific staging profiles.
@@ -398,7 +398,7 @@ The first dual-edition import is accepted only when all boxes below are supporte
 - [ ] Independent WEBP and KJV source versification profiles are complete and approved; primary address comparison is preliminary only.
 - [ ] STEPBible TVTMS revision is pinned, attributed and applied only after editorial review.
 - [ ] Split, merged, moved, absent, subverse and alternate-number cases are represented in reviewed mapping groups.
-- [ ] The production schema can preserve structured USFM content as well as non-one-to-one mappings.
+- [x] The draft schema now preserves grouped non-one-to-one mapping membership; migration 0004 applies and a three-to-two mapping group is tested in local D1.\n- [ ] The production schema can preserve structured USFM content and approved source mappings.
 - [ ] Rights review is recorded for intended publication territories.
 - [ ] All blocking validation findings are cleared, including the Romans address divergence.
 - [ ] A reviewer approves the exact source checksums and complete semantic import run.
