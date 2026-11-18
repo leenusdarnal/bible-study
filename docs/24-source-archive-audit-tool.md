@@ -84,7 +84,8 @@ The workflow:
 2. sets up Python 3.12;
 3. runs the source-audit unit tests;
 4. downloads and structurally audits both official archives;
-5. runs the USFMTC semantic parse and canonical XML round-trip audit over every USFM member;\n6. uploads metadata-only structural and semantic reports.
+5. runs the USFMTC semantic parse and canonical XML round-trip audit over every USFM member;
+6. uploads metadata-only structural and semantic reports.
 
 The official binary archives are held only in the GitHub runner's temporary cache for the duration of the job; they are not committed to the repository or uploaded as workflow artifacts. The report artifact is temporary and subject to GitHub retention limits. Archive hashes and key results are preserved in document 23.
 
