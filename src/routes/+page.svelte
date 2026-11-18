@@ -8,7 +8,7 @@
   <meta name="description" content="A thoughtful space to read Scripture, explore its context, and grow through structured Bible study." />
 </svelte:head>
 
-<div class="app-shell">
+<div class="app-shell">\n  <a class="skip-link" href="#home-content">Skip to main content</a>
   <aside class="sidebar">
     <a class="brand" href="/" aria-label="Bible Study home">
       <span class="brand-mark">✦</span>
@@ -40,7 +40,7 @@
     </div>
   </aside>
 
-  <main class="main-area">
+  <main class="main-area" id="home-content" tabindex="-1">
     <header class="topbar">
       <div class="breadcrumb">Workspace <span>/</span> Home</div>
       <div class="top-actions">
