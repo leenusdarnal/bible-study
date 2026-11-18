@@ -31,7 +31,7 @@
   <meta name="description" content="Browse the 66 books of the Protestant Bible and open the Scripture reader." />
 </svelte:head>
 
-<div class="library-page">
+<div class="library-page">\n  <a class="skip-link" href="#reader-content">Skip to selected book</a>
   <header class="reader-header">
     <a class="back-link" href="/">← Home</a>
     <div class="header-title"><span class="eyebrow">SCRIPTURE LIBRARY</span><h1>Browse the Bible</h1></div>
@@ -79,7 +79,7 @@
         </div>
       </aside>
 
-      <main class="reader-panel">
+      <main class="reader-panel" id="reader-content" tabindex="-1">
         {#if selectedBook}
           <div class="reader-kicker">{selectedBook.testament === 'old' ? 'OLD TESTAMENT' : 'NEW TESTAMENT'} <span>·</span> BOOK {selectedBook.position}</div>
           <h2>{selectedBook.display_name}</h2>
@@ -117,7 +117,7 @@
 </div>
 
 <style>
-  .library-page{min-height:100vh;background:#f7f6f1;color:#29372d;padding:0 clamp(18px,5vw,76px);font-family:Arial,Helvetica,sans-serif}
+  .skip-link{position:absolute;left:12px;top:-60px;background:#344d3b;color:#fff;padding:10px 14px;border-radius:6px;z-index:10}.skip-link:focus{top:12px}\n  .library-page{min-height:100vh;background:#f7f6f1;color:#29372d;padding:0 clamp(18px,5vw,76px);font-family:Arial,Helvetica,sans-serif}
   .reader-header{min-height:145px;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid #e7e5dc}
   .back-link{color:#62725f;text-decoration:none;font-size:12px;white-space:nowrap}
   .header-title{text-align:center}.eyebrow{display:block;font-size:9px;font-weight:700;letter-spacing:1.7px;color:#92988b}
