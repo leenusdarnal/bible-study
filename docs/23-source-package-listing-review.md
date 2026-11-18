@@ -271,3 +271,40 @@ Romans 16:25 is a common address in both source profiles. A displayed WEB footno
 The utility validates the ZIP structure, CRCs, paths, sizes, member inventory, UTF-8 decoding and basic primary `\\id`, `\\c` and `\\v` address structure. It inventories marker frequency and exact primary chapter–verse labels without writing Scripture wording to reports.
 
 It is a structural audit utility, **not** a complete semantic USFM parser. It does not validate every marker's nesting/attributes, prove text round-tripping, verify the detached package signature, decide textual variants, or publish text into D1. A full marker-aware parser and reviewer-led versification reconciliation are still required before import approval.
+
+
+## 23.13 Semantic USFM parsing and round-trip results — completed 18 November 2026
+
+The official USFM Technical Committee reference parser, pinned to `usfmtc 0.4.10`, successfully parsed and round-tripped every USFM member in both archives.
+
+| Measure | WEBP | KJV |
+|---|---:|---:|
+| USFM members audited | 68 | 81 |
+| Parsed and round-tripped | 68 | 81 |
+| Review required | 0 | 0 |
+| Candidate 2.5 profile passed | 68 | 81 |
+| Candidate 3.1 fallback used | 0 | 0 |
+
+The workflow used the USFM 2.5 parser profile first and would have tried 3.1 only for a file that did not pass 2.5. All files passed the first profile. This establishes that the pinned reference parser can parse and round-trip these files under its 2.5 compatibility profile. It does **not** establish a publisher-declared USFM version because no `\\usfm <version>` declaration was found in the source files.
+
+The round-trip audit canonicalises each parsed USX representation, serialises it back to USFM, reparses the generated source and compares a SHA-256 fingerprint of the full canonical XML tree, including text. The report contains only source hashes, parse/profile results, structural counts and round-trip status; no Scripture wording is written to the report.
+
+### Execution evidence
+
+- Workflow: [Scripture source archive and semantic audit, run 44250112893](https://github.com/leenusdarnal/bible-study/actions/runs/44250112893)
+- Commit: `89494243ee8c0db99c25a5090a5d74aec541f59b`
+- Parser: USFM Technical Committee `usfmtc 0.4.10`, MIT
+- Total members: 149
+- Passed: 149
+- Review required: 0
+- Metadata-only report artifact: `scripture-source-audit-44250112893`, artifact ID `14403203746`
+- Artifact SHA-256: `823c0975de780d602ec23a8bcc3824b502143aaaffa8195237a0bdf8f466606e`
+
+### What this closes — and what remains open
+
+The source files are no longer awaiting initial semantic parsing or round-trip validation. The result does not by itself approve publication. The following remain:
+- manual review of unknown/extended marker semantics and any parser warnings surfaced by future source revisions;
+- detached package signature verification, if the publisher provides a verifiable procedure;
+- reviewer-approved WEBP/KJV versification profiles and the Romans 14/16 mapping group;
+- territorial rights review, particularly KJV distribution in the UK;
+- staging, deterministic import and publication/rollback tests in the application environment.
