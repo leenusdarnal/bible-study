@@ -1,6 +1,6 @@
 # ADR-007: Dual Bible Text Corpus and Lossless USFM Import
 
-- **Status:** Proposed — owner selection recorded; archive and publication gates remain open.
+- **Status:** Proposed — owner selection recorded; official archives acquired and structurally audited; semantic, versification, publication and rights gates remain open.
 - **Date:** 2026-11-17
 - **Decision owner:** Bible Study Repo project owner.
 - **Related:** [ADR-006: Scripture Core Schema](ADR-006-scripture-core-schema.md), [Source Selection](../docs/14-scripture-source-selection.md), [Dual Text Import Pipeline](../docs/15-dual-bible-text-import-pipeline.md).
@@ -9,7 +9,7 @@
 
 The project requires complete English Bible text for the initial Scripture reader. The project owner selected both the World English Bible Update (WEBP) and the King James Version (KJV).
 
-The candidate eBible.org packages provide machine-readable USFM. WEBP is presented as a public-domain 66-book protocanon edition. The KJV package is the 1769 standardised text and includes Apocrypha/Deuterocanon material. The eBible.org KJV notice identifies a UK Crown patent printing/import caveat, so the global publication scope needs a territorial rights review.
+The official eBible.org USFM packages have been acquired and structurally audited. Their exact SHA-256 hashes, inventories and source-address differences are recorded in [Source Package Listing Review](../docs/23-source-package-listing-review.md). WEBP is presented as a public-domain 66-book protocanon edition. The KJV package is the 1769 standardised text and includes Apocrypha/Deuterocanon material. The eBible.org KJV notice identifies a UK Crown patent printing/import caveat, so the global publication scope needs a territorial rights review.
 
 USFM can carry more than plain verse text: headings, paragraphs, poetry, footnotes, cross-references, alternate numbering and inline semantic markers. Versification differences can include one-to-many and many-to-one relationships, subverses, moved passages, absent references and colophons. A naive import that reduces each file to one plain-text row per verse would lose important structure.
 
