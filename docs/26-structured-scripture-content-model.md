@@ -1,6 +1,6 @@
 # 26. Structured Scripture Content Model
 
-- **Status:** Proposed schema extension; migration 0006 is draft and passed SQLite regression tests plus local Cloudflare D1 migration/node-fixture CI ([run 44257329898](https://github.com/leenusdarnal/bible-study/actions/runs/44257329898)).
+- **Status:** Structured schema and initial deterministic one-member USFM converter implemented; migration 0006 remains a draft and passed SQLite regression tests plus local Cloudflare D1 migration/node-fixture CI ([run 44257329898](https://github.com/leenusdarnal/bible-study/actions/runs/44257329898)). Batch orchestration, complete marker review and end-to-end staging remain open.
 - **Purpose:** Preserve USFM-derived structure in addition to the plain-text verse projection.
 - **Related:** [Dual-edition import pipeline](15-dual-bible-text-import-pipeline.md), [Scripture core schema](13-scripture-core-implementation-spec.md), [source archive audit](23-source-package-listing-review.md).
 
@@ -68,7 +68,7 @@ Tests cover nested inline content, source marker retention, ordering, cross-bloc
 ## 26.5 Known limitations and next gates
 
 - The schema is a normalized content tree, not a complete implementation of every USFM/USX semantic convention.
-- Marker-to-node mapping and exact handling of all markers in the two source archives still require a marker inventory and representative visual review.
-- A deterministic importer must generate both the structured tree and plain-text projection from the same parser output.
+- A versioned marker registry and initial converter now exist, but mappings remain pending editorial review and must be reconciled with the complete WEBP/KJV marker inventory and representative visual review.
+- The initial converter at `tools/usfm_to_structured_content.py` generates structured node rows and per-source-verse text projections from the same parsed USX tree; batch orchestration and staging/database integration remain to be implemented.
 - The app must support footnote/cross-reference navigation and paragraph/poetry layout before the import is considered display-ready.
 - D1 production migration, import staging, deterministic re-run/idempotency, full corpus counts and reviewer sign-off remain pending.
