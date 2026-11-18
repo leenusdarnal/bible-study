@@ -324,6 +324,14 @@ The project inspected the actual STEPBible TVTMS text file through its Git repos
 
 The data explicitly discusses one-to-one renumbering, split and merged verses, subverses, text moved to another location, duplicated text, absent/empty references, passages that may be missing, different verse starting points and epistle colophons. It also gives KJV-related examples in the New Testament. This is direct evidence that the project must not assume a one-to-one reference conversion.
 
+### Romans 14 / 16 placement: direct TVTMS evidence
+
+The pinned TVTMS file contains a specific record headed `$Rom.14:22-23; 16:24-27`. Its English-standard and KJV columns both place the relevant material at Romans 16:25–27, while a Greek-tradition column records the related text at Romans 14:22–23 and marks the later location as merged/absent. The accompanying note states that the passage at Romans 16:25–27 is found at Romans 14:24–26 in some manuscripts.
+
+This is consistent with the archive scan's observed address sets: WEBP has Romans 14:24–26 and KJV has Romans 16:26–27 (with Romans 16:25 common). It is strong evidence that this is a known passage-placement/versification issue, not a random parser defect. However, TVTMS does not name WEBP as the translation using that profile, and its Greek-tradition column must not be equated with WEBP without source-text review.
+
+**Do not auto-map yet.** Compare the actual three WEBP verse texts with the corresponding KJV Romans 16 text, identify any split/merged boundaries and retain the source-specific addresses. The final mapping should cite both the exact archive checksums and the pinned TVTMS revision.
+
 The file states that it is CC BY 4.0, allows inclusion and reformatting in software, requests attribution to Tyndale House and STEPBible.org with a link to the source repository, and asks users not to post copies of the file elsewhere so that the repository remains the maintained source. Accordingly:
 
 - link to the authoritative STEPBible repository rather than committing a full copy of TVTMS;
