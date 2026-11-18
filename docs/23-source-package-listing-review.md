@@ -1,7 +1,7 @@
 # 23. Source Package Listing Review — WEBP and KJV
 
 - **Reviewed:** 18 November 2026
-- **Status:** Official source pages and online HTML indexes reviewed; binary archive acquisition remains blocked.
+- **Status:** Official WEBP and KJV archives acquired, checksummed and structurally audited; semantic parsing, versification review and territorial rights review remain open.
 - **Purpose:** Record what has been verified before downloading and parsing the two selected USFM source packages.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Import pipeline](15-dual-bible-text-import-pipeline.md), [Licensing](09-licensing-attribution.md).
 
@@ -12,7 +12,7 @@ The eBible.org edition pages confirm the direct USFM download links and the righ
 - **WEBP:** eBible.org identifies engwebp as its World English Bible Protestant Edition and states that this variant contains only the 66 books of the Old and New Testaments.
 - **KJV:** eBible.org identifies eng-kjv as the 1769-standardised King James Version with Apocrypha/Deuterocanon. Its online index lists the 66 Protestant-canon books plus 14 additional apocryphal/additional-corpus page entries.
 
-This does **not** establish the actual ZIP member inventory. The two binary USFM ZIP files have not been acquired, checksummed, opened or parsed in this runtime. No archive checksum, exact archive member count, chapter count, verse count or parser output is claimed.
+The exact ZIP member inventories, SHA-256 hashes, CRC integrity, primary book IDs, chapter/verse markers and source-address comparison have now been verified by a GitHub-hosted audit. Exact results are recorded in section 23.12. This structural scan is not a full semantic USFM parse and does not approve publication.
 
 ## 23.2 Official source register
 
