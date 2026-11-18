@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
       sw.id AS work_id,
       sw.testament,
       sw.usfm_code,
-      COUNT(DISTINCT sc.id) AS chapter_count
+      COUNT(DISTINCT CASE WHEN vs.status = 'verified' THEN sc.id END) AS chapter_count
     FROM canon_books cb
     INNER JOIN scriptural_works sw ON sw.id = cb.work_id
     LEFT JOIN scheme_chapters sc ON sc.work_id = sw.id
