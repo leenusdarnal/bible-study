@@ -47,7 +47,11 @@ A printed reference such as Psalm 3:1 is not a globally unique identity.
 
 Mapping groups are the canonical representation of a reviewed relationship between two versification schemes. Ordered group members explicitly capture the source-side and target-side unit sets, supporting one-to-one, one-to-many, many-to-one, many-to-many (for example, three source units to two target units), moved, subverse and absent relationships. Pairwise scripture_unit_mappings rows are optional edges within a group and are constrained to use group-member endpoints. Legacy pairwise rows remain valid with a null mapping_group_id. Translation text is attached to a unit in the edition's own scheme. The first release can seed one primary Protestant scheme and the 66-book canon without assuming all future editions use identical divisions.
 
-### Versification mapping groups\n\nA mapping group links exactly two distinct versification schemes. Its ordered members are divided into from-side and to-side sets, and every member is constrained to a Scripture unit in the corresponding scheme. A group can contain multiple members on either side; an absent mapping can have members on only one side. Optional pairwise mapping edges must connect members of that same group. Do not approve a group until the source profiles, exact unit sets, source citation, rationale and reviewer decision are recorded. Migration 0004 adds this structure and preserves existing pairwise mappings as ungrouped rows.\n\n### Passage references
+### Versification mapping groups
+
+A mapping group links exactly two distinct versification schemes. Its ordered members are divided into from-side and to-side sets, and every member is constrained to a Scripture unit in the corresponding scheme. A group can contain multiple members on either side; an absent mapping can have members on only one side. Optional pairwise mapping edges must connect members of that same group. Do not approve a group until the source profiles, exact unit sets, source citation, rationale and reviewer decision are recorded. Migration 0004 adds this structure and preserves existing pairwise mappings as ungrouped rows.
+
+### Passage references
 
 Use passage_references (id, label, reference_scheme_id, created_at) and passage_reference_segments (id, passage_reference_id, segment_order, start_unit_id, end_unit_id, notes).
 
