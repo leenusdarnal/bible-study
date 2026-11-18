@@ -81,6 +81,13 @@ jobs:
             --persist-to "$RUNNER_TEMP/d1-state" \
             --file docs/sql/0004_versification_mapping_groups.sql
 
+      - name: Apply translation-text content-state migration to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0005_translation_text_content_states.sql
+
       - name: Assert D1 schema, canon seed and foreign-key integrity
         run: |
           npx wrangler d1 execute bible-study-schema-validation \
@@ -93,7 +100,52 @@ jobs:
           npx wrangler d1 execute bible-study-schema-validation \
             --local --config "$RUNNER_TEMP/wrangler.toml" \
             --persist-to "$RUNNER_TEMP/d1-state" \
-            --command "INSERT INTO versification_schemes (id, code, name, description, version, source_note, status, created_at, updated_at) VALUES ('d1-test-scheme', 'd1-test', 'D1 test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000), ('d1-test-scheme-b', 'd1-test-b', 'D1 target test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000); INSERT INTO scheme_chapters (id, scheme_id, work_id, chapter_label, chapter_order) VALUES ('d1-gen-1', 'd1-test-scheme', 'work-gen', '1', 1), ('d1-exo-1', 'd1-test-scheme', 'work-exo', '1', 1), ('d1-gen-1-b', 'd1-test-scheme-b', 'work-gen', '1', 1); INSERT INTO scripture_units (id, scheme_id, work_id, chapter_id, unit_label, unit_order, unit_kind) VALUES ('d1-a-v1', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '1', 1, 'verse'), ('d1-a-v2', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '2', 2, 'verse'), ('d1-a-v3', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '3', 3, 'verse'), ('d1-b-v1', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '1', 1, 'verse'), ('d1-b-v2', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '2', 2, 'verse');"
+            --command "INSERT INTO versification_schemes (id, code, name, description, version, source_note, status, created_at, updated_at) VALUES ('d1-test-scheme', 'd1-test', 'D1 test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000), ('d1-test-scheme-b', 'd1-test-b', 'D1 target test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000); INSERT INTO scheme_chapters (id, scheme_id, work_id, chapter_label, chapter_order) VALUES ('d1-gen-1', 'd1-test-scheme', 'work-gen', '1', 1), ('d1-exo-1', 'd1-test-scheme', 'work-exo', '1', 1), ('d1-gen-1-b', 'd1-test-scheme-b', 'work-gen', '1', 1); INSERT INTO scripture_units (id, scheme_id, work_id, chapter_id, unit_label, unit_order, unit_kind) VALUES ('d1-a-v1', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '1', 1, 'verse'), ('d1-a-v2', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '2', 2, 'verse'), ('d1-a-v3', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '3', 3, 'verse'), ('d1-a-v4', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '4', 4, 'verse'), ('d1-b-v1', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '1', 1, 'verse'), ('d1-b-v2', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '2', 2, 'verse');"
+
+      - name: Exercise text-bearing, annotation-only and empty-marker content states in D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO translation_editions (id, code, name, abbreviation, language_tag, versification_scheme_id, created_at, updated_at) VALUES ('d1-test-edition', 'd1-test-ed', 'D1 synthetic edition', 'D1T', 'en', 'd1-test-scheme', 1800000000000, 1800000000000); INSERT INTO translation_texts (id, edition_id, versification_scheme_id, scripture_unit_id, text, footnote_metadata_json, content_state, created_at, updated_at) VALUES ('d1-text', 'd1-test-edition', 'd1-test-scheme', 'd1-a-v1', 'Synthetic test wording', NULL, 'text', 1800000000000, 1800000000000), ('d1-note-only', 'd1-test-edition', 'd1-test-scheme', 'd1-a-v2', '', '{\"footnotes\":[{\"marker\":\"f\"}]}', 'annotation_only', 1800000000000, 1800000000000), ('d1-empty-marker', 'd1-test-edition', 'd1-test-scheme', 'd1-a-v3', '', NULL, 'empty_marker', 1800000000000, 1800000000000); CREATE TABLE ci_assert_text_states (ok INTEGER CHECK(ok = 1)); INSERT INTO ci_assert_text_states SELECT CASE WHEN COUNT(*) = 3 AND SUM(CASE WHEN content_state = 'annotation_only' AND text = '' AND footnote_metadata_json IS NOT NULL THEN 1 ELSE 0 END) = 1 THEN 1 ELSE 0 END FROM translation_texts WHERE edition_id = 'd1-test-edition'; DROP TABLE ci_assert_text_states;"
+
+      - name: Assert D1 rejects blank text with the default text-bearing state
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO translation_texts (id, edition_id, versification_scheme_id, scripture_unit_id, text, content_state, created_at, updated_at) VALUES ('d1-invalid-text-state', 'd1-test-edition', 'd1-test-scheme', 'd1-a-v4', '', 'text', 1800000000000, 1800000000000);" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly accepted blank text as a text-bearing verse."
+            exit 1
+          fi
+          if ! grep -q "translation text does not match its content state" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
+
+      - name: Assert D1 prevents removing metadata from an annotation-only anchor
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "UPDATE translation_texts SET footnote_metadata_json = NULL WHERE id = 'd1-note-only';" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly allowed an annotation-only anchor to lose its note."
+            exit 1
+          fi
+          if ! grep -q "translation text does not match its content state" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
 
       - name: Exercise selected-book scope and valid chapter progress in D1
         run: |
