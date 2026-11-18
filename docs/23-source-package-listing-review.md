@@ -124,7 +124,9 @@ No archive files were created in that initial chat-runtime attempt. This was an 
 | Primary chapter/verse address counts | Structurally audited | Section 23.12; full semantic parser and mapping review remain pending |
 | Rights clearance for all launch territories | Pending | Requires legal review, especially for UK KJV distribution |
 
-## 23.9 Remaining operational checklist
+## 23.9 Remaining operational checklist (initial pre-run snapshot)
+
+> **Historical status note:** This checklist records the position before the GitHub-hosted archive audit was implemented. Its archive-acquisition items were subsequently completed and are superseded by section 23.12. The remaining semantic, versification, signature and legal gates are still open.
 
 The acquisition and ZIP inventory tasks are complete. The following work remains before a text import can be approved:
 
@@ -137,7 +139,7 @@ The acquisition and ZIP inventory tasks are complete. The following work remains
 7. Complete territorial rights review, including KJV UK questions.
 8. Implement D1 staging and publication, then approve one complete checksummed import run.
 
-**Decision:** retain WEBP and KJV as the selected initial editions, but keep both in an unacquired/unpublished state until the binary archive and legal validation gates are complete.
+**Historical decision at this stage:** WEBP and KJV remained the selected initial editions, but were not yet acquired. The binary acquisition and structural ZIP checks were later completed as documented in section 23.12. Both editions remain unpublished pending semantic parsing, versification review and applicable rights clearance.
 
 
 ## 23.10 Official archive directory metadata
