@@ -326,6 +326,8 @@ class USXConverter:
                 node_type = "unknown_marker"
             self._record_marker(marker, entry)
             semantic = entry.get("semantic") if entry else None
+            if node_type == "unknown_marker":
+                self.unresolved_markers.add(marker)
         elif tag in {"optbreak", "br"}:
             node_type, semantic = "break", "optional_break"
             self._record_marker(marker, entry)
@@ -335,6 +337,7 @@ class USXConverter:
         else:
             node_type, semantic = "unknown_marker", None
             self._record_marker(marker, entry)
+            self.unresolved_markers.add(marker)
 
         stored_attrs: dict[str, Any] = {"source": attrs}
         if semantic:
