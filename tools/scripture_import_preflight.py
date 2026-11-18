@@ -27,6 +27,10 @@ EXPECTED_CONVERTER = {
     "version": "0.1.0",
 }
 EXPECTED_SOURCE_IDS = {"WEBP": "engwebp", "KJV": "eng-kjv"}
+EXPECTED_ARCHIVE_URLS = {
+    "engwebp": "https://ebible.org/Scriptures/engwebp_usfm.zip",
+    "eng-kjv": "https://ebible.org/Scriptures/eng-kjv_usfm.zip",
+}
 
 
 class PreflightInputError(ValueError):
@@ -369,8 +373,11 @@ def run_preflight(
     archive_sha = archive.get("sha256")
     if not sha_is_valid(archive_sha):
         add("ARCHIVE_HASH_INVALID", "blocking", "Source archive SHA-256 is missing or malformed.")
-    if not isinstance(archive.get("url"), str) or not archive["url"].startswith("https://"):
-        add("ARCHIVE_URL_INVALID", "blocking", "Source archive URL must use HTTPS.")
+    if (
+        not isinstance(archive.get("url"), str)
+        or archive.get("url") != EXPECTED_ARCHIVE_URLS.get(source_id)
+    ):
+        add("ARCHIVE_URL_INVALID", "blocking", "Source archive URL does not match the pinned official source URL.")
     if not isinstance(archive.get("size_bytes"), int) or archive["size_bytes"] <= 0:
         add("ARCHIVE_SIZE_INVALID", "blocking", "Source archive size must be a positive integer.")
     if archive.get("zip_integrity_status") != "passed":
@@ -437,6 +444,14 @@ def run_preflight(
         permissions = rights.get("permissions")
         if not isinstance(permissions, dict) or permissions.get("display") is not True or permissions.get("cache") is not True:
             add("RIGHTS_DISPLAY_CACHE_NOT_APPROVED", "blocking", "Display and cache permissions must both be explicitly approved.")
+        review = rights.get("review")
+        if not isinstance(rights.get("evidence"), list) or not rights["evidence"]:
+            add("RIGHTS_EVIDENCE_MISSING", "blocking", "Translation rights approval must include supporting evidence.")
+        if not isinstance(review, dict) or not all(
+            isinstance(review.get(key), str) and review[key].strip()
+            for key in ("reviewer", "reviewed_at", "decision_reference")
+        ):
+            add("RIGHTS_REVIEW_MISSING", "blocking", "Rights approval requires a named reviewer, date and decision reference.")
         if not _source_archive_evidence_matches(rights, archive_sha if isinstance(archive_sha, str) else ""):
             add("RIGHTS_ARCHIVE_EVIDENCE_MISMATCH", "blocking", "Rights evidence does not identify the exact source archive checksum.")
 
@@ -512,6 +527,13 @@ def run_preflight(
         digest = member.get("sha256")
         if not sha_is_valid(digest):
             add("MEMBER_HASH_INVALID", "blocking", f"{name}: source member SHA-256 is missing or malformed.")
+        canonical_key = member.get("canonical_usx_object_key")
+        if not safe_relative_path(canonical_key):
+            add("CANONICAL_USX_KEY_INVALID", "blocking", f"{name}: canonical USX object key is missing or unsafe.")
+        if not sha_is_valid(member.get("canonical_usx_sha256")):
+            add("CANONICAL_USX_HASH_INVALID", "blocking", f"{name}: canonical USX SHA-256 is missing or malformed.")
+        if member.get("canonical_usx_object_status") != "verified":
+            add("CANONICAL_USX_MEMBER_UNVERIFIED", "blocking", f"{name}: canonical USX object is not checksum-verified.")
         book_ids = member.get("book_ids")
         if not isinstance(book_ids, list) or not book_ids or any(
             not isinstance(code, str) or len(code) != 3 or not code.isalnum()
@@ -547,11 +569,15 @@ def run_preflight(
             continue
         if source.get("source_member") != name or source.get("source_sha256") != digest:
             add("CONVERSION_SOURCE_MISMATCH", "blocking", f"{name}: converted member path or source checksum does not match the archive inventory.")
-        if source.get("parser", {}).get("package") != (parser.get("package") if isinstance(parser, dict) else None):
+        output_parser = source.get("parser")
+        if not isinstance(output_parser, dict):
+            output_parser = {}
+            add("CONVERSION_PARSER_MISMATCH", "blocking", f"{name}: converter output parser metadata is missing.")
+        if output_parser.get("package") != (parser.get("package") if isinstance(parser, dict) else None):
             add("CONVERSION_PARSER_MISMATCH", "blocking", f"{name}: converter output parser package does not match the manifest.")
-        if source.get("parser", {}).get("version") != (parser.get("version") if isinstance(parser, dict) else None):
+        if output_parser.get("version") != (parser.get("version") if isinstance(parser, dict) else None):
             add("CONVERSION_PARSER_MISMATCH", "blocking", f"{name}: converter output parser version does not match the manifest.")
-        if source.get("parser", {}).get("compatibility_profile") != (parser.get("compatibility_profile") if isinstance(parser, dict) else None):
+        if output_parser.get("compatibility_profile") != (parser.get("compatibility_profile") if isinstance(parser, dict) else None):
             add("CONVERSION_PARSER_MISMATCH", "blocking", f"{name}: converter output parser profile does not match the manifest.")
         if not isinstance(book, dict) or book.get("code") not in book_ids:
             add("CONVERSION_BOOK_MISMATCH", "blocking", f"{name}: converted book identity does not match the source archive inventory.")
