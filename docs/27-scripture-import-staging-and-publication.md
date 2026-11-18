@@ -5,7 +5,7 @@
 - **Purpose:** Define the auditable, repeatable boundary between source archives, parsed import staging and published Scripture text.
 - **Related:** [Dual-text import pipeline](15-dual-bible-text-import-pipeline.md), [database schema](11-database-schema.md), [source archive audit](23-source-package-listing-review.md), [Romans versification review](25-romans-versification-review.md).
 
-## 26.1 Design boundary
+## 27.1 Design boundary
 
 The project has verified the selected WEBP and KJV source archives and parsed/round-tripped all 149 USFM members. It has **not** imported their Bible text into a live database or published either edition.
 
@@ -19,7 +19,7 @@ The import pipeline has three separate data zones:
 
 Do not put complete source ZIPs, parsed Bible wording, canonical USX files or other source text into this public documentation repository or public GitHub workflow artifacts. CI should emit metadata-only audit reports. Real import artefacts belong in controlled storage.
 
-## 26.2 Import-run state machine
+## 27.2 Import-run state machine
 
 Each edition/archive/parser combination receives a distinct immutable import-run identity.
 
@@ -38,7 +38,7 @@ Any non-terminal state may instead move to `failed` or `rejected`. Those states 
 
 The parser profile is recorded as a compatibility test. Because the selected archives have no publisher-declared `\\usfm` version marker, do not label the source itself “USFM 2.5”. The current audit records that every file passed the USFMTC 0.4.10 USFM 2.5 parser profile.
 
-## 26.3 Physical tables in migration 0007
+## 27.3 Physical tables in migration 0007
 
 | Table | Purpose and key invariants |
 |---|---|
@@ -57,7 +57,7 @@ The WEBP Romans 16:25 note-only anchor is the first real source example for `ann
 
 The staging schema stores a plain-text projection plus structured-content JSON for the D1 import process. The canonical USX R2 object remains the authoritative full parsed source representation, including headings, paragraph/poetry structure, inline character markers, word attributes, footnotes and cross-references. The display/search projection must be reproducible from that canonical representation.
 
-## 26.4 Safety and integrity rules
+## 27.4 Safety and integrity rules
 
 Migration 0007 enforces the following database-level controls:
 
@@ -74,7 +74,7 @@ Migration 0007 enforces the following database-level controls:
 
 The D1 triggers do not replace application-level validation. The publication service must also check rights approval, canon scope, source mapping approval, complete source inventory, canonical USX object presence and successful staging-to-core row materialisation.
 
-## 26.5 Publication transaction
+## 27.5 Publication transaction
 
 The application must publish one edition/run in a single transactional operation (or a controlled, idempotent workflow if the dataset exceeds one transaction):
 
@@ -89,7 +89,7 @@ The application must publish one edition/run in a single transactional operation
 
 For a new edition version, keep the previous published run available until the new run has passed every gate. Promotion and rollback must not cascade-delete notes, bookmarks, highlights, reading progress or passage references.
 
-## 26.6 Idempotency and reprocessing
+## 27.6 Idempotency and reprocessing
 
 - The same edition + archive SHA-256 + parser name/version/profile is one logical import identity.
 - Re-running a completed parse should reuse verified content-addressed artefacts, not produce duplicate source units.
@@ -98,13 +98,13 @@ For a new edition version, keep the previous published run available until the n
 - Never edit the source archive or previous published artefacts in place.
 - A new import must not overwrite user-owned annotations or personal reading data.
 
-## 26.7 Cloudflare and deployment boundary
+## 27.7 Cloudflare and deployment boundary
 
-The connected Cloudflare account currently has no D1 database for this project. GitHub Actions has successfully applied migrations 0001–0006 to ephemeral local D1 during CI, but there is no remote project D1 deployment, R2 source bucket or application Worker yet.
+The connected Cloudflare account currently has no D1 database for this project. GitHub Actions has successfully applied migrations 0001–0007 to ephemeral local D1 during CI, but there is no remote project D1 deployment, R2 source bucket or application Worker yet.
 
 When the application source repository and environments are established, create separate development/staging and production resources. Apply reviewed migrations in development first, run importer/publication tests, back up production before a schema rollout, and keep raw/canonical Scripture artefacts in restricted R2 storage. Do not upload the source ZIPs to GitHub or public buckets.
 
-## 26.8 Acceptance tests and CI
+## 27.8 Acceptance tests and CI
 
 The migration/test suite must demonstrate:
 - initial run creation and event history;
