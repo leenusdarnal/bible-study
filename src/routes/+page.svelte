@@ -1,10 +1,6 @@
 <script lang="ts">
   let { data } = $props<{ data: { books: Array<{ position: number; display_name: string; work_id: string; testament: 'old' | 'new'; usfm_code: string }> } }>();
-  let activeTab = $state('Overview');
-  let searchQuery = $state('');
-  let showSearch = $state(false);
-
-  const navigation = ['Home', 'Bible', 'Study', 'Explore', 'Research'];
+  const navigation = [{ label: 'Home', href: '/' }, { label: 'Bible', href: '/bible' }];
 </script>
 
 <svelte:head>
@@ -22,17 +18,16 @@
     <div class="side-label">WORKSPACE</div>
     <nav aria-label="Main navigation">
       {#each navigation as item}
-        <button class:active={activeTab === item} class="nav-item" onclick={() => activeTab = item}>
-          <span class="nav-symbol">{item === 'Home' ? '⌂' : item === 'Bible' ? '▤' : item === 'Study' ? '✎' : item === 'Explore' ? '◎' : '⌕'}</span>
-          {item}
-        </button>
+        <a class="nav-item" href={item.href} aria-current={item.href === '/' ? 'page' : undefined}>
+          <span class="nav-symbol">{item.label === 'Home' ? '⌂' : '▤'}</span>
+          {item.label}
+        </a>
       {/each}
     </nav>
 
     <div class="sidebar-bottom">
       <div class="side-label">YOUR SPACE</div>
-      <button class="nav-item"><span class="nav-symbol">▧</span> My Library</button>
-      <button class="nav-item"><span class="nav-symbol">◷</span> Reading plans</button>
+      <a class="nav-item" href="/bible"><span class="nav-symbol">▧</span> Browse books</a>
       <div class="sidebar-note">
         <span class="note-icon">✧</span>
         <p>Small steps in the Word. A deeper understanding over time.</p>
@@ -47,21 +42,11 @@
 
   <main class="main-area">
     <header class="topbar">
-      <div class="breadcrumb">Workspace <span>/</span> {activeTab}</div>
+      <div class="breadcrumb">Workspace <span>/</span> Home</div>
       <div class="top-actions">
-        <button class="icon-button" aria-label="Search" onclick={() => showSearch = !showSearch}>⌕</button>
-        <button class="theme-button" aria-label="Appearance settings">◐</button>
-        <button class="upgrade-button">Create your library <span>↗</span></button>
+        <a class="upgrade-button" href="/bible">Open Bible <span>↗</span></a>
       </div>
     </header>
-
-    {#if showSearch}
-      <form class="search-panel" onsubmit={(event) => event.preventDefault()}>
-        <span>⌕</span>
-        <input bind:value={searchQuery} placeholder="Search a passage, person, place or topic…" autofocus />
-        <button type="button" onclick={() => showSearch = false}>Esc</button>
-      </form>
-    {/if}
 
     <div class="content">
       <section class="welcome-row">
@@ -81,7 +66,7 @@
           <div class="eyebrow light">PICK UP WHERE YOU LEFT OFF</div>
           <h2>Begin with the beginning.</h2>
           <p>Explore the opening chapter of the Bible and discover the foundations of its grand story.</p>
-          <button class="primary-button" onclick={() => activeTab = 'Bible'}>Open Genesis 1 <span>→</span></button>
+          <a class="primary-button" href="/bible">Browse Genesis <span>→</span></a>
         </div>
         <div class="verse-art">
           <span class="verse-number">01</span>
@@ -94,16 +79,16 @@
       <section class="section-block">
         <div class="section-heading">
           <div><div class="eyebrow">A GOOD PLACE TO START</div><h2>Explore the Scriptures</h2></div>
-          <button class="text-link" onclick={() => activeTab = 'Bible'}>Browse all 66 books <span>→</span></button>
+          <a class="text-link" href="/bible">Browse all 66 books <span>→</span></a>
         </div>
         <div class="book-grid">
           {#each data.books.slice(0, 6) as book, i}
-            <button class="book-card" onclick={() => activeTab = 'Bible'}>
+            <a class="book-card" href="/bible?book={book.work_id}">
               <span class="book-index">{String(i + 1).padStart(2, '0')}</span>
               <span class="book-name">{book.display_name}</span>
               <span class="book-meta">{book.testament === 'old' ? 'Old Testament' : 'New Testament'}</span>
               <span class="book-arrow">↗</span>
-            </button>
+            </a>
           {/each}
         </div>
       </section>
@@ -111,8 +96,8 @@
       <section class="bottom-grid">
         <article class="daily-card">
           <div class="eyebrow">A MOMENT IN THE WORD</div>
-          <div class="daily-quote">“Your word is a lamp to my feet and a light to my path.”</div>
-          <div class="daily-ref">PSALM 119:105 <span>·</span> NIV</div>
+          <div class="daily-quote">Read a passage. Observe its context. Follow its connections.</div>
+          <div class="daily-ref">A SIMPLE STUDY RHYTHM</div>
         </article>
         <article class="progress-card">
           <div class="eyebrow">YOUR READING JOURNEY</div>
