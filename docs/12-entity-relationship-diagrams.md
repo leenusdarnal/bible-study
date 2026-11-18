@@ -24,7 +24,7 @@ erDiagram
     SCRIPTURE_UNITS ||--o{ PASSAGE_REFERENCE_SEGMENTS : end_unit
 ~~~
 
-**Interpretation:** work identity, canon order and verse numbering are separate. Translation text uses its edition's scheme; explicit mapping handles non-one-to-one alignment.
+**Interpretation:** work identity, canon order and verse numbering are separate. Translation text uses its edition's scheme. Mapping groups preserve complete ordered source and target unit sets for one-to-many, many-to-one and many-to-many relationships; pairwise mapping edges are optional links within those groups.
 
 ## 12.2 Entities and knowledge graph
 
