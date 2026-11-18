@@ -1,6 +1,6 @@
 # 26. Structured Scripture Content Model
 
-- **Status:** Proposed schema extension; migration 0006 is draft and passed SQLite regression tests plus local Cloudflare D1 migration/node-fixture CI ([run 44257036764](https://github.com/leenusdarnal/bible-study/actions/runs/44257036764)).
+- **Status:** Proposed schema extension; migration 0006 is draft and passed SQLite regression tests plus local Cloudflare D1 migration/node-fixture CI ([run 44257329898](https://github.com/leenusdarnal/bible-study/actions/runs/44257329898)).
 - **Purpose:** Preserve USFM-derived structure in addition to the plain-text verse projection.
 - **Related:** [Dual-edition import pipeline](15-dual-bible-text-import-pipeline.md), [Scripture core schema](13-scripture-core-implementation-spec.md), [source archive audit](23-source-package-listing-review.md).
 
