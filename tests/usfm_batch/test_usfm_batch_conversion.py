@@ -3,6 +3,10 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools"))
 
 from usfm_batch_conversion import BatchError, classify_member, load_json, run_batch
 
@@ -34,7 +38,7 @@ class BatchOrchestratorTests(unittest.TestCase):
                     source_audit={"source_id": "eng-kjv"},
                     semantic_audit={"schema_version": 2, "files": []},
                     source_root=base,
-                    registry_path=Path("data/usfm/marker-registry.json"),
+                    registry_path=ROOT / "data/usfm/marker-registry.json",
                     output_root=output,
                     territory="IN",
                 )
