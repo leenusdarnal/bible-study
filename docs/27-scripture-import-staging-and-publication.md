@@ -1,6 +1,6 @@
 # 27. Scripture Import Staging and Publication Contract
 
-- **Status:** Draft migration 0007 and SQLite/D1 validation added; live D1 deployment and real text staging/import remain pending.
+- **Status:** Migrations 0001–0007 applied to the live APAC staging D1 database on 18 November 2026; real text staging/import remains pending.
 - **Date:** 18 November 2026
 - **Purpose:** Define the auditable, repeatable boundary between source archives, parsed import staging and published Scripture text.
 - **Related:** [Dual-text import pipeline](15-dual-bible-text-import-pipeline.md), [database schema](11-database-schema.md), [source archive audit](23-source-package-listing-review.md), [Romans versification review](25-romans-versification-review.md).
