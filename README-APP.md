@@ -27,8 +27,8 @@ npm run build
 
 ## Current implementation
 
-The first UI pass establishes responsive navigation and a Scripture-focused dashboard. The Bible reader, account system, database-backed queries, personal library, offline support and search are not yet wired to services. The homepage's example book cards and reading quote are interface placeholders, not live Bible content.
+The dashboard and `/bible` catalogue are connected to the staging D1 canon. The Bible page supports searching the 66-book catalogue, filtering by testament, selecting a book and checking for verified chapter structure. Chapter navigation and verse text are intentionally unavailable until a verified versification scheme and rights-cleared translation edition are published. Account features, personal library, reading plans, offline support and passage search remain future work.
 
 ## Cloudflare deployment
 
-The Worker configuration is a starting point. Before deployment, bind the staging D1 database and later private R2 buckets using Wrangler environment bindings. Do not put API tokens, Bible source archives or licensed translation text in the repository. No production deployment is configured by this branch.
+The Worker configuration is a starting point and includes the staging D1 binding. Before deployment, enable R2 and bind private source buckets using Wrangler environment bindings. Do not put API tokens, Bible source archives or licensed translation text in the repository. No production deployment is configured by this branch.
