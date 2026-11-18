@@ -1,6 +1,6 @@
 # ADR-010: Structured Scripture Content Representation
 
-- **Status:** Proposed; migration 0006 applies in fresh local D1 and the structured-node fixture passes CI run [44257036764](https://github.com/leenusdarnal/bible-study/actions/runs/44257036764)
+- **Status:** Proposed; migration 0006 applies in fresh local D1 and the structured-node fixture passes CI run [44257329898](https://github.com/leenusdarnal/bible-study/actions/runs/44257329898)
 - **Date:** 18 November 2026
 - **Related:** ADR-006, ADR-007, ADR-009; [structured content model](../docs/26-structured-scripture-content-model.md); [import pipeline](../docs/15-dual-bible-text-import-pipeline.md).
 
