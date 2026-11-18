@@ -34,6 +34,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+      - name: Generate SvelteKit types
+        run: npx svelte-kit sync
       - name: Svelte and TypeScript checks
         run: npm run check
       - name: Unit tests
