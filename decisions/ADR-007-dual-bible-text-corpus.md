@@ -1,6 +1,6 @@
 # ADR-007: Dual Bible Text Corpus and Lossless USFM Import
 
-- **Status:** Proposed — owner selection recorded; official archives acquired and structurally audited; semantic, versification, publication and rights gates remain open.
+- **Status:** Proposed — owner selection recorded; official archives acquired, structurally audited and all 149 USFM members semantically round-tripped; versification, publication and rights gates remain open.
 - **Date:** 2026-11-17
 - **Decision owner:** Bible Study Repo project owner.
 - **Related:** [ADR-006: Scripture Core Schema](ADR-006-scripture-core-schema.md), [Source Selection](../docs/14-scripture-source-selection.md), [Dual Text Import Pipeline](../docs/15-dual-bible-text-import-pipeline.md).
