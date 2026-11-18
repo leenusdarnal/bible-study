@@ -20,7 +20,7 @@ The CLI consumes four input groups:
 3. **Marker registry** — the same registry version used by conversion. Coverage must be complete and editorially reviewed; every encountered marker must be registered and individually reviewed; converted outputs must report no unresolved or pending markers.
 4. **Versification proposal directory** — proposals are matched against the source package ID and exact archive checksum. For a native-source-only import, every matching unapproved cross-edition proposal must be explicitly listed as excluded. A cross-edition import is blocked until the applicable proposal is approved.
 
-The manifest also identifies the selected source-specific scheme and its approval. It must not invent a canonical numbering system or rewrite the source's native references.
+The manifest also identifies the selected source-specific scheme and its approval. It must not invent a canonical numbering system or rewrite the source's native references. The explicit `required_permissions` list must always include `display`, `cache` and `transform`; `redistribute` must also be listed whenever the selected product delivery requires that additional right.
 
 ## 31.3 Manifest contract
 
@@ -38,7 +38,7 @@ The manifest is JSON with \`schema_version: 1\` and these top-level properties:
 | \`versification\` | Source scheme code, approved state, named reviewer/date/decision, import mode and explicit excluded pending proposal IDs |
 | \`storage\` | Private-bucket assertion and verified immutable archive/canonical-USX object status |
 
-The member inventory is compared with the expected count. Every member must have a corresponding converted output whose embedded edition, source package, source-member path, source checksum, parser profile, converter identity and registry version agree with the manifest. Every source member must pass parsing and canonical round-trip checks.
+The member inventory is compared with the total expected archive count. Every source member, including material outside the launch canon, must pass parsing and canonical round-trip checks and have a checksum-verified canonical USX object. Each member must be explicitly marked `included` or `excluded`. Only included members require a converted output, and every excluded member requires a reason and an explicit not-for-publication flag. All 66 Protestant-canon books must be included; non-canon book content must be excluded from the initial release. Every included member's converted output must agree with the manifest's edition, source package, source-member path, source checksum, parser profile, converter identity and registry version.
 
 The converted-output path must be relative to the manifest directory and remain inside that directory. The referenced JSON contains Scripture wording and must live in a private workspace. Never commit it or upload it as a public workflow artifact.
 
@@ -59,7 +59,7 @@ The engine currently validates:
 - source-specific versification approval and explicit treatment of matching pending cross-edition mapping proposals;
 - private object-storage configuration and verified archive/canonical USX objects.
 
-The 66-book gate is the initial Protestant-canon scope. This does not silently approve importing the KJV archive's additional Apocrypha/Deuterocanon books into the first-release canon.
+The 66-book gate is the initial Protestant-canon scope. The complete source ZIP is still inventoried and parsed: WEBP's front matter/glossary and KJV's front matter plus Apocrypha/Deuterocanon books must be recorded as explicitly excluded where outside this release scope. This does not silently approve importing additional KJV books into the first-release canon.
 
 ## 31.5 Findings and exit codes
 
