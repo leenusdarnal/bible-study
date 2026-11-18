@@ -119,6 +119,7 @@ class USXConverter:
         self.unresolved_markers: set[str] = set()
         self.pending_mappings: set[str] = set()
         self._node_counter = 0
+        self.current_block_review_required = False
 
     def _registry_entry(self, marker: str) -> dict[str, Any] | None:
         return self.marker_index.get(marker)
@@ -144,7 +145,7 @@ class USXConverter:
                 "verse_label": verse,
                 "text_parts": [],
                 "annotation_count": 0,
-                "review_required": False,
+                "review_required": self.current_block_review_required,
             }
         return self.projections[key]
 
@@ -362,6 +363,11 @@ class USXConverter:
 
     def _block_type(self, style: str) -> tuple[str, str | None]:
         entry = self._registry_entry(style)
+        self.current_block_review_required = (
+            entry is None or entry.get("review_status") != "reviewed"
+        )
+        if self.current_block_review_required and self.current_verse_key in self.projections:
+            self.projections[self.current_verse_key]["review_required"] = True
         if entry is None:
             self._record_marker(style, None)
             return "other", None
@@ -374,6 +380,7 @@ class USXConverter:
     def _convert_block(
         self, element: ET.Element, source_order: int, block_order: int
     ) -> dict[str, Any]:
+        self.current_block_review_required = False
         style = element.attrib.get("style", "")
         tag = local_name(element.tag)
         block_type, semantic = self._block_type(style or tag)
