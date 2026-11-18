@@ -88,19 +88,19 @@ jobs:
             --persist-to "$RUNNER_TEMP/d1-state" \
             --file docs/sql/0005_translation_text_content_states.sql
 
-      - name: Apply scripture import staging migration to local D1
-        run: |
-          npx wrangler d1 execute bible-study-schema-validation \
-            --local --config "$RUNNER_TEMP/wrangler.toml" \
-            --persist-to "$RUNNER_TEMP/d1-state" \
-            --file docs/sql/0006_scripture_import_staging.sql
-
-      - name: Apply structured translation-content migration to local D1
+      - name: Apply structured translation-content migration 0006 to local D1
         run: |
           npx wrangler d1 execute bible-study-schema-validation \
             --local --config "$RUNNER_TEMP/wrangler.toml" \
             --persist-to "$RUNNER_TEMP/d1-state" \
             --file docs/sql/0006_structured_translation_content.sql
+
+      - name: Apply scripture import staging migration 0007 to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0007_scripture_import_staging.sql
 
       - name: Assert D1 schema, canon seed and foreign-key integrity
         run: |
