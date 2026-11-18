@@ -1,6 +1,6 @@
 # 15. Dual Bible Text Import and Validation Pipeline
 
-- **Status:** Proposed implementation design; official archives downloaded, checksummed, structurally audited and all 149 USFM members parsed/round-tripped; draft structured-content schema is locally tested; full marker review, versification approval, rights review, import staging and D1 publication remain pending.
+- **Status:** Proposed implementation design; official archives downloaded, checksummed, structurally audited and all 149 USFM members parsed/round-tripped; structured-content migration 0006 and import-staging migration 0007 pass local D1 CI; full marker review, versification approval, rights review, real text staging/import and remote D1 publication remain pending.
 - **Decision:** Import WEBP and KJV as two distinct translation editions.
 - **Target:** Cloudflare R2 + D1 staging and publication workflow.
 - **Related:** [Source selection](14-scripture-source-selection.md), [Scripture core implementation](13-scripture-core-implementation-spec.md), [database schema](11-database-schema.md), ADR-006.
@@ -105,25 +105,21 @@ The table is an initial coverage target, not an exhaustive list of USFM markers.
 
 Use a durable import-run state machine:
 
-`ACQUIRED → INVENTORIED → PARSED → VALIDATED → REVIEWED → PUBLISHED`
+`acquired → inventoried → parsed → validated → reviewed → published`
 
-Any stage may instead end in `REJECTED` or `FAILED`, with a recorded reason. Publication is an explicit transaction/operation after all blocking validations pass.
+Any non-terminal stage may instead end in `rejected` or `failed`, with a recorded reason. These states are terminal; a corrected source or parser requires a new import run. A published run is immutable. Rollback is a separate, audited publication operation.
 
-Suggested staging entities (logical names; final physical DDL is a later implementation task):
+The physical draft DDL now exists in the documentation repository:
 
-- `source_acquisitions`: archive URL, retrieval metadata, checksum, rights snapshot.
-- `import_runs`: edition, acquisition, parser version, status, start/end times.
-- `import_files`: archive member name, file checksum, book identifier, byte count.
-- `staged_books`: source book code, recognised work ID, canon eligibility, inventory status.
-- `staged_chapters`: source chapter label and order.
-- `staged_units`: source verse label, raw label, parsed label, source order and text payload.
-- `staged_content_nodes`: headings, paragraphs, poetry, footnotes, cross-references and inline spans.
-- `staged_numbering_aliases`: alternate chapter/verse labels and source numbering annotations.
-- `import_warnings`: unknown markers, malformed structures, duplicate identifiers and review notes.
-- `import_validation_results`: rule, severity, expected value, actual value and outcome.
-- `import_publication_events`: who approved publication, when, and which immutable run was promoted.
+- `scripture_import_runs` (migration 0007) records the edition/source-scheme binding, immutable archive URL/object key/SHA-256/size/retrieval time, parser identity/profile, manifest, run state, validation summary and reviewer/publication timestamps.
+- `scripture_import_files` records every archive member, member hash/size, book code/work ID, parse status, canonical USX R2 object key/hash, source version declaration (nullable), tested parser profile and structural counts.
+- `scripture_import_staging_units` records source-specific chapter/unit labels and order, marker order, text, content state, annotation metadata, structured content JSON and validation status. It preserves native source references.
+- `scripture_import_validation_results` records append-only rule/severity/result evidence and optional source locations.
+- `scripture_import_run_events` records immutable creation and status-transition history.
 
-Do not add unreviewed staging tables to the production schema prematurely. The initial Scripture SQL migration remains the stable domain layer; staging may be implemented as a separate import schema or temporary tables once the application repository is created.
+The final edition-specific semantic layout is represented separately by `translation_content_blocks` and `translation_content_nodes` (migration 0006). Staged verse projections are not a replacement for the canonical USX artefact: retain the full canonical USX per source file in restricted R2 and generate both the verse-level text projection and ordered structural blocks/nested nodes from the same parser output. The current staging schema includes structured JSON per staged unit; book/chapter-level nodes and the complete marker-to-node registry still require importer implementation and tests.
+
+The physical schemas are draft-only and are applied in CI to fresh SQLite/local D1. They are not yet production migrations; they must be transferred into the separate application repository with the importer and its deployment configuration.
 
 ## 15.6 Canon and source-book handling
 
