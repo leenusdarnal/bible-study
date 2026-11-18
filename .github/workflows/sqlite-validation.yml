@@ -88,6 +88,13 @@ jobs:
             --persist-to "$RUNNER_TEMP/d1-state" \
             --file docs/sql/0005_translation_text_content_states.sql
 
+      - name: Apply scripture import staging migration to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0006_scripture_import_staging.sql
+
       - name: Apply structured translation-content migration to local D1
         run: |
           npx wrangler d1 execute bible-study-schema-validation \
@@ -108,6 +115,32 @@ jobs:
             --local --config "$RUNNER_TEMP/wrangler.toml" \
             --persist-to "$RUNNER_TEMP/d1-state" \
             --command "INSERT INTO versification_schemes (id, code, name, description, version, source_note, status, created_at, updated_at) VALUES ('d1-test-scheme', 'd1-test', 'D1 test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000), ('d1-test-scheme-b', 'd1-test-b', 'D1 target test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000); INSERT INTO scheme_chapters (id, scheme_id, work_id, chapter_label, chapter_order) VALUES ('d1-gen-1', 'd1-test-scheme', 'work-gen', '1', 1), ('d1-exo-1', 'd1-test-scheme', 'work-exo', '1', 1), ('d1-gen-1-b', 'd1-test-scheme-b', 'work-gen', '1', 1); INSERT INTO scripture_units (id, scheme_id, work_id, chapter_id, unit_label, unit_order, unit_kind) VALUES ('d1-a-v1', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '1', 1, 'verse'), ('d1-a-v2', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '2', 2, 'verse'), ('d1-a-v3', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '3', 3, 'verse'), ('d1-a-v4', 'd1-test-scheme', 'work-gen', 'd1-gen-1', '4', 4, 'verse'), ('d1-b-v1', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '1', 1, 'verse'), ('d1-b-v2', 'd1-test-scheme-b', 'work-gen', 'd1-gen-1-b', '2', 2, 'verse');"
+
+      - name: Exercise an auditable Scripture import run in local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO translation_editions (id, code, name, abbreviation, language_tag, versification_scheme_id, created_at, updated_at) VALUES ('d1-import-edition', 'd1-import', 'D1 import test edition', 'D1I', 'en', 'd1-test-scheme', 1800000000000, 1800000000000); INSERT INTO scripture_import_runs (id, edition_id, versification_scheme_id, source_archive_url, source_archive_object_key, source_archive_sha256, source_archive_size_bytes, source_retrieved_at, parser_name, parser_version, parser_compatibility_profile, manifest_json, created_at, updated_at) VALUES ('d1-import-run', 'd1-import-edition', 'd1-test-scheme', 'https://source.example/engwebp_usfm.zip', 'source-archives/d1-import-edition/sha.zip', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1000, 1800000000000, 'usfmtc', '0.4.10', '2.5', '{\"schema_version\":1}', 1800000000000, 1800000000000); INSERT INTO scripture_import_files (id, import_run_id, member_name, member_sha256, member_size_bytes, book_code, work_id, parse_status, parser_compatibility_profile, canonical_usx_object_key, canonical_usx_sha256, chapter_count, verse_marker_count, created_at, updated_at) VALUES ('d1-import-gen-file', 'd1-import-run', '02-GENengwebp.usfm', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 100, 'GEN', 'work-gen', 'parsed', '2.5', 'canonical-usx/d1-import-run/GEN.usx', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', 1, 1, 1800000000000, 1800000000000); INSERT INTO scripture_import_staging_units (id, import_run_id, source_file_id, versification_scheme_id, work_id, source_chapter_label, source_chapter_order, source_unit_label, source_unit_order, source_marker_order, unit_kind, content_state, text, structured_content_json, validation_status, created_at, updated_at) VALUES ('d1-stage-gen-v1', 'd1-import-run', 'd1-import-gen-file', 'd1-test-scheme', 'work-gen', '1', 1, '1', 1, 1, 'verse', 'text', 'Synthetic staging text', '{\"nodes\":[{\"type\":\"text\"}]}', 'valid', 1800000000000, 1800000000000); INSERT INTO scripture_import_validation_results (id, import_run_id, rule_code, severity, result, detail_json, created_at) VALUES ('d1-import-crc', 'd1-import-run', 'archive-crc', 'info', 'passed', '{\"checked\":true}', 1800000000000); UPDATE scripture_import_runs SET status = 'inventoried', updated_at = 1800000000001 WHERE id = 'd1-import-run'; UPDATE scripture_import_runs SET status = 'parsed', updated_at = 1800000000002 WHERE id = 'd1-import-run'; UPDATE scripture_import_runs SET status = 'validated', validation_summary_json = '{\"blocking_errors\":0}', updated_at = 1800000000003 WHERE id = 'd1-import-run'; UPDATE scripture_import_runs SET status = 'reviewed', approved_by = 'ci-reviewer', approved_at = 1800000000004, updated_at = 1800000000004 WHERE id = 'd1-import-run'; UPDATE scripture_import_runs SET status = 'published', published_at = 1800000000005, updated_at = 1800000000005 WHERE id = 'd1-import-run'; UPDATE translation_editions SET status = 'available', updated_at = 1800000000005 WHERE id = 'd1-import-edition'; CREATE TABLE ci_assert_import_run (ok INTEGER CHECK(ok = 1)); INSERT INTO ci_assert_import_run SELECT CASE WHEN (SELECT status FROM scripture_import_runs WHERE id = 'd1-import-run') = 'published' AND (SELECT COUNT(*) FROM scripture_import_run_events WHERE import_run_id = 'd1-import-run') = 6 AND (SELECT status FROM translation_editions WHERE id = 'd1-import-edition') = 'available' THEN 1 ELSE 0 END; DROP TABLE ci_assert_import_run;"
+
+      - name: Assert local D1 blocks publication with unresolved staged content
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO scripture_import_runs (id, edition_id, versification_scheme_id, source_archive_url, source_archive_object_key, source_archive_sha256, source_archive_size_bytes, source_retrieved_at, parser_name, parser_version, parser_compatibility_profile, manifest_json, created_at, updated_at) VALUES ('d1-bad-import-run', 'd1-import-edition', 'd1-test-scheme', 'https://source.example/engwebp_usfm.zip', 'source-archives/d1-bad/sha.zip', 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd', 1000, 1800000000000, 'usfmtc', '0.4.10', '2.5', '{\"schema_version\":1}', 1800000000000, 1800000000000); INSERT INTO scripture_import_files (id, import_run_id, member_name, member_sha256, member_size_bytes, book_code, work_id, parse_status, canonical_usx_object_key, canonical_usx_sha256, created_at, updated_at) VALUES ('d1-bad-file', 'd1-bad-import-run', '03-EXOengwebp.usfm', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 100, 'EXO', 'work-exo', 'parsed', 'canonical-usx/d1-bad/EXO.usx', 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 1, 1); INSERT INTO scripture_import_staging_units (id, import_run_id, source_file_id, versification_scheme_id, work_id, source_chapter_label, source_chapter_order, source_unit_label, source_unit_order, source_marker_order, unit_kind, content_state, text, validation_status, created_at, updated_at) VALUES ('d1-bad-stage', 'd1-bad-import-run', 'd1-bad-file', 'd1-test-scheme', 'work-exo', '1', 1, '1', 1, 1, 'verse', 'text', 'Synthetic unresolved text', 'review_required', 1800000000000, 1800000000000); UPDATE scripture_import_runs SET status = 'inventoried' WHERE id = 'd1-bad-import-run'; UPDATE scripture_import_runs SET status = 'parsed' WHERE id = 'd1-bad-import-run'; UPDATE scripture_import_runs SET status = 'validated' WHERE id = 'd1-bad-import-run'; UPDATE scripture_import_runs SET status = 'reviewed', approved_by = 'ci-reviewer', approved_at = 1800000000000 WHERE id = 'd1-bad-import-run'; UPDATE scripture_import_runs SET status = 'published', published_at = 1800000000001 WHERE id = 'd1-bad-import-run';" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly published an import with unresolved staging units."
+            exit 1
+          fi
+          if ! grep -q "import run has unresolved blocking validation issues" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
 
       - name: Exercise text-bearing, annotation-only and empty-marker content states in D1
         run: |
