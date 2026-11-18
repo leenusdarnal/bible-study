@@ -249,6 +249,9 @@ def _validate_nodes(
         return
 
     block_ids: set[str] = set()
+    all_node_ids: set[str] = set()
+    previous_block_source_order = 0
+    previous_block_order = 0
     for block_index, block in enumerate(blocks):
         prefix = f"{member_name}: block {block_index + 1}"
         if not isinstance(block, dict) or block.get("block_type") not in {
@@ -262,6 +265,36 @@ def _validate_nodes(
             })
             continue
         block_id = block.get("id")
+        block_source_order = block.get("source_order")
+        block_order = block.get("block_order")
+        if block.get("source_member") != member_name:
+            findings.append({
+                "code": "CONTENT_BLOCK_SOURCE_MISMATCH",
+                "severity": "blocking",
+                "message": f"{prefix} is not bound to its inventoried source member.",
+            })
+        if not isinstance(block.get("source_marker"), str) or not block.get("source_marker"):
+            findings.append({
+                "code": "CONTENT_BLOCK_MARKER_INVALID",
+                "severity": "blocking",
+                "message": f"{prefix} has no source marker.",
+            })
+        if type(block_source_order) is not int or block_source_order <= previous_block_source_order:
+            findings.append({
+                "code": "CONTENT_BLOCK_SOURCE_ORDER_INVALID",
+                "severity": "blocking",
+                "message": f"{prefix} does not have increasing source order.",
+            })
+        else:
+            previous_block_source_order = block_source_order
+        if type(block_order) is not int or block_order <= previous_block_order:
+            findings.append({
+                "code": "CONTENT_BLOCK_ORDER_INVALID",
+                "severity": "blocking",
+                "message": f"{prefix} does not have increasing block order.",
+            })
+        else:
+            previous_block_order = block_order
         if not isinstance(block_id, str) or not block_id or block_id in block_ids:
             findings.append({
                 "code": "CONTENT_BLOCK_ID_INVALID",
@@ -296,7 +329,7 @@ def _validate_nodes(
             parent_id = node.get("parent_node_id")
             order = node.get("source_order")
             order_path = node.get("node_order_path")
-            if not isinstance(node_id, str) or not node_id or node_id in node_ids:
+            if not isinstance(node_id, str) or not node_id or node_id in node_ids or node_id in all_node_ids:
                 findings.append({
                     "code": "CONTENT_NODE_ID_INVALID",
                     "severity": "blocking",
@@ -318,6 +351,30 @@ def _validate_nodes(
                 })
             else:
                 previous_order = order
+            if node.get("block_id") != block_id:
+                findings.append({
+                    "code": "CONTENT_NODE_BLOCK_MISMATCH",
+                    "severity": "blocking",
+                    "message": f"{node_prefix} is not bound to its containing block.",
+                })
+            if not isinstance(node.get("source_marker"), str) or not node.get("source_marker"):
+                findings.append({
+                    "code": "CONTENT_NODE_MARKER_INVALID",
+                    "severity": "blocking",
+                    "message": f"{node_prefix} has no source marker.",
+                })
+            if not isinstance(node.get("attributes"), dict):
+                findings.append({
+                    "code": "CONTENT_NODE_ATTRIBUTES_INVALID",
+                    "severity": "blocking",
+                    "message": f"{node_prefix} has no structured attributes object.",
+                })
+            if node.get("text_content") is not None and not isinstance(node.get("text_content"), str):
+                findings.append({
+                    "code": "CONTENT_NODE_TEXT_INVALID",
+                    "severity": "blocking",
+                    "message": f"{node_prefix} has an invalid text payload.",
+                })
             if not isinstance(order_path, str) or not order_path or order_path in paths:
                 findings.append({
                     "code": "CONTENT_NODE_PATH_INVALID",
@@ -325,6 +382,7 @@ def _validate_nodes(
                     "message": f"{node_prefix} has a missing or duplicate order path.",
                 })
             node_ids.add(node_id if isinstance(node_id, str) else "")
+            all_node_ids.add(node_id if isinstance(node_id, str) else "")
             paths.add(order_path if isinstance(order_path, str) else "")
 
 
