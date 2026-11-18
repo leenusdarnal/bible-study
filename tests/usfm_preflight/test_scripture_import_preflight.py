@@ -45,7 +45,7 @@ def synthetic_rights(archive_sha):
                 "display": True,
                 "cache": True,
                 "redistribute": False,
-                "transform": False,
+                "transform": True,
                 "ai_use": False,
             },
             "evidence": [{
@@ -130,6 +130,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
                 "parse_status": "passed",
                 "roundtrip_matches": True,
                 "compatibility_profile": "2.5",
+                "inclusion_status": "included",
                 "canonical_usx_object_key": f"canonical-usx/{book_code}.usx.xml",
                 "canonical_usx_sha256": hashlib.sha256((book_code + "-canonical-usx").encode()).hexdigest(),
                 "canonical_usx_object_status": "verified",
@@ -141,6 +142,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
             "edition_id": "WEBP",
             "source_id": "engwebp",
             "territory": "IN",
+            "required_permissions": ["display", "cache", "transform"],
             "source_archive": {
                 "url": "https://ebible.org/Scriptures/engwebp_usfm.zip",
                 "sha256": cls.archive_sha,
@@ -160,6 +162,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
             },
             "expected": {
                 "member_count": len(CORE_66),
+                "included_member_count": len(CORE_66),
                 "require_all_protestant_66": True,
             },
             "archive_members": members,
@@ -219,6 +222,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
         self.assertTrue(report["ready_for_import"])
         self.assertEqual(report["summary"]["core_book_count"], 66)
         self.assertEqual(report["summary"]["converted_member_count"], 66)
+        self.assertEqual(report["summary"]["included_member_count"], 66)
         self.assertEqual(report["summary"]["verse_projection_count"], 66)
         self.assertIn("synthetic-pending-move", report["summary"]["pending_versification_proposal_ids"])
 
@@ -305,6 +309,50 @@ class ScriptureImportPreflightTests(unittest.TestCase):
         self.rights["editions"][0]["territories"] = ["GB"]
         report = self.run_check()
         self.assertIn("RIGHTS_TERRITORY_NOT_APPROVED", self.findings(report))
+
+
+    def test_noncanon_archive_members_must_be_explicitly_excluded(self):
+        member = {
+            "member_name": "synthetic/FRT.usfm",
+            "sha256": hashlib.sha256(b"front-matter").hexdigest(),
+            "book_ids": ["FRT"],
+            "parse_status": "passed",
+            "roundtrip_matches": True,
+            "compatibility_profile": "2.5",
+            "canonical_usx_object_key": "canonical-usx/FRT.usx.xml",
+            "canonical_usx_sha256": hashlib.sha256(b"front-matter-usx").hexdigest(),
+            "canonical_usx_object_status": "verified",
+            "inclusion_status": "excluded",
+            "excluded_from_publication": True,
+            "exclusion_reason": "Outside the initial 66-book Protestant-canon release scope.",
+        }
+        self.manifest["archive_members"].append(member)
+        self.manifest["expected"]["member_count"] += 1
+        report = self.run_check()
+        self.assertTrue(report["ready_for_import"])
+        self.assertEqual(report["summary"]["archive_member_count"], 67)
+        self.assertEqual(report["summary"]["included_member_count"], 66)
+
+    def test_a_core_book_cannot_be_excluded(self):
+        member = next(item for item in self.manifest["archive_members"] if item["book_ids"] == ["GEN"])
+        member["inclusion_status"] = "excluded"
+        member["excluded_from_publication"] = True
+        member["exclusion_reason"] = "Test attempt to omit a core book."
+        member.pop("conversion_output")
+        report = self.run_check()
+        self.assertIn("CORE_BOOK_EXCLUDED", self.findings(report))
+        self.assertIn("CORE_CANON_INCOMPLETE", self.findings(report))
+
+    def test_noncanon_book_cannot_be_included_in_initial_66_book_release(self):
+        member = next(item for item in self.manifest["archive_members"] if item["book_ids"] == ["GEN"])
+        member["book_ids"].append("WIS")
+        report = self.run_check()
+        self.assertIn("NONCANON_BOOK_INCLUDED", self.findings(report))
+
+    def test_converter_requires_explicit_transform_permission(self):
+        self.rights["editions"][0]["permissions"]["transform"] = False
+        report = self.run_check()
+        self.assertIn("RIGHTS_REQUIRED_USE_NOT_APPROVED", self.findings(report))
 
     def test_report_never_contains_synthetic_verse_text(self):
         report = self.run_check()
