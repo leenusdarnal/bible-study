@@ -1,0 +1,509 @@
+{
+  "schema_version": 1,
+  "registry_id": "usfm-marker-registry",
+  "registry_version": "0.1.0",
+  "source_profiles": [
+    "WEBP",
+    "KJV"
+  ],
+  "parser": {
+    "package": "usfmtc",
+    "version": "0.4.10",
+    "compatibility_profile": "2.5",
+    "publisher_version": "not_declared"
+  },
+  "coverage": {
+    "status": "initial_partial",
+    "review_status": "pending_editorial_review",
+    "note": "Initial mappings are conservative implementation hypotheses for common USFM/USX styles. This registry is not an exhaustive inventory of the source archives and does not certify publisher semantics."
+  },
+  "unknown_marker_policy": {
+    "node_type": "unknown_marker",
+    "preserve_original_marker": true,
+    "preserve_all_attributes": true,
+    "preserve_text": true,
+    "preserve_children": true,
+    "preserve_source_order": true,
+    "render_as_scripture_text": false,
+    "publication_blocking": false,
+    "requires_review": true
+  },
+  "markers": [
+    {
+      "marker": "id",
+      "category": "document",
+      "semantic": "book_identity",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "c",
+      "category": "reference",
+      "semantic": "chapter_boundary",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "v",
+      "category": "reference",
+      "semantic": "verse_boundary",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ide",
+      "category": "metadata",
+      "semantic": "encoding_declaration",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "h",
+      "category": "metadata",
+      "semantic": "running_header",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "toc1",
+      "category": "metadata",
+      "semantic": "table_of_contents_title",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "toc2",
+      "category": "metadata",
+      "semantic": "table_of_contents_short_title",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "toc3",
+      "category": "metadata",
+      "semantic": "table_of_contents_abbreviation",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "mt1",
+      "category": "heading",
+      "semantic": "main_title",
+      "node_type": "book_intro",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "mt2",
+      "category": "heading",
+      "semantic": "main_title_secondary",
+      "node_type": "book_intro",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "mte1",
+      "category": "heading",
+      "semantic": "embedded_title",
+      "node_type": "book_intro",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ms1",
+      "category": "heading",
+      "semantic": "major_section_title",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "s1",
+      "category": "heading",
+      "semantic": "section_heading_level_1",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "s2",
+      "category": "heading",
+      "semantic": "section_heading_level_2",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "s3",
+      "category": "heading",
+      "semantic": "section_heading_level_3",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "r",
+      "category": "heading",
+      "semantic": "parallel_passage_reference",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "d",
+      "category": "heading",
+      "semantic": "descriptive_title",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "sp",
+      "category": "heading",
+      "semantic": "speaker_label",
+      "node_type": "section_heading",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "p",
+      "category": "paragraph",
+      "semantic": "prose_paragraph",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "m",
+      "category": "paragraph",
+      "semantic": "margin_paragraph",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "pi1",
+      "category": "paragraph",
+      "semantic": "indented_paragraph_level_1",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "pi2",
+      "category": "paragraph",
+      "semantic": "indented_paragraph_level_2",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "pc",
+      "category": "paragraph",
+      "semantic": "centered_paragraph",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "pr",
+      "category": "paragraph",
+      "semantic": "right_aligned_paragraph",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "b",
+      "category": "break",
+      "semantic": "blank_line",
+      "node_type": "paragraph",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "q",
+      "category": "poetry",
+      "semantic": "poetry_line",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "q1",
+      "category": "poetry",
+      "semantic": "poetry_line_level_1",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "q2",
+      "category": "poetry",
+      "semantic": "poetry_line_level_2",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "q3",
+      "category": "poetry",
+      "semantic": "poetry_line_level_3",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "qm1",
+      "category": "poetry",
+      "semantic": "embedded_poetry_level_1",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "qm2",
+      "category": "poetry",
+      "semantic": "embedded_poetry_level_2",
+      "node_type": "poetry_line_group",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "li1",
+      "category": "list",
+      "semantic": "list_item_level_1",
+      "node_type": "list",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "li2",
+      "category": "list",
+      "semantic": "list_item_level_2",
+      "node_type": "list",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "f",
+      "category": "annotation",
+      "semantic": "footnote_container",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "x",
+      "category": "annotation",
+      "semantic": "cross_reference_container",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fr",
+      "category": "annotation",
+      "semantic": "footnote_reference_origin",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ft",
+      "category": "annotation",
+      "semantic": "footnote_text",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fq",
+      "category": "annotation",
+      "semantic": "footnote_quotation",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fqa",
+      "category": "annotation",
+      "semantic": "footnote_alternate_quotation",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fk",
+      "category": "annotation",
+      "semantic": "footnote_keyword",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fl",
+      "category": "annotation",
+      "semantic": "footnote_label",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fv",
+      "category": "annotation",
+      "semantic": "footnote_verse_number",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fp",
+      "category": "annotation",
+      "semantic": "footnote_paragraph",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "xo",
+      "category": "annotation",
+      "semantic": "cross_reference_origin",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "xt",
+      "category": "annotation",
+      "semantic": "cross_reference_target",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "xq",
+      "category": "annotation",
+      "semantic": "cross_reference_quotation",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "add",
+      "category": "character",
+      "semantic": "added_words",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "bd",
+      "category": "character",
+      "semantic": "bold",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "bdit",
+      "category": "character",
+      "semantic": "bold_italic",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "it",
+      "category": "character",
+      "semantic": "italic",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "em",
+      "category": "character",
+      "semantic": "emphasis",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "nd",
+      "category": "character",
+      "semantic": "divine_name",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "sc",
+      "category": "character",
+      "semantic": "small_caps",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "qt",
+      "category": "character",
+      "semantic": "quoted_text",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "tl",
+      "category": "character",
+      "semantic": "transliterated_text",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "w",
+      "category": "character",
+      "semantic": "word_with_attributes",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "wh",
+      "category": "character",
+      "semantic": "hebrew_word",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "wa",
+      "category": "character",
+      "semantic": "aramaic_word",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "k",
+      "category": "character",
+      "semantic": "keyword",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "ord",
+      "category": "character",
+      "semantic": "ordinal",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "sup",
+      "category": "character",
+      "semantic": "superscript",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "sub",
+      "category": "character",
+      "semantic": "subscript",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "wj",
+      "category": "character",
+      "semantic": "words_of_jesus",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "jmp",
+      "category": "character",
+      "semantic": "link_or_jump",
+      "node_type": "span",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "fig",
+      "category": "character",
+      "semantic": "figure_or_illustration",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "pb",
+      "category": "break",
+      "semantic": "page_break",
+      "node_type": "other",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "periph",
+      "category": "peripheral",
+      "semantic": "peripheral_section",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    },
+    {
+      "marker": "rem",
+      "category": "metadata",
+      "semantic": "remark",
+      "node_type": "peripheral",
+      "review_status": "pending_review"
+    }
+  ]
+}
