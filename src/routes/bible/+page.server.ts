@@ -1,13 +1,6 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';\nimport { resolveInitialBook, type CanonBook } from '$lib/bible-catalogue';
 
-type CanonBook = {
-  position: number;
-  display_name: string;
-  work_id: string;
-  testament: 'old' | 'new';
-  usfm_code: string;
-  chapter_count: number;
-};
+
 
 export const load: PageServerLoad = async ({ platform, url }) => {
   if (!platform?.env?.DB) {
@@ -32,10 +25,4 @@ export const load: PageServerLoad = async ({ platform, url }) => {
     ORDER BY cb.position ASC
   `).bind('canon-protestant-66').all<CanonBook>();
 
-  const requestedBook = url.searchParams.get('book') ?? '';
-  const initialBook = results.some((book) => book.work_id === requestedBook)
-    ? requestedBook
-    : results[0]?.work_id ?? '';
-
-  return { books: results, initialBook, databaseAvailable: true };
-};
+  const initialBook = resolveInitialBook(results, url.searchParams.get('book'));
