@@ -1,6 +1,6 @@
 # 26. Structured Scripture Content Model
 
-- **Status:** Proposed schema extension; migration 0006 is draft and locally tested in SQLite and Cloudflare D1 CI.
+- **Status:** Proposed schema extension; migration 0006 is draft and passed SQLite regression tests plus local Cloudflare D1 migration/node-fixture CI ([run 44257036764](https://github.com/leenusdarnal/bible-study/actions/runs/44257036764)).
 - **Purpose:** Preserve USFM-derived structure in addition to the plain-text verse projection.
 - **Related:** [Dual-edition import pipeline](15-dual-bible-text-import-pipeline.md), [Scripture core schema](13-scripture-core-implementation-spec.md), [source archive audit](23-source-package-listing-review.md).
 
@@ -63,7 +63,7 @@ Migration `docs/sql/0006_structured_translation_content.sql` creates the block a
 - deterministic unique node order paths;
 - indexes for location, anchor and node traversal.
 
-Tests cover nested inline content, source marker retention, ordering, cross-block parent rejection, invalid JSON, duplicate paths and book-level introduction blocks. The migration is a draft schema experiment, not a production deployment.
+Tests cover nested inline content, source marker retention, ordering, cross-block parent rejection, invalid JSON, duplicate paths and book-level introduction blocks. The local D1 workflow also applies migrations 0001–0006 and exercises a nested span/text node tree. The migration is a draft schema experiment, not a production deployment.
 
 ## 26.5 Known limitations and next gates
 
