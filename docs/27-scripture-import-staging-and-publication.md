@@ -1,6 +1,6 @@
 # 27. Scripture Import Staging and Publication Contract
 
-- **Status:** Migrations 0001–0007 applied to the live APAC staging D1 database on 18 November 2026; real text staging/import remains pending.
+- **Status:** Migrations 0001–0007 are deployed to the live APAC staging D1 database; real text staging/import remains pending.
 - **Date:** 18 November 2026
 - **Purpose:** Define the auditable, repeatable boundary between source archives, parsed import staging and published Scripture text.
 - **Related:** [Dual-text import pipeline](15-dual-bible-text-import-pipeline.md), [database schema](11-database-schema.md), [source archive audit](23-source-package-listing-review.md), [Romans versification review](25-romans-versification-review.md).
@@ -9,7 +9,7 @@
 
 The project has verified the selected WEBP and KJV source archives and parsed/round-tripped all 149 USFM members. It has **not** imported their Bible text into a live database or published either edition.
 
-Migration `0007_scripture_import_staging.sql` adds a proposed staging/provenance layer to the documentation schema. It is tested against fresh SQLite and temporary local Cloudflare D1 in CI. It is not yet a production migration and has not been applied to a remote D1 database.
+Migration `0007_scripture_import_staging.sql` adds the staging/provenance layer. It is tested against fresh SQLite and temporary local Cloudflare D1 in CI and has also been applied to the live `bible-study-staging` D1 database. This is a staging database, not production.
 
 The import pipeline has three separate data zones:
 
@@ -100,9 +100,9 @@ For a new edition version, keep the previous published run available until the n
 
 ## 27.7 Cloudflare and deployment boundary
 
-The connected Cloudflare account currently has no D1 database for this project. GitHub Actions has successfully applied migrations 0001–0007 to ephemeral local D1 during CI, but there is no remote project D1 deployment, R2 source bucket or application Worker yet.
+The connected Cloudflare account has a remote D1 database named `bible-study-staging`, created on 18 November 2026 with APAC as the primary location hint and read replication disabled. Migrations 0001–0007 were applied sequentially from the checked-in SQL files. Verification confirmed 25 application tables, 66 `scriptural_works`, 66 `canon_books`, and zero rows from `PRAGMA foreign_key_check`. The database currently has zero translation editions, translation text rows, import runs and staged units. No Scripture text has been loaded or published.
 
-When the application source repository and environments are established, create separate development/staging and production resources. Apply reviewed migrations in development first, run importer/publication tests, back up production before a schema rollout, and keep raw/canonical Scripture artefacts in restricted R2 storage. Do not upload the source ZIPs to GitHub or public buckets.
+R2 is not enabled on the connected Cloudflare account. The R2 API returned error 10042 and instructed that R2 be enabled through the Cloudflare Dashboard. Private source-archive and canonical-USX buckets therefore remain blocked. Once enabled, create private staging buckets and verify object-level access controls before uploading source archives. The application Worker is not deployed yet. Keep raw/canonical Scripture artefacts out of GitHub and public buckets.
 
 ## 27.8 Acceptance tests and CI
 
@@ -121,4 +121,4 @@ The migration/test suite must demonstrate:
 - no edition availability before a published import exists;
 - zero foreign-key violations.
 
-CI coverage is implemented in `tests/sqlite/test_scripture_import_staging_migration.py` and the SQLite/D1 workflow. A passing local D1 run validates the draft SQL behaviour; it does not establish a remote database deployment or prove that a real USFM corpus has been imported.
+CI coverage is implemented in `tests/sqlite/test_scripture_import_staging_migration.py` and the SQLite/D1 workflow. A passing local D1 run validates SQL behaviour; the live staging D1 deployment separately confirms that migrations 0001–0007 were applied remotely. Neither result proves that a real USFM corpus has been imported or published.
