@@ -142,7 +142,7 @@ class ScriptureImportPreflightTests(unittest.TestCase):
             "source_id": "engwebp",
             "territory": "IN",
             "source_archive": {
-                "url": "https://example.test/engwebp_usfm.zip",
+                "url": "https://ebible.org/Scriptures/engwebp_usfm.zip",
                 "sha256": cls.archive_sha,
                 "size_bytes": 1024,
                 "zip_integrity_status": "passed",
