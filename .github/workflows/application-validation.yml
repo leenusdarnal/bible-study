@@ -1,0 +1,42 @@
+name: Application validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'svelte.config.js'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'wrangler.jsonc'
+      - '.github/workflows/application-validation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'svelte.config.js'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'wrangler.jsonc'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Svelte and TypeScript checks
+        run: npm run check
+      - name: Unit tests
+        run: npm test
+      - name: Production build
+        run: npm run build
