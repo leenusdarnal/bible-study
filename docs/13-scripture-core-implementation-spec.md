@@ -11,9 +11,11 @@
 - `sql/0002_seed_protestant_66.sql` — 66-book identity and order seed only.
 - `sql/0003_reading_progress.sql` — draft account-owned tracker tables and integrity triggers.
 - `sql/0004_versification_mapping_groups.sql` — grouped source/target unit sets and constrained pairwise mapping edges.
+- `sql/0005_translation_text_content_states.sql` — explicit text-bearing, annotation-only and empty source-marker states.
 - `tests/sqlite/test_reading_progress_migration.py` — standard-library SQLite regression tests for the draft tracker migration.
+- `tests/sqlite/test_translation_text_content_state_migration.py` — standard-library SQLite tests for source text/annotation state integrity.
 
-These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups.
+These are specifications in the documentation repository. They are not production migrations and must not be run against a live database without review, testing and transfer into the separate application repository. Migration 0003 requires migration 0001, the canon seed and selected canon/scheme records. Migration 0004 requires migration 0001 and preserves existing pairwise mappings while adding explicit mapping groups. Migration 0005 requires migration 0001 and enforces consistent translation text states when a source unit contains text, only annotations, or an explicitly empty marker.
 
 ## 13.2 What migration 0001 creates
 
@@ -40,7 +42,7 @@ The initial versification scheme remains an open decision. A scheme record shoul
 
 ## 13.4 Validation plan
 
-Run these checks in a disposable SQLite database and against D1 local. The repository CI now applies migrations 0001–0004 to a fresh local D1 database, seeds the Protestant 66-book canon, asserts the book count and foreign-key integrity, and tests a grouped three-to-two mapping. D1 preview/remote behavioural validation remains a separate pre-production gate:
+Run these checks in a disposable SQLite database and against D1 local. The repository CI now applies migrations 0001–0005 to a fresh local D1 database, seeds the Protestant 66-book canon, asserts the book count and foreign-key integrity, and tests grouped mappings, reading-progress integrity and translation text content states. D1 preview/remote behavioural validation remains a separate pre-production gate:
 
 1. Apply the schema to an empty database.
 2. Apply the 66-book seed; verify 66 books and positions 1–66.
