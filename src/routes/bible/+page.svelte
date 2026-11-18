@@ -97,8 +97,8 @@
         {:else}
           <div class="empty-reader"><h3>Select a book</h3><p>Choose a title from the catalogue to view its reader status.</p></div>
         {/if}
-      </main>
-    </div>
+      </section>
+    </main>
   {/if}
 
   <footer class="library-footer">Scripture first · Context always <span>Translation text will appear only after rights and source review.</span></footer>
