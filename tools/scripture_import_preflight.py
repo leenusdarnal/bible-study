@@ -624,11 +624,16 @@ def run_preflight(
         if member.get("canonical_usx_object_status") != "verified":
             add("CANONICAL_USX_MEMBER_UNVERIFIED", "blocking", f"{name}: canonical USX object is not checksum-verified.")
         book_ids = member.get("book_ids")
-        if not isinstance(book_ids, list) or not book_ids or any(
-            not isinstance(code, str) or len(code) != 3 or not code.isalnum()
-            for code in book_ids
-        ) or (isinstance(book_ids, list) and len(book_ids) != len(set(x for x in book_ids if isinstance(x, str)))):
-            add("MEMBER_BOOK_ID_INVALID", "blocking", f"{name}: source member has no valid book ID inventory.")
+        inclusion_status = member.get("inclusion_status")
+        valid_book_ids = (
+            isinstance(book_ids, list)
+            and all(isinstance(code, str) and len(code) == 3 and code.isalnum() for code in book_ids)
+            and len(book_ids) == len(set(book_ids))
+        )
+        # Front matter and glossary members may legitimately contain no \\id.
+        # They must still be explicitly excluded and justified below.
+        if not valid_book_ids or (not book_ids and inclusion_status != "excluded"):
+            add("MEMBER_BOOK_ID_INVALID", "blocking", f"{name}: source member has an invalid book ID inventory or an empty inventory that is not explicitly excluded.")
             book_ids = []
         seen_books.update(book_ids)
         if member.get("parse_status") != "passed":
