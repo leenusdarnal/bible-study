@@ -28,10 +28,10 @@ Deterministic IDs are derived from the edition, source member, block and node po
 ## 30.3 Projection rules
 
 - Character-level text is included in its source verse projection.
-- Footnote and cross-reference bodies remain in their original structured node trees and are excluded from ordinary verse text.
+- Footnote/endnote and cross-reference containers (including their caller and nested character styles) remain in their original structured node trees and are excluded from ordinary verse text.
 - A verse marker with annotation content but no verse wording becomes \`annotation_only\`; an explicit marker with neither wording nor annotation becomes \`empty_marker\`.
 - Unknown inline marker text is retained in the plain-text projection to avoid silently losing words, but the affected projection is marked for review. Unknown structures are represented as \`unknown_marker\` nodes with source attributes, child nodes and source order preserved.
-- Chapter/verse labels are kept source-native. The converter does not apply cross-edition versification mappings or rewrite source addresses.
+- Chapter/verse labels are kept source-native, including USX milestone `number` or `sid` values. The converter does not apply cross-edition versification mappings or rewrite source addresses.
 
 The plain-text projection is a convenience for later staging. The structured node rows and original canonical USX remain the structural evidence; the projection does not replace them.
 
