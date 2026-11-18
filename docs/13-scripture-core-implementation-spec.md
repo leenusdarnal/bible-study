@@ -77,7 +77,7 @@ Migration 0003 adds account-owned trackers with explicit canon, scheme and scope
 
 Validate 0003 only after the Scripture core, canon seed and selected versification data are present. Test all-books and selected-books trackers, cross-scheme rejection, cross-canon rejection, duplicate chapter rows, state/timestamp checks, selected-scope changes, cascade behaviour and PRAGMA foreign_key_check. Guest migration is a service-level workflow and is not implemented by this SQL file.
 
-Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite. A separate GitHub Actions job also applies all three migrations to Wrangler local D1 and checks the 66-book seed plus foreign-key integrity. Behavioural trigger tests against D1 preview and production safety review remain outstanding.
+Run the repository's SQLite regression tests with `python -m unittest discover -s tests/sqlite -v`. These tests target SQLite. A separate GitHub Actions job also applies all three migrations to Wrangler local D1 and checks the 66-book seed plus foreign-key integrity. Local D1 trigger tests now cover selected-scope activation and the key rejection cases; D1 preview/remote validation and production safety review remain outstanding.
 
 ## 13.6 Acceptance criteria
 
