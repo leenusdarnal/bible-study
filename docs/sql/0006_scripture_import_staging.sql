@@ -224,6 +224,42 @@ BEGIN
   SELECT RAISE(ABORT, 'scripture import run records cannot be deleted');
 END;
 
+CREATE TRIGGER trg_scripture_import_published_run_immutable
+BEFORE UPDATE ON scripture_import_runs
+WHEN OLD.status = 'published'
+BEGIN
+  SELECT RAISE(ABORT, 'published scripture import runs are immutable');
+END;
+
+CREATE TRIGGER trg_scripture_import_publish_requires_validated_content
+BEFORE UPDATE OF status ON scripture_import_runs
+WHEN NEW.status = 'published'
+AND (
+  NOT EXISTS (
+    SELECT 1 FROM scripture_import_files f
+    WHERE f.import_run_id = NEW.id
+  )
+  OR EXISTS (
+    SELECT 1 FROM scripture_import_files f
+    WHERE f.import_run_id = NEW.id
+      AND f.parse_status IN ('review_required', 'rejected')
+  )
+  OR EXISTS (
+    SELECT 1 FROM scripture_import_staging_units u
+    WHERE u.import_run_id = NEW.id
+      AND u.validation_status <> 'valid'
+  )
+  OR EXISTS (
+    SELECT 1 FROM scripture_import_validation_results v
+    WHERE v.import_run_id = NEW.id
+      AND v.severity IN ('error', 'blocking')
+      AND v.result = 'failed'
+  )
+)
+BEGIN
+  SELECT RAISE(ABORT, 'import run has unresolved blocking validation issues');
+END;
+
 CREATE TRIGGER trg_scripture_import_files_parsed_payload
 BEFORE INSERT ON scripture_import_files
 WHEN NEW.parse_status = 'parsed'
@@ -243,6 +279,16 @@ END;
 
 CREATE TRIGGER trg_scripture_import_files_no_change_after_publish
 BEFORE UPDATE ON scripture_import_files
+WHEN EXISTS (
+  SELECT 1 FROM scripture_import_runs r
+  WHERE r.id = OLD.import_run_id AND r.status = 'published'
+)
+BEGIN
+  SELECT RAISE(ABORT, 'published import source-file inventory is immutable');
+END;
+
+CREATE TRIGGER trg_scripture_import_files_no_delete_after_publish
+BEFORE DELETE ON scripture_import_files
 WHEN EXISTS (
   SELECT 1 FROM scripture_import_runs r
   WHERE r.id = OLD.import_run_id AND r.status = 'published'
@@ -289,6 +335,16 @@ WHEN EXISTS (
 )
 BEGIN
   SELECT RAISE(ABORT, 'published import staging units are immutable');
+END;
+
+CREATE TRIGGER trg_scripture_import_validation_no_insert_after_publish
+BEFORE INSERT ON scripture_import_validation_results
+WHEN EXISTS (
+  SELECT 1 FROM scripture_import_runs r
+  WHERE r.id = NEW.import_run_id AND r.status = 'published'
+)
+BEGIN
+  SELECT RAISE(ABORT, 'published import validation evidence is immutable');
 END;
 
 CREATE TRIGGER trg_scripture_import_validation_no_update
@@ -347,6 +403,13 @@ CREATE TRIGGER trg_scripture_import_events_no_delete
 BEFORE DELETE ON scripture_import_run_events
 BEGIN
   SELECT RAISE(ABORT, 'import run events are append-only');
+END;
+
+CREATE TRIGGER trg_translation_edition_insert_available_requires_import
+BEFORE INSERT ON translation_editions
+WHEN NEW.status = 'available'
+BEGIN
+  SELECT RAISE(ABORT, 'translation edition requires a published import run');
 END;
 
 CREATE TRIGGER trg_translation_edition_available_requires_import
