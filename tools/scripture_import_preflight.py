@@ -452,11 +452,13 @@ def run_preflight(
             add("RIGHTS_TERRITORY_NOT_APPROVED", "blocking", "The selected publication territory is not explicitly approved.")
         permissions = rights.get("permissions")
         required_permissions = manifest.get("required_permissions")
-        if (
-            not isinstance(required_permissions, list)
-            or not {"display", "cache", "transform"}.issubset(set(required_permissions))
-            or any(item not in {"display", "cache", "redistribute", "transform"} for item in required_permissions)
-        ):
+        allowed_permissions = {"display", "cache", "redistribute", "transform"}
+        valid_permission_list = (
+            isinstance(required_permissions, list)
+            and all(isinstance(item, str) and item in allowed_permissions for item in required_permissions)
+            and {"display", "cache", "transform"}.issubset(set(required_permissions))
+        )
+        if not valid_permission_list:
             add("RIGHTS_USE_SCOPE_INVALID", "blocking", "Required uses must explicitly include display, cache and transform; optional uses are redistribute.")
             required_permissions = ["display", "cache", "transform"]
         if not isinstance(permissions, dict) or any(permissions.get(use) is not True for use in required_permissions):
@@ -557,7 +559,7 @@ def run_preflight(
         if not isinstance(book_ids, list) or not book_ids or any(
             not isinstance(code, str) or len(code) != 3 or not code.isalnum()
             for code in book_ids
-        ):
+        ) or (isinstance(book_ids, list) and len(book_ids) != len(set(x for x in book_ids if isinstance(x, str)))):
             add("MEMBER_BOOK_ID_INVALID", "blocking", f"{name}: source member has no valid book ID inventory.")
             book_ids = []
         seen_books.update(book_ids)
