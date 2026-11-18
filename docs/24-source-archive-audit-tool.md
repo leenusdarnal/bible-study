@@ -147,3 +147,12 @@ Every member passed under the first USFM 2.5 compatibility profile. This is not 
 - Artifact SHA-256: `823c0975de780d602ec23a8bcc3824b502143aaaffa8195237a0bdf8f466606e`
 
 The result closes initial source parsing and canonical XML round-trip validation for these exact archive checksums. It does not close source-signature verification, marker interpretation review, verse mapping approval, territorial rights clearance or D1 publication.
+
+
+## 24.10 Semantic marker-style inventory
+
+The semantic audit report now aggregates USX element counts and USX `style` attribute values by source edition, in addition to per-file counts. These values provide a concrete inventory of structural elements and marker styles that the importer must handle or explicitly retain as unknown nodes.
+
+The inventory is metadata only: it contains marker/style identifiers and counts, not Scripture wording. It is a discovery input for the versioned marker registry, not a claim that every marker's semantics have already been reviewed. The report schema is version 2.
+
+The summary helper has a regression test confirming that element/style counts are retained while verse and note wording is excluded from the summary output.
