@@ -4,7 +4,9 @@ declare global {
       env: {
         DB: {
           prepare(query: string): {
-            all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
+            bind(...values: unknown[]): {
+              all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
+            };
           };
         };
       };
