@@ -41,9 +41,13 @@ def xml_shape(element: ET.Element) -> tuple[Any, ...]:
 def summarise(doc: Any) -> dict[str, Any]:
     root = doc.getroot()
     counts: Counter[str] = Counter()
+    style_counts: Counter[str] = Counter()
     book_codes: list[str] = []
     for element in root.iter():
         counts[element.tag] += 1
+        style = element.attrib.get("style")
+        if style:
+            style_counts[style] += 1
         if element.tag == "book":
             code = element.attrib.get("code")
             if code:
@@ -51,6 +55,7 @@ def summarise(doc: Any) -> dict[str, Any]:
     return {
         "book_codes": book_codes,
         "element_counts": dict(sorted(counts.items())),
+        "style_counts": dict(sorted(style_counts.items())),
         "chapter_nodes": counts.get("chapter", 0),
         "verse_nodes": counts.get("verse", 0),
     }
@@ -162,17 +167,31 @@ def audit_directory(source_dir: Path) -> dict[str, Any]:
             source_results.append(result)
             files.append(result)
 
+        aggregate_elements: Counter[str] = Counter()
+        aggregate_styles: Counter[str] = Counter()
+        for file_result in source_results:
+            passing_profile = next(
+                (profile for profile in file_result["profile_results"] if profile["status"] == "passed"),
+                None,
+            )
+            if passing_profile:
+                structure = passing_profile.get("original_structure", {})
+                aggregate_elements.update(structure.get("element_counts", {}))
+                aggregate_styles.update(structure.get("style_counts", {}))
+
         summary_by_source[source_id] = {
             "source_id": source_id,
             "member_count": len(source_results),
             "passed_count": sum(x["status"] == "passed" for x in source_results),
             "review_required_count": sum(x["status"] != "passed" for x in source_results),
             "fallback_profile_count": sum("3.1" in [p["profile"] for p in x["profile_results"]] for x in source_results),
+            "aggregate_element_counts": dict(sorted(aggregate_elements.items())),
+            "aggregate_style_counts": dict(sorted(aggregate_styles.items())),
         }
 
     failures = sum(x["status"] != "passed" for x in files)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "parser": {
             "package": "usfmtc",
             "version": PARSER_VERSION,
