@@ -77,7 +77,7 @@ See [Technical Architecture](docs/03-technical-architecture.md).
 | [Source archive audit tool](docs/24-source-archive-audit-tool.md) | Reproducible download, ZIP safety, checksum, USFM marker and verse-address audit process |
 | [Architecture decisions](decisions/README.md) | Numbered decision register, statuses and decision history |
 
-SQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. Source audit tests are in `tests/source_audit/` and run with `python -m unittest discover -s tests/source_audit -v`. GitHub Actions workflows validate both suites and the official WEBP/KJV archive acquisition; D1 local/preview validation is still required.
+SQLite regression tests for the draft reading-progress migration are in `tests/sqlite/` and can be run with `python -m unittest discover -s tests/sqlite -v`. Source audit tests are in `tests/source_audit/` and run with `python -m unittest discover -s tests/source_audit -v`. GitHub Actions validates both test suites, acquires and audits the official WEBP/KJV archives, and applies the draft migrations to a fresh local D1 database. D1 preview behavioural tests, semantic Scripture parsing, versification review and rights approval remain open.
 
 ## Status
 
