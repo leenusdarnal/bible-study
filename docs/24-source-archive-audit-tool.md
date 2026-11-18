@@ -122,6 +122,6 @@ The report contains no Scripture wording. It records source hashes, parser profi
 The GitHub Actions workflow installs the pinned USFMTC version, safely extracts only validated USFM members into the ephemeral runner workspace and executes this audit over both editions. The original ZIP archives and extracted Scripture files are not committed or uploaded. Only metadata-only reports are retained as workflow artifacts.
 
 - Reference implementation: [usfm-bible/usfmtc](https://github.com/usfm-bible/usfmtc)
-- Diagnostic workflow: [run 44248908061](https://github.com/leenusdarnal/bible-study/actions/runs/44248908061) (superseded by the USFMTC-based run triggered after this tool change)
+- Diagnostic workflow: [USFMTC-based run 44249381803](https://github.com/leenusdarnal/bible-study/actions/runs/44249381803) (result pending at the time of this document update)
 - Acceptance condition: every source member must parse and round-trip under at least one candidate profile with an identical canonical XML fingerprint. Files that pass more than one profile remain version-ambiguous and require explicit metadata treatment.
 - A successful round-trip is a strong structural/text preservation check, not a substitute for manual review of marker semantics, versification exceptions or legal publication rights.
