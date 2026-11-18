@@ -80,3 +80,74 @@ jobs:
             --local --config "$RUNNER_TEMP/wrangler.toml" \
             --persist-to "$RUNNER_TEMP/d1-state" \
             --command "CREATE TABLE ci_assert_66_books (book_count INTEGER CHECK(book_count = 66)); INSERT INTO ci_assert_66_books SELECT COUNT(*) FROM canon_books WHERE canon_id = 'canon-protestant-66' AND is_included = 1; DROP TABLE ci_assert_66_books; CREATE TABLE ci_assert_foreign_keys (ok INTEGER CHECK(ok = 1)); INSERT INTO ci_assert_foreign_keys SELECT CASE WHEN COUNT(*) = 0 THEN 1 ELSE 0 END FROM pragma_foreign_key_check; DROP TABLE ci_assert_foreign_keys; SELECT COUNT(*) AS protestant_book_count FROM canon_books WHERE canon_id = 'canon-protestant-66' AND is_included = 1;"
+
+      - name: Seed a minimal D1 versification fixture
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO versification_schemes (id, code, name, description, version, source_note, status, created_at, updated_at) VALUES ('d1-test-scheme', 'd1-test', 'D1 test scheme', 'CI only', '1', 'CI fixture', 'verified', 1800000000000, 1800000000000); INSERT INTO scheme_chapters (id, scheme_id, work_id, chapter_label, chapter_order) VALUES ('d1-gen-1', 'd1-test-scheme', 'work-gen', '1', 1), ('d1-exo-1', 'd1-test-scheme', 'work-exo', '1', 1);"
+
+      - name: Exercise selected-book scope and valid chapter progress in D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO reading_trackers (id, user_id, name, canon_id, versification_scheme_id, scope_mode, created_at, updated_at) VALUES ('d1-selected', 'ci-user', 'D1 selected scope', 'canon-protestant-66', 'd1-test-scheme', 'all_books', 1800000000000, 1800000000000); INSERT INTO reading_tracker_books (id, tracker_id, canon_id, work_id, display_order) VALUES ('d1-selected-gen', 'd1-selected', 'canon-protestant-66', 'work-gen', 1); UPDATE reading_trackers SET scope_mode = 'selected_books', updated_at = 1800000000000 WHERE id = 'd1-selected'; INSERT INTO reading_tracker_chapter_progress (id, tracker_id, canon_id, versification_scheme_id, work_id, chapter_id, progress_state, started_at, completed_at, updated_at) VALUES ('d1-gen-progress', 'd1-selected', 'canon-protestant-66', 'd1-test-scheme', 'work-gen', 'd1-gen-1', 'read', 1800000000000, 1800000000000, 1800000000000);"
+
+      - name: Assert D1 rejects progress outside selected-book scope
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO reading_tracker_chapter_progress (id, tracker_id, canon_id, versification_scheme_id, work_id, chapter_id, progress_state, started_at, completed_at, updated_at) VALUES ('d1-invalid-exo', 'd1-selected', 'canon-protestant-66', 'd1-test-scheme', 'work-exo', 'd1-exo-1', 'read', 1800000000000, 1800000000000, 1800000000000);" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly accepted progress for an unselected book."
+            exit 1
+          fi
+          if ! grep -q "chapter is outside selected tracker book scope" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
+
+      - name: Assert D1 prevents deleting the final selected book
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "DELETE FROM reading_tracker_books WHERE tracker_id = 'd1-selected' AND work_id = 'work-gen';" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly allowed deletion of the final selected book."
+            exit 1
+          fi
+          if ! grep -q "selected_books scope must retain at least one selected book" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
+
+      - name: Assert D1 prevents direct creation of an empty selected scope
+        run: |
+          set +e
+          output=$(npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO reading_trackers (id, user_id, name, canon_id, versification_scheme_id, scope_mode, created_at, updated_at) VALUES ('d1-empty', 'ci-user', 'Empty selected scope', 'canon-protestant-66', 'd1-test-scheme', 'selected_books', 1800000000000, 1800000000000);" 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ]; then
+            echo "D1 unexpectedly accepted an empty selected scope."
+            exit 1
+          fi
+          if ! grep -q "create selected scope by adding books before activating selected_books" <<< "$output"; then
+            echo "D1 failed for an unexpected reason."
+            exit 1
+          fi
