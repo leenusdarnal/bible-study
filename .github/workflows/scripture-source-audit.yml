@@ -6,7 +6,7 @@ on:
     paths:
       - ".github/workflows/scripture-source-audit.yml"
       - "tools/scripture_source_audit.py"
-      - "tools/usfm_semantic_audit.cjs"
+      - "tools/usfm_semantic_audit.py"
       - "tests/source_audit/**"
   workflow_dispatch:
 
@@ -16,7 +16,7 @@ permissions:
 jobs:
   source-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -26,16 +26,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: "24"
-
       - name: Test source-audit utility
         run: python -m unittest discover -s tests/source_audit -v
 
-      - name: Install pinned USFM semantic parser
-        run: npm install --no-save --package-lock=false usfm-grammar@3.2.3
+      - name: Install pinned USFM Technical Committee reference parser
+        run: python -m pip install "usfmtc==0.4.10"
 
       - name: Download, audit and safely extract official WEBP and KJV archives
         run: |
@@ -45,9 +40,9 @@ jobs:
             --extract-usfm-dir "$RUNNER_TEMP/usfm-source" \
             --output-dir "$RUNNER_TEMP/source-audit-report"
 
-      - name: Parse and round-trip every source USFM member
+      - name: Parse with USFM 2.5 and 3.1 profiles and round-trip every source member
         run: |
-          node tools/usfm_semantic_audit.cjs \
+          python tools/usfm_semantic_audit.py \
             --source-dir "$RUNNER_TEMP/usfm-source" \
             --output "$RUNNER_TEMP/source-audit-report/semantic-audit.json"
 
