@@ -463,6 +463,11 @@ class USXConverter:
                 if number:
                     self.current_chapter = number
                     self.current_verse_key = None
+                elif attrs.get("sid"):
+                    chapter_from_sid, _ = _sid_reference(attrs["sid"])
+                    if chapter_from_sid:
+                        self.current_chapter = chapter_from_sid
+                        self.current_verse_key = None
                 self.events.append({
                     "source_order": index,
                     "kind": "chapter_boundary",
