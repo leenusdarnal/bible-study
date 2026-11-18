@@ -88,6 +88,20 @@ jobs:
             --persist-to "$RUNNER_TEMP/d1-state" \
             --file docs/sql/0005_translation_text_content_states.sql
 
+      - name: Apply structured translation-content migration to local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --file docs/sql/0006_structured_translation_content.sql
+
+      - name: Exercise structured content nodes in local D1
+        run: |
+          npx wrangler d1 execute bible-study-schema-validation \
+            --local --config "$RUNNER_TEMP/wrangler.toml" \
+            --persist-to "$RUNNER_TEMP/d1-state" \
+            --command "INSERT INTO translation_content_blocks (id, edition_id, versification_scheme_id, work_id, chapter_id, anchor_unit_id, block_order, block_type, source_marker, source_member, source_order, created_at, updated_at) VALUES ('d1-content-block', 'd1-test-edition', 'd1-test-scheme', 'work-gen', 'd1-gen-1', 'd1-a-v1', 1, 'paragraph', '\\p', '01-GEN.usfm', 1, 1800000000000, 1800000000000); INSERT INTO translation_content_nodes (id, block_id, node_order_path, node_type, source_marker, text_content, attributes_json, source_order, created_at) VALUES ('d1-content-span', 'd1-content-block', '0001', 'span', '\\add', NULL, '{\"style\":\"added\"}', 1, 1800000000000); INSERT INTO translation_content_nodes (id, block_id, parent_node_id, node_order_path, node_type, text_content, source_order, created_at) VALUES ('d1-content-text', 'd1-content-block', 'd1-content-span', '0001.0001', 'text', 'Synthetic content node', 2, 1800000000000); CREATE TABLE ci_assert_content_tree (ok INTEGER CHECK(ok = 1)); INSERT INTO ci_assert_content_tree SELECT CASE WHEN (SELECT COUNT(*) FROM translation_content_nodes WHERE block_id = 'd1-content-block') = 2 AND (SELECT parent_node_id FROM translation_content_nodes WHERE id = 'd1-content-text') = 'd1-content-span' THEN 1 ELSE 0 END; DROP TABLE ci_assert_content_tree;"
+
       - name: Assert D1 schema, canon seed and foreign-key integrity
         run: |
           npx wrangler d1 execute bible-study-schema-validation \
