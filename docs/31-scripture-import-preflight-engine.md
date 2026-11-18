@@ -67,7 +67,7 @@ The report contains `status`, `ready_for_import`, a list of finding codes/severi
 
 - **Exit 0:** no blocking findings; a later, separately reviewed staging transition may be considered.
 - **Exit 1:** preflight blocked by one or more blocking findings.
-- **Warning:** a documented signature waiver is visible in the report but does not silently disappear.
+- **Warning:** a documented signature waiver or an explicitly excluded pending cross-edition mapping is visible in the report but does not silently disappear.
 
 A passing preflight is not a publication command. It does not create D1 import rows, approve a human review, change edition availability or publish text.
 
