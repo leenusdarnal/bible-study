@@ -1,6 +1,6 @@
 # ADR-009: Dual-Edition Scripture Import Implementation
 
-- **Status:** Proposed; source packages acquired and structurally audited; semantic parsing, mapping and legal gates remain open.
+- **Status:** Proposed; source packages acquired, structurally audited and all 149 USFM members parsed/round-tripped; mapping approval and legal gates remain open.
 - **Date:** 2026-11-17
 - **Related:** ADR-005, ADR-006, [Source selection](../docs/14-scripture-source-selection.md), [Dual-text import pipeline](../docs/15-dual-bible-text-import-pipeline.md).
 
