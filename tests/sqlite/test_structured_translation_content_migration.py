@@ -124,6 +124,26 @@ class StructuredTranslationContentTests(unittest.TestCase):
                    VALUES ('node-duplicate', 'block-1', '0001', 'text', 2, 1)"""
             )
 
+    def test_anchor_unit_must_belong_to_declared_chapter(self) -> None:
+        self.db.execute(
+            """INSERT INTO scheme_chapters
+               (id, scheme_id, work_id, chapter_label, chapter_order)
+               VALUES ('chapter-gen-2', 'scheme-structured', 'work-gen', '2', 2)"""
+        )
+        self.db.execute(
+            """INSERT INTO scripture_units
+               (id, scheme_id, work_id, chapter_id, unit_label, unit_order, unit_kind)
+               VALUES ('unit-gen-2-1', 'scheme-structured', 'work-gen', 'chapter-gen-2', '1', 1, 'verse')"""
+        )
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.db.execute(
+                """INSERT INTO translation_content_blocks
+                   (id, edition_id, versification_scheme_id, work_id, chapter_id, anchor_unit_id,
+                    block_order, block_type, source_member, source_order, created_at, updated_at)
+                   VALUES ('wrong-anchor', 'edition-structured', 'scheme-structured', 'work-gen',
+                           'chapter-gen-1', 'unit-gen-2-1', 2, 'paragraph', '01-GEN.usfm', 2, 1, 1)"""
+            )
+
     def test_book_level_blocks_do_not_require_a_chapter(self) -> None:
         self.db.execute(
             """INSERT INTO translation_content_blocks
