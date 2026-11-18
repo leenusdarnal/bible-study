@@ -68,7 +68,7 @@ Do not overwrite an archive at the same key. A changed checksum means a new sour
 
 ## 15.4 USFM parser design
 
-Use USFM as the common interchange format for both editions. The official USFM documentation has multiple versioned specifications, including 2.5 and 3.x, and describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes. The version marker inside each actual source file has not yet been inspected; detect and record it per file rather than assuming USFM 3.0.
+Use USFM as the common interchange format for both editions. The official USFM documentation has multiple versioned specifications, including 2.5 and 3.x, and describes book identification, chapter and verse markers, headings, paragraphs, poetry, footnotes, cross-references, character styles and attributes. The source scan found no explicit `\\usfm <version>` marker in the USFM members. Do not infer a declared version from the extension. The semantic audit tests candidate USFM 2.5 and 3.1 parser profiles and records compatibility separately from source-declared version metadata.
 
 Parser should be a marker-aware state machine, not a regular expression that strips markers and concatenates everything into plain text.
 
