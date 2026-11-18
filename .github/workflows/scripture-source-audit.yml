@@ -7,7 +7,10 @@ on:
       - ".github/workflows/scripture-source-audit.yml"
       - "tools/scripture_source_audit.py"
       - "tools/usfm_semantic_audit.py"
+      - "tools/validate_translation_rights.py"
+      - "data/rights/**"
       - "tests/source_audit/**"
+      - "tests/rights/**"
   workflow_dispatch:
 
 permissions:
@@ -28,6 +31,11 @@ jobs:
 
       - name: Test source-audit utility
         run: python -m unittest discover -s tests/source_audit -v
+
+      - name: Test translation rights publication gate
+        run: |
+          python -m unittest discover -s tests/rights -v
+          python tools/validate_translation_rights.py data/rights/translation-rights-register.json
 
       - name: Install pinned USFM Technical Committee reference parser
         run: python -m pip install "usfmtc==0.4.10"
