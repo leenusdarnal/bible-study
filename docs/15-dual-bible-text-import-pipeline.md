@@ -178,7 +178,7 @@ Consequently, a simple `source_verse_id → canonical_verse_id` one-to-one forei
 8. Store the mapping dataset version, source URL, licence attribution, transformation notes and reviewer approval.
 
 TVTMS source file:
-[STEPBible Versification / TVTMS](https://github.com/STEPBible/STEPBible-Data/blob/master/Versification/TVTMS%20-%20Translators%20Versification%20Traditions%20with%20Methodology%20for%20Standardisation%20for%20Eng%2BHeb%2BLat%2BGrk%2BOthers%20-%20STEPBible.org%20CC%20BY.txt)
+[STEPBible Versification / TVTMS](https://github.com/STEPBible/STEPBible-Data/blob/5de0a47f35f0fc13dfe1430d104e5db8a4285f9c/Versification/TVTMS%20-%20Translators%20Versification%20Traditions%20with%20Methodology%20for%20Standardisation%20for%20Eng%2BHeb%2BLat%2BGrk%2BOthers%20-%20STEPBible.org%20CC%20BY.txt)
 
 ## 15.8 Validation gates
 
@@ -261,7 +261,7 @@ The dual-text corpus is ready for initial release only when:
 - [USFM footnotes](https://ubsicap.github.io/usfm/notes_basic/fnotes.html)
 - [USFM cross-references](https://ubsicap.github.io/usfm/notes_basic/xrefs.html)
 - [STEPBible Data repository and CC BY 4.0 terms](https://github.com/STEPBible/STEPBible-Data)
-- [STEPBible Versification / TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/tree/master/Versification)
+- [STEPBible Versification / TVTMS dataset](https://github.com/STEPBible/STEPBible-Data/tree/5de0a47f35f0fc13dfe1430d104e5db8a4285f9c/Versification)
 
 
 ## 15.12 Archive validation and safe extraction — executed
