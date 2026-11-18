@@ -1,8 +1,8 @@
 # 31. Scripture Import Preflight and Validation Engine
 
 - **Status:** Fail-closed metadata and converted-output preflight engine implemented; synthetic coverage tests run in GitHub Actions.
-- **Tool:** \`tools/scripture_import_preflight.py\`
-- **Tests:** \`tests/usfm_preflight/test_scripture_import_preflight.py\`
+- **Tool:** `tools/scripture_import_preflight.py`
+- **Tests:** `tests/usfm_preflight/test_scripture_import_preflight.py`
 - **Related:** [Source archive audit](24-source-archive-audit-tool.md), [Romans 14/16 versification review](25-romans-versification-review.md), [Structured Scripture content model](26-structured-scripture-content-model.md), [Import staging and publication](27-scripture-import-staging-and-publication.md), [Marker registry](29-usfm-marker-interpretation-registry.md), [USFM converter](30-usfm-to-structured-scripture-converter.md).
 
 ## 31.1 Purpose
@@ -24,19 +24,19 @@ The manifest also identifies the selected source-specific scheme and its approva
 
 ## 31.3 Manifest contract
 
-The manifest is JSON with \`schema_version: 1\` and these top-level properties:
+The manifest is JSON with `schema_version: 1` and these top-level properties:
 
 | Property | Required content |
 |---|---|
-| \`edition_id\`, \`source_id\` | Supported pair: WEBP / \`engwebp\` or KJV / \`eng-kjv\` |
-| \`territory\` | Two-letter uppercase publication territory |
-| \`source_archive\` | Pinned official HTTPS URL, archive SHA-256, positive size, passed ZIP integrity, signature state |
-| \`parser\` | \`usfmtc 0.4.10\`, compatibility profile 2.5 or 3.1, no inferred publisher-declared version |
-| \`converter\` | Project converter name and pinned version 0.1.0 |
-| \`expected\` | Expected USFM member count and explicit requirement for all 66 Protestant books |
-| \`archive_members\` | Exact complete USFM inventory; each member has its path, uncompressed SHA-256, book IDs, parser/round-trip results, profile, canonical USX object key/hash/status and converted-output path |
-| \`versification\` | Source scheme code, approved state, named reviewer/date/decision, import mode and explicit excluded pending proposal IDs |
-| \`storage\` | Private-bucket assertion and verified immutable archive/canonical-USX object status |
+| `edition_id`, `source_id` | Supported pair: WEBP / `engwebp` or KJV / `eng-kjv` |
+| `territory` | Two-letter uppercase publication territory |
+| `source_archive` | Pinned official HTTPS URL, archive SHA-256, positive size, passed ZIP integrity, signature state |
+| `parser` | `usfmtc 0.4.10`, compatibility profile 2.5 or 3.1, no inferred publisher-declared version |
+| `converter` | Project converter name and pinned version 0.1.0 |
+| `expected` | Expected USFM member count and explicit requirement for all 66 Protestant books |
+| `archive_members` | Exact complete USFM inventory; each member has its path, uncompressed SHA-256, book IDs, parser/round-trip results, profile, canonical USX object key/hash/status and converted-output path |
+| `versification` | Source scheme code, approved state, named reviewer/date/decision, import mode and explicit excluded pending proposal IDs |
+| `storage` | Private-bucket assertion and verified immutable archive/canonical-USX object status |
 
 The member inventory is compared with the total expected archive count. Every source member, including material outside the launch canon, must pass parsing and canonical round-trip checks and have a checksum-verified canonical USX object. Each member must be explicitly marked `included` or `excluded`. Only included members require a converted output, and every excluded member requires a reason and an explicit not-for-publication flag. All 66 Protestant-canon books must be included; non-canon book content must be excluded from the initial release. Every included member's converted output must agree with the manifest's edition, source package, source-member path, source checksum, parser profile, converter identity and registry version.
 
@@ -54,7 +54,7 @@ The engine currently validates:
 - per-member converter provenance, source hashes, book identity and marker-registry version;
 - complete/reviewed marker coverage and absence of unknown or pending marker mappings;
 - structural block/node types, node identifiers, parent-before-child references, unique order paths and increasing source order;
-- source-native book/chapter/verse addresses, duplicate address detection and consistent \`text\`, \`annotation_only\` and \`empty_marker\` states;
+- source-native book/chapter/verse addresses, duplicate address detection and consistent `text`, `annotation_only` and `empty_marker` states;
 - rights approval for the requested territory, display/cache permissions, reviewer evidence and exact source archive checksum;
 - source-specific versification approval and explicit treatment of matching pending cross-edition mapping proposals;
 - private object-storage configuration and verified archive/canonical USX objects.
@@ -63,7 +63,7 @@ The 66-book gate is the initial Protestant-canon scope. The complete source ZIP 
 
 ## 31.5 Findings and exit codes
 
-The report contains \`status\`, \`ready_for_import\`, a list of finding codes/severities/messages and metadata-only summary counts. It never includes converted verse text.
+The report contains `status`, `ready_for_import`, a list of finding codes/severities/messages and metadata-only summary counts. It never includes converted verse text.
 
 - **Exit 0:** no blocking findings; a later, separately reviewed staging transition may be considered.
 - **Exit 1:** preflight blocked by one or more blocking findings.
@@ -75,27 +75,27 @@ A passing preflight is not a publication command. It does not create D1 import r
 
 From the repository root:
 
-\`\`\`bash
+```bash
 python -m unittest discover -s tests/usfm_preflight -v
-\`\`\`
+```
 
 After a real private import workspace and manifest exist:
 
-\`\`\`bash
+```bash
 python tools/scripture_import_preflight.py \
   --manifest /private/import-run/preflight-manifest.json \
   --rights-register data/rights/translation-rights-register.json \
   --marker-registry data/usfm/marker-registry.json \
   --proposals-dir data/versification/proposals \
   --output /private/import-run/preflight-report.json
-\`\`\`
+```
 
 The output report is metadata-only. The manifest points to private converted outputs and must not be placed in a public repository if it reveals private object keys or source storage details.
 
 ## 31.7 Current project result and remaining gates
 
 The current project data is deliberately not preflight-ready:
-- WEBP and KJV rights records remain \`review_required\`;
+- WEBP and KJV rights records remain `review_required`;
 - the marker registry is still initial/partial and pending editorial review;
 - the Romans 14/16 moved-passage proposal remains pending human review;
 - detached archive signature verification has not been completed;
