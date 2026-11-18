@@ -302,7 +302,9 @@ def _validate_nodes(
                     "severity": "blocking",
                     "message": f"{node_prefix} has a missing or duplicate node identifier.",
                 })
-            if parent_id is not None and parent_id not in node_ids:
+            if parent_id is not None and (
+                not isinstance(parent_id, str) or parent_id not in node_ids
+            ):
                 findings.append({
                     "code": "CONTENT_NODE_PARENT_INVALID",
                     "severity": "blocking",
@@ -473,7 +475,7 @@ def run_preflight(
     ):
         add("VERSIFICATION_REVIEW_MISSING", "blocking", "Versification approval requires a named reviewer, date and decision reference.")
     mode = versification.get("mode")
-    if mode not in {"native_source_only", "cross_edition"}:
+    if not isinstance(mode, str) or mode not in {"native_source_only", "cross_edition"}:
         add("VERSIFICATION_MODE_INVALID", "blocking", "Versification mode must be native_source_only or cross_edition.")
 
     if not isinstance(storage, dict):
@@ -623,9 +625,10 @@ def run_preflight(
             for row in converted.get("verse_projections", []):
                 if isinstance(row, dict):
                     key = (row.get("source_book_id"), row.get("chapter_label"), row.get("verse_label"))
-                    if key in all_addresses:
-                        add("DUPLICATE_ARCHIVE_SOURCE_REFERENCE", "blocking", f"Duplicate source address {'.'.join(str(x) for x in key)} across archive members.")
-                    all_addresses.add(key)
+                    if all(isinstance(value, str) for value in key):
+                        if key in all_addresses:
+                            add("DUPLICATE_ARCHIVE_SOURCE_REFERENCE", "blocking", f"Duplicate source address {'.'.join(key)} across archive members.")
+                        all_addresses.add(key)
 
     if file_count != len(members):
         add("CONVERSION_COVERAGE_INCOMPLETE", "blocking", "Not every inventoried USFM member has a valid converted output.")
