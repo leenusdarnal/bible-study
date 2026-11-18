@@ -36,14 +36,14 @@ A printed reference such as Psalm 3:1 is not a globally unique identity.
 | scriptural_works | id PK, usfm_code UNIQUE, osis_code UNIQUE where known, standard_name, testament, genre |
 | canons | id PK, code UNIQUE, name, tradition_label, description, status |
 | canon_books | id PK, canon_id FK, work_id FK, position, display_name, is_included; UNIQUE(canon_id, work_id), UNIQUE(canon_id, position) |
-| versification_schemes | id PK, code UNIQUE, name, description, source_id FK, version |
+| versification_schemes | id PK, code UNIQUE, name, description, version, source_note, status |
 | scheme_chapters | id PK, scheme_id FK, work_id FK, chapter_label, chapter_order; unique chapter order and label within scheme/work |
 | scripture_units | id PK, scheme_id FK, work_id FK, chapter_id FK, unit_label, unit_order, unit_kind; normally a verse |
-| scripture_mapping_groups | id PK, from_scheme_id FK, to_scheme_id FK, group_type, source provenance, confidence, review_status, rationale |
+| scripture_mapping_groups | id PK, from_scheme_id FK, to_scheme_id FK, group_type, source_id, source_reference, confidence, review_status, rationale, notes |
 | scripture_mapping_group_members | id PK, mapping_group_id FK, side, scheme_id FK, unit_id FK, member_order; ordered source and target unit sets |
 | scripture_unit_mappings | id PK, from_unit_id FK, to_unit_id FK, mapping_group_id FK nullable, mapping_type, source_id, confidence, notes, review_status |
-| translation_editions | id PK, code, name, abbreviation, language_tag, publisher, edition_label, publication_year, versification_scheme_id FK, licence_id FK, rights_status, source_id FK, status |
-| translation_texts | id PK, edition_id FK, scripture_unit_id FK, text, paragraph_marker, poetry_level, footnote_metadata_json, source_version_id FK; UNIQUE(edition_id, scripture_unit_id) |
+| translation_editions | id PK, code UNIQUE, name, abbreviation, language_tag, publisher, edition_label, publication_year, versification_scheme_id FK, rights_status, rights_notes, source_url, status |
+| translation_texts | id PK, edition_id FK, versification_scheme_id FK, scripture_unit_id FK, text, paragraph_marker, poetry_level, footnote_metadata_json; UNIQUE(edition_id, scripture_unit_id) |
 
 Mapping groups are the canonical representation of a reviewed relationship between two versification schemes. Ordered group members explicitly capture the source-side and target-side unit sets, supporting one-to-one, one-to-many, many-to-one, many-to-many (for example, three source units to two target units), moved, subverse and absent relationships. Pairwise scripture_unit_mappings rows are optional edges within a group and are constrained to use group-member endpoints. Legacy pairwise rows remain valid with a null mapping_group_id. Translation text is attached to a unit in the edition's own scheme. The first release can seed one primary Protestant scheme and the 66-book canon without assuming all future editions use identical divisions.
 
