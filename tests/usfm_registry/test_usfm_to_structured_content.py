@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 from usfm_to_structured_content import (  # noqa: E402
+    ConversionError,
     USXConverter,
     load_registry,
     validate_output,
@@ -124,7 +125,7 @@ class USFMToStructuredContentTests(unittest.TestCase):
             source_sha256=SOURCE_HASH,
             parser={"package": "fixture", "version": "1", "compatibility_profile": "test"},
         )
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ConversionError):
             converter.convert(ET.fromstring('<usx version="2.5"><para style="p">x</para></usx>'))
 
 
