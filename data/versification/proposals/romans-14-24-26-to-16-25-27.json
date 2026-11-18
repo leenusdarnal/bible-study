@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "proposal_id": "romans-14-24-26-to-16-25-27",
+  "status": "pending_human_review",
+  "group_type": "moved",
+  "confidence": "medium",
+  "from_edition": {
+    "source_id": "engwebp",
+    "display_name": "World English Bible Protestant Edition",
+    "archive_filename": "engwebp_usfm.zip",
+    "archive_sha256": "707aea4a010c535af87c6d919f43674f076590d343137eb9f3e264c2b782a424",
+    "source_member": "75-ROMengwebp.usfm",
+    "provisional_scheme_code": "engwebp-source-v1"
+  },
+  "to_edition": {
+    "source_id": "eng-kjv",
+    "display_name": "King James Version, 1769 standardised text",
+    "archive_filename": "eng-kjv_usfm.zip",
+    "archive_sha256": "9d37aa78180ceefd5e4aeeaedceccf16f21484e5eb17d5662e8beff31bc3d8a5",
+    "source_member": "75-ROMeng-kjv.usfm",
+    "provisional_scheme_code": "eng-kjv-source-v1"
+  },
+  "ordered_correspondence": [
+    { "from": "ROM.14.24", "to": "ROM.16.25", "order": 1 },
+    { "from": "ROM.14.25", "to": "ROM.16.26", "order": 2 },
+    { "from": "ROM.14.26", "to": "ROM.16.27", "order": 3 }
+  ],
+  "additional_source_anchor": {
+    "edition": "engwebp",
+    "reference": "ROM.16.25",
+    "classification": "footnote_only_anchor",
+    "handling": "Preserve the source verse marker and attached footnote metadata at this native reference. Do not treat it as a second copy of the moved passage or as a fourth member of the moved-passage correspondence."
+  },
+  "evidence": [
+    {
+      "kind": "primary_source_note",
+      "source_id": "engwebp",
+      "member": "75-ROMengwebp.usfm",
+      "reference": "ROM.14.26",
+      "finding": "The WEBP source footnote states that the Textus Receptus places verses 24-26 after Romans 16:24 and numbers them 16:25-27."
+    },
+    {
+      "kind": "primary_source_anchor",
+      "source_id": "engwebp",
+      "member": "75-ROMengwebp.usfm",
+      "reference": "ROM.16.25",
+      "finding": "The native marker is a footnote-only anchor explaining the relocation; preserve it separately from the moved verse text."
+    },
+    {
+      "kind": "target_source_structure",
+      "source_id": "eng-kjv",
+      "member": "75-ROMeng-kjv.usfm",
+      "references": ["ROM.16.25", "ROM.16.26", "ROM.16.27"],
+      "finding": "The KJV source contains the corresponding three-part passage at these consecutive native references."
+    },
+    {
+      "kind": "secondary_crosswalk_context",
+      "dataset": "STEPBible TVTMS",
+      "repository": "https://github.com/STEPBible/STEPBible-Data",
+      "commit": "5de0a47f35f0fc13dfe1430d104e5db8a4285f9c",
+      "file": "Versification/TVTMS - Translators Versification Traditions with Methodology for Standardisation for Eng+Heb+Lat+Grk+Others - STEPBible.org CC BY.txt",
+      "git_blob_sha": "c82082b14dfcd507cd5c899ae88445e04f940360",
+      "license": "CC BY 4.0",
+      "attribution": "Tyndale House and STEPBible.org",
+      "limitation": "Use as supporting versification methodology only. The cited TVTMS file is not a WEBP-specific mapping instruction; the primary WEBP source footnote is the direct evidence for this proposal."
+    }
+  ],
+  "review": {
+    "review_status": "pending",
+    "requires_human_approval": true,
+    "approval_scope": "Approve or reject this exact 3-to-3 moved-passage mapping after reviewing the two checksummed source files and the footnote-only WEBP anchor.",
+    "do_not_publish_or_seed_as_approved": true,
+    "questions": [
+      "Confirm that the three source references align in order with the three KJV target references.",
+      "Confirm that the WEBP ROM.16.25 marker is retained as a note-only anchor and is not imported as another text occurrence.",
+      "Confirm that the mapping group is represented as group_type moved and remains pending until editorial approval."
+    ]
+  },
+  "implementation_notes": [
+    "Resolve provisional scheme codes to actual versification_schemes IDs only after the source-specific chapter and unit staging pass is complete.",
+    "Create ordered scripture_mapping_group_members for the three source units and three target units only after those source units exist.",
+    "Optional pairwise scripture_unit_mappings rows may be created for aligned sequence positions after review; do not flatten the passage move into rewritten source verse labels.",
+    "This proposal does not establish a single canonical Bible versification and does not authorize text publication."
+  ]
+}
