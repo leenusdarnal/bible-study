@@ -1,17 +1,10 @@
 <script lang="ts">
+  let { data } = $props<{ data: { books: Array<{ position: number; display_name: string; work_id: string; testament: 'old' | 'new'; usfm_code: string }> } }>();
   let activeTab = $state('Overview');
   let searchQuery = $state('');
   let showSearch = $state(false);
 
   const navigation = ['Home', 'Bible', 'Study', 'Explore', 'Research'];
-  const books = [
-    { name: 'Genesis', chapters: 50, testament: 'Old Testament' },
-    { name: 'Psalms', chapters: 150, testament: 'Old Testament' },
-    { name: 'Proverbs', chapters: 31, testament: 'Old Testament' },
-    { name: 'Matthew', chapters: 28, testament: 'New Testament' },
-    { name: 'John', chapters: 21, testament: 'New Testament' },
-    { name: 'Romans', chapters: 16, testament: 'New Testament' }
-  ];
 </script>
 
 <svelte:head>
@@ -101,14 +94,14 @@
       <section class="section-block">
         <div class="section-heading">
           <div><div class="eyebrow">A GOOD PLACE TO START</div><h2>Explore the Scriptures</h2></div>
-          <button class="text-link" onclick={() => activeTab = 'Bible'}>Browse all books <span>→</span></button>
+          <button class="text-link" onclick={() => activeTab = 'Bible'}>Browse all 66 books <span>→</span></button>
         </div>
         <div class="book-grid">
-          {#each books as book, i}
+          {#each data.books.slice(0, 6) as book, i}
             <button class="book-card" onclick={() => activeTab = 'Bible'}>
               <span class="book-index">{String(i + 1).padStart(2, '0')}</span>
-              <span class="book-name">{book.name}</span>
-              <span class="book-meta">{book.testament} · {book.chapters} chapters</span>
+              <span class="book-name">{book.display_name}</span>
+              <span class="book-meta">{book.testament === 'old' ? 'Old Testament' : 'New Testament'}</span>
               <span class="book-arrow">↗</span>
             </button>
           {/each}
