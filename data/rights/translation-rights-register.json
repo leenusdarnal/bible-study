@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "purpose": "Conservative rights register. No translation is approved for publication until exact edition, use, territory and evidence are reviewed.",
+  "editions": [
+    {
+      "schema_version": 1,
+      "edition_id": "WEBP",
+      "display_name": "World English Bible Protestant Edition",
+      "source_url": "https://ebible.org/engwebp/",
+      "rights_holder": "Requires source-specific confirmation",
+      "rights_status": "review_required",
+      "territories": [],
+      "permissions": {
+        "display": "unknown",
+        "cache": "unknown",
+        "redistribute": "unknown",
+        "transform": "unknown",
+        "ai_use": "unknown"
+      },
+      "evidence": [
+        {
+          "kind": "source_archive",
+          "reference": "eBible.org engwebp USFM archive",
+          "sha256": "707aea4a010c535af87c6d919f43674f076590d343137eb9f3e264c2b782a424"
+        },
+        {
+          "kind": "review_note",
+          "reference": "docs/09-licensing-attribution.md",
+          "note": "Verify exact source edition, licence and intended digital distribution use."
+        }
+      ],
+      "review": {
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision_reference": null,
+        "notes": "Not approved. Do not infer redistribution or digital-app permission from public availability."
+      }
+    },
+    {
+      "schema_version": 1,
+      "edition_id": "KJV",
+      "display_name": "King James Version, 1769 standardised text",
+      "source_url": "https://ebible.org/eng-kjv/",
+      "rights_holder": "Jurisdiction- and edition-specific rights review required",
+      "rights_status": "review_required",
+      "territories": [],
+      "permissions": {
+        "display": "unknown",
+        "cache": "unknown",
+        "redistribute": "unknown",
+        "transform": "unknown",
+        "ai_use": "unknown"
+      },
+      "evidence": [
+        {
+          "kind": "source_archive",
+          "reference": "eBible.org eng-kjv USFM archive",
+          "sha256": "9d37aa78180ceefd5e4aeeaedceccf16f21484e5eb17d5662e8beff31bc3d8a5"
+        },
+        {
+          "kind": "review_note",
+          "reference": "docs/09-licensing-attribution.md",
+          "note": "Existing source review records a UK letters-patent caveat; digital distribution and each target territory require specific review."
+        }
+      ],
+      "review": {
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision_reference": null,
+        "notes": "Not approved. Public-domain status in one jurisdiction must not be treated as worldwide clearance."
+      }
+    }
+  ]
+}
