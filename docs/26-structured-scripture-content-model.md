@@ -57,13 +57,13 @@ The tree retains source marker, text content, raw value, JSON attributes, source
 
 Migration `docs/sql/0006_structured_translation_content.sql` creates the block and node tables with:
 - composite foreign keys tying content to the selected edition and source versification;
-- optional chapter and verse anchors;
+- optional chapter and verse anchors, with triggers ensuring a verse anchor belongs to its declared chapter;
 - JSON validity checks;
 - a parent-node foreign key constrained to the same block;
 - deterministic unique node order paths;
 - indexes for location, anchor and node traversal.
 
-Tests cover nested inline content, source marker retention, ordering, cross-block parent rejection, invalid JSON, duplicate paths and book-level introduction blocks. The local D1 workflow also applies migrations 0001–0006 and exercises a nested span/text node tree. The migration is a draft schema experiment, not a production deployment.
+Tests cover nested inline content, source marker retention, ordering, cross-block parent rejection, invalid JSON, duplicate paths, anchor/chapter consistency and book-level introduction blocks. The local D1 workflow also applies migrations 0001–0006 and exercises a nested span/text node tree. The migration is a draft schema experiment, not a production deployment.
 
 ## 26.5 Known limitations and next gates
 
