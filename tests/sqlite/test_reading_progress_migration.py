@@ -70,7 +70,31 @@ class ReadingProgressMigrationTests(unittest.TestCase):
             ],
         )
 
+        self.db.executemany(
+            """INSERT INTO scripture_units
+               (id, scheme_id, work_id, chapter_id, unit_label, unit_order, unit_kind)
+               VALUES (?, ?, 'work-gen', ?, ?, ?, 'verse')""",
+            [
+                ("a-v1", "scheme-test-a", "gen-1-a", "1", 1),
+                ("a-v2", "scheme-test-a", "gen-1-a", "2", 2),
+                ("a-v3", "scheme-test-a", "gen-1-a", "3", 3),
+                ("b-v1", "scheme-test-b", "gen-1-b", "1", 1),
+                ("b-v2", "scheme-test-b", "gen-1-b", "2", 2),
+                ("b-v3", "scheme-test-b", "gen-1-b", "3", 3),
+            ],
+        )
+
         self.db.executescript((SQL_DIR / "0003_reading_progress.sql").read_text(encoding="utf-8"))
+        # Seed a legacy pairwise mapping to prove migration 0004 preserves it.
+        self.db.execute(
+            """INSERT INTO scripture_unit_mappings
+               (id, from_unit_id, from_scheme_id, to_unit_id, to_scheme_id,
+                mapping_type, source_id, confidence, notes, review_status, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("legacy-map", "a-v1", "scheme-test-a", "b-v1", "scheme-test-b",
+             "equivalent", "test-source", "high", "legacy mapping fixture", "approved", NOW),
+        )
+        self.db.executescript((SQL_DIR / "0004_versification_mapping_groups.sql").read_text(encoding="utf-8"))
 
     def tearDown(self):
         self.db.close()
@@ -109,6 +133,101 @@ class ReadingProgressMigrationTests(unittest.TestCase):
     def assert_integrity_error(self, sql, params=()):
         with self.assertRaises(sqlite3.IntegrityError):
             self.db.execute(sql, params)
+
+
+    def test_mapping_group_supports_three_to_two_unit_relationship(self):
+        self.db.execute(
+            """INSERT INTO scripture_mapping_groups
+               (id, from_scheme_id, to_scheme_id, group_type, source_id, source_reference,
+                confidence, review_status, rationale, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("group-3-to-2", "scheme-test-a", "scheme-test-b", "complex",
+             "tvts-test", "Rom.14:24-26 <> Rom.16:25-27", "unreviewed", "pending",
+             "Three source units correspond to two target units.", NOW, NOW),
+        )
+        members = [
+            ("group-from-1", "group-3-to-2", "scheme-test-a", "scheme-test-b", "from", "scheme-test-a", "a-v1", 1),
+            ("group-from-2", "group-3-to-2", "scheme-test-a", "scheme-test-b", "from", "scheme-test-a", "a-v2", 2),
+            ("group-from-3", "group-3-to-2", "scheme-test-a", "scheme-test-b", "from", "scheme-test-a", "a-v3", 3),
+            ("group-to-1", "group-3-to-2", "scheme-test-a", "scheme-test-b", "to", "scheme-test-b", "b-v1", 1),
+            ("group-to-2", "group-3-to-2", "scheme-test-a", "scheme-test-b", "to", "scheme-test-b", "b-v2", 2),
+        ]
+        self.db.executemany(
+            """INSERT INTO scripture_mapping_group_members
+               (id, mapping_group_id, from_scheme_id, to_scheme_id, side, scheme_id, unit_id, member_order)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            members,
+        )
+        counts = dict(self.db.execute(
+            """SELECT side, COUNT(*) FROM scripture_mapping_group_members
+               WHERE mapping_group_id = ? GROUP BY side""",
+            ("group-3-to-2",),
+        ).fetchall())
+        self.assertEqual(counts, {"from": 3, "to": 2})
+
+        # A pairwise edge is valid only when both endpoints are members of this group.
+        self.db.execute(
+            """INSERT INTO scripture_unit_mappings
+               (id, from_unit_id, from_scheme_id, to_unit_id, to_scheme_id, mapping_group_id,
+                mapping_type, source_id, confidence, notes, review_status, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("group-edge-1", "a-v1", "scheme-test-a", "b-v1", "scheme-test-b",
+             "group-3-to-2", "partial", "tvts-test", "unreviewed", None, "pending", NOW),
+        )
+        self.assertEqual(
+            self.db.execute(
+                "SELECT COUNT(*) FROM scripture_unit_mappings WHERE mapping_group_id = ?",
+                ("group-3-to-2",),
+            ).fetchone()[0],
+            1,
+        )
+
+    def test_mapping_group_rejects_member_from_wrong_side_scheme(self):
+        self.db.execute(
+            """INSERT INTO scripture_mapping_groups
+               (id, from_scheme_id, to_scheme_id, group_type, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            ("group-side-check", "scheme-test-a", "scheme-test-b", "moved", NOW, NOW),
+        )
+        self.assert_integrity_error(
+            """INSERT INTO scripture_mapping_group_members
+               (id, mapping_group_id, from_scheme_id, to_scheme_id, side, scheme_id, unit_id, member_order)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("bad-side-member", "group-side-check", "scheme-test-a", "scheme-test-b",
+             "from", "scheme-test-b", "b-v1", 1),
+        )
+
+    def test_mapping_group_edge_rejects_non_member_endpoint(self):
+        self.db.execute(
+            """INSERT INTO scripture_mapping_groups
+               (id, from_scheme_id, to_scheme_id, group_type, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            ("group-edge-check", "scheme-test-a", "scheme-test-b", "split", NOW, NOW),
+        )
+        self.db.executemany(
+            """INSERT INTO scripture_mapping_group_members
+               (id, mapping_group_id, from_scheme_id, to_scheme_id, side, scheme_id, unit_id, member_order)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            [
+                ("edge-from-member", "group-edge-check", "scheme-test-a", "scheme-test-b", "from", "scheme-test-a", "a-v1", 1),
+                ("edge-to-member", "group-edge-check", "scheme-test-a", "scheme-test-b", "to", "scheme-test-b", "b-v1", 1),
+            ],
+        )
+        self.assert_integrity_error(
+            """INSERT INTO scripture_unit_mappings
+               (id, from_unit_id, from_scheme_id, to_unit_id, to_scheme_id, mapping_group_id,
+                mapping_type, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            ("bad-edge", "a-v1", "scheme-test-a", "b-v3", "scheme-test-b",
+             "group-edge-check", "partial", NOW),
+        )
+
+    def test_mapping_group_migration_preserves_existing_pairwise_rows(self):
+        row = self.db.execute(
+            """SELECT id, mapping_group_id, mapping_type, review_status
+               FROM scripture_unit_mappings WHERE id = 'legacy-map'"""
+        ).fetchone()
+        self.assertEqual(row, ("legacy-map", None, "equivalent", "approved"))
 
     def test_all_books_tracker_accepts_chapters_in_its_canon(self):
         self.make_tracker("all-books")
