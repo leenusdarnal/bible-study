@@ -417,6 +417,9 @@ def run_preflight(
     member_count = expected.get("member_count")
     if not isinstance(member_count, int) or member_count < 1:
         add("EXPECTED_MEMBER_COUNT_INVALID", "blocking", "Expected USFM member count must be a positive integer.")
+    expected_included_count = expected.get("included_member_count")
+    if not isinstance(expected_included_count, int) or expected_included_count < 1:
+        add("EXPECTED_INCLUDED_COUNT_INVALID", "blocking", "Expected included-member count must be a positive integer.")
 
     members = manifest.get("archive_members")
     if not isinstance(members, list) or not members:
@@ -448,8 +451,16 @@ def run_preflight(
         if not isinstance(territories, list) or territory not in territories:
             add("RIGHTS_TERRITORY_NOT_APPROVED", "blocking", "The selected publication territory is not explicitly approved.")
         permissions = rights.get("permissions")
-        if not isinstance(permissions, dict) or permissions.get("display") is not True or permissions.get("cache") is not True:
-            add("RIGHTS_DISPLAY_CACHE_NOT_APPROVED", "blocking", "Display and cache permissions must both be explicitly approved.")
+        required_permissions = manifest.get("required_permissions")
+        if (
+            not isinstance(required_permissions, list)
+            or not {"display", "cache", "transform"}.issubset(set(required_permissions))
+            or any(item not in {"display", "cache", "redistribute", "transform"} for item in required_permissions)
+        ):
+            add("RIGHTS_USE_SCOPE_INVALID", "blocking", "Required uses must explicitly include display, cache and transform; optional uses are redistribute.")
+            required_permissions = ["display", "cache", "transform"]
+        if not isinstance(permissions, dict) or any(permissions.get(use) is not True for use in required_permissions):
+            add("RIGHTS_REQUIRED_USE_NOT_APPROVED", "blocking", "One or more explicitly required translation uses are not approved.")
         review = rights.get("review")
         if not isinstance(rights.get("evidence"), list) or not rights["evidence"]:
             add("RIGHTS_EVIDENCE_MISSING", "blocking", "Translation rights approval must include supporting evidence.")
@@ -513,6 +524,8 @@ def run_preflight(
     seen_members: set[str] = set()
     seen_books: set[str] = set()
     file_count = 0
+    included_count = 0
+    included_books: set[str] = set()
     unit_count = 0
     distinct_markers: set[str] = set()
     all_addresses: set[tuple[str, str, str]] = set()
@@ -554,6 +567,24 @@ def run_preflight(
             add("SOURCE_ROUNDTRIP_FAILED", "blocking", f"{name}: canonical USX round-trip did not match.")
         if member.get("compatibility_profile") != (parser.get("compatibility_profile") if isinstance(parser, dict) else None):
             add("MEMBER_PROFILE_MISMATCH", "blocking", f"{name}: parser compatibility profile is inconsistent.")
+
+        inclusion_status = member.get("inclusion_status")
+        if inclusion_status == "excluded":
+            reason = member.get("exclusion_reason")
+            if member.get("excluded_from_publication") is not True or not isinstance(reason, str) or not reason.strip():
+                add("EXCLUDED_MEMBER_NOT_JUSTIFIED", "blocking", f"{name}: excluded archive member requires an explicit reason and publication-exclusion flag.")
+            if any(code in CORE_66 for code in book_ids):
+                add("CORE_BOOK_EXCLUDED", "blocking", f"{name}: a required Protestant-canon book cannot be excluded.")
+            if member.get("conversion_output") not in (None, ""):
+                add("EXCLUDED_MEMBER_HAS_CONVERSION", "blocking", f"{name}: an excluded source member must not have a release conversion output.")
+            continue
+        if inclusion_status != "included":
+            add("MEMBER_INCLUSION_STATUS_INVALID", "blocking", f"{name}: member must be explicitly included or excluded.")
+            continue
+        included_count += 1
+        included_books.update(book_ids)
+        if any(code not in CORE_66 for code in book_ids):
+            add("NONCANON_BOOK_INCLUDED", "blocking", f"{name}: non-Protestant-canon book material must be explicitly excluded from the initial release.")
         conversion_path = member.get("conversion_output")
         if not safe_relative_path(conversion_path):
             add("CONVERSION_OUTPUT_PATH_INVALID", "blocking", f"{name}: conversion output path must be a safe relative path.")
@@ -630,11 +661,13 @@ def run_preflight(
                             add("DUPLICATE_ARCHIVE_SOURCE_REFERENCE", "blocking", f"Duplicate source address {'.'.join(key)} across archive members.")
                         all_addresses.add(key)
 
-    if file_count != len(members):
-        add("CONVERSION_COVERAGE_INCOMPLETE", "blocking", "Not every inventoried USFM member has a valid converted output.")
-    if isinstance(member_count, int) and file_count != member_count:
-        add("CONVERSION_MEMBER_COUNT_MISMATCH", "blocking", "Converted file count does not match the expected archive USFM member count.")
-    missing_core = sorted(CORE_66 - seen_books)
+    if isinstance(expected_included_count, int) and included_count != expected_included_count:
+        add("INCLUDED_MEMBER_COUNT_MISMATCH", "blocking", "Included USFM member count does not match the declared product-scope count.")
+    if file_count != included_count:
+        add("CONVERSION_COVERAGE_INCOMPLETE", "blocking", "Every included USFM member must have exactly one valid converted output.")
+    if isinstance(expected_included_count, int) and file_count != expected_included_count:
+        add("CONVERSION_MEMBER_COUNT_MISMATCH", "blocking", "Converted file count does not match the expected included-member count.")
+    missing_core = sorted(CORE_66 - included_books)
     if missing_core:
         add("CORE_CANON_INCOMPLETE", "blocking", "Source inventory is missing one or more Protestant 66-book IDs: " + ", ".join(missing_core))
     if expected.get("require_all_protestant_66") is not True:
@@ -652,9 +685,10 @@ def run_preflight(
         "findings": findings,
         "summary": {
             "archive_member_count": len(members),
+            "included_member_count": included_count,
             "converted_member_count": file_count,
-            "core_book_count": len(seen_books & CORE_66),
-            "distinct_book_id_count": len(seen_books),
+            "core_book_count": len(included_books & CORE_66),
+            "archive_distinct_book_id_count": len(seen_books),
             "verse_projection_count": unit_count,
             "distinct_marker_count": len(distinct_markers),
             "blocking_finding_count": blocking_count,
