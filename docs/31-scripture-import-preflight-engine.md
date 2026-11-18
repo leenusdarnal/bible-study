@@ -33,8 +33,9 @@ The manifest is JSON with `schema_version: 1` and these top-level properties:
 | `source_archive` | Pinned official HTTPS URL, archive SHA-256, positive size, passed ZIP integrity, signature state |
 | `parser` | `usfmtc 0.4.10`, compatibility profile 2.5 or 3.1, no inferred publisher-declared version |
 | `converter` | Project converter name and pinned version 0.1.0 |
-| `expected` | Expected USFM member count and explicit requirement for all 66 Protestant books |
-| `archive_members` | Exact complete USFM inventory; each member has its path, uncompressed SHA-256, book IDs, parser/round-trip results, profile, canonical USX object key/hash/status and converted-output path |
+| `expected` | Total archive USFM member count, included-member count and explicit requirement for all 66 Protestant books |
+| `required_permissions` | Required rights uses; must include `display`, `cache` and `transform`, and may additionally include `redistribute` |
+| `archive_members` | Exact complete USFM inventory; each member has its path, uncompressed SHA-256, book IDs, parser/round-trip results, profile, canonical USX object key/hash/status and explicit inclusion/exclusion decision. Included members also have a converted-output path |
 | `versification` | Source scheme code, approved state, named reviewer/date/decision, import mode and explicit excluded pending proposal IDs |
 | `storage` | Private-bucket assertion and verified immutable archive/canonical-USX object status |
 
