@@ -1,8 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { resolveInitialBook, type CanonBook } from '$lib/bible-catalogue';
 
-
-
 export const load: PageServerLoad = async ({ platform, url }) => {
   if (!platform?.env?.DB) {
     return { books: [] as CanonBook[], initialBook: '', databaseAvailable: false };
@@ -27,3 +25,5 @@ export const load: PageServerLoad = async ({ platform, url }) => {
   `).bind('canon-protestant-66').all<CanonBook>();
 
   const initialBook = resolveInitialBook(results, url.searchParams.get('book'));
+  return { books: results, initialBook, databaseAvailable: true };
+};
