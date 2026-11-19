@@ -1,16 +1,24 @@
 <script lang="ts">
   import { filterCanonBooks, type CanonBook } from '$lib/bible-catalogue';
 
-  let { data } = $props<{
-    data: { books: CanonBook[]; initialBook: string; databaseAvailable: boolean };
-  }>();
+  type PageData = {
+    books: CanonBook[];
+    initialBook: string;
+    databaseAvailable: boolean;
+  };
+
+  let { data }: { data: PageData } = $props();
 
   let search = $state('');
   let testament = $state<'all' | 'old' | 'new'>('all');
-  let selectedId = $state(data.initialBook);
+  let selectedId = $state('');
 
-  const selectedBook = $derived(data.books.find((book) => book.work_id === selectedId));
-  const filteredBooks = $derived(filterCanonBooks(data.books, search, testament));
+  $effect(() => {
+    if (!selectedId && data.initialBook) selectedId = data.initialBook;
+  });
+
+  const selectedBook = $derived((data.books ?? []).find((book) => book.work_id === selectedId));
+  const filteredBooks = $derived(filterCanonBooks(data.books ?? [], search, testament));
 </script>
 
 <svelte:head>
