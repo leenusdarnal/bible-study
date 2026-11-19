@@ -1,5 +1,13 @@
 <script lang="ts">
-  let { data } = $props<{ data: { books: Array<{ position: number; display_name: string; work_id: string; testament: 'old' | 'new'; usfm_code: string }> } }>();
+  type HomeBook = {
+    position: number;
+    display_name: string;
+    work_id: string;
+    testament: 'old' | 'new';
+    usfm_code: string;
+  };
+
+  let { data }: { data: { books: HomeBook[] } } = $props();
   const navigation = [{ label: 'Home', href: '/' }, { label: 'Bible', href: '/bible' }];
 </script>
 
