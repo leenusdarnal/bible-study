@@ -12,7 +12,7 @@ on:
       - "tools/usfm_to_structured_content.py"
       - "tools/scripture_import_preflight.py"
       - "tools/usfm_batch_conversion.py"
-      - "tools/scripture_import_staging_coordinator.py"
+      - "tools/scripture_import_staging_coordinator.py"\n      - "tools/scripture_staging_adapter.py"
       - "data/usfm/**"
       - "data/versification/**"
       - "data/rights/**"
@@ -21,7 +21,7 @@ on:
       - "tests/usfm_registry/**"
       - "tests/usfm_preflight/**"
       - "tests/usfm_batch/**"
-      - "tests/usfm_staging/**"
+      - "tests/usfm_staging/**"\n      - "tests/usfm_staging_adapter/**"
   workflow_dispatch:
 
 permissions:
@@ -62,7 +62,7 @@ jobs:
       - name: Test Scripture import staging coordinator
         run: python -m unittest discover -s tests/usfm_staging -v
 
-      - name: Install pinned USFM Technical Committee reference parser
+      - name: Test synthetic SQLite staging adapter\n        run: |\n          python -m unittest discover -s tests/usfm_staging_adapter -v\n          python tools/scripture_staging_adapter.py --self-test\n\n      - name: Install pinned USFM Technical Committee reference parser
         run: python -m pip install "usfmtc==0.4.10"
 
       - name: Smoke-test parser-backed structured conversion with synthetic USFM
